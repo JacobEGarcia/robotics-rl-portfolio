@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robotics RL — 1-Bit Edition</title>
+<meta name="description" content="A robotics reinforcement-learning portfolio rendered in the visual language of Susan Kare's original Macintosh interface: 32x32 hand-plotted icons and Atkinson-dithered plates.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =========================================================================
+   1-BIT EDITION
+   Black ink, white paper, nothing else. The original Macintosh had a 1-bit
+   display: a pixel was on or it was off. Every effect here is built from
+   that constraint rather than around it — greys are dither patterns, not
+   opacity; shadows are hard offsets, not blurs.
+
+   Typography follows the Mac's own system: Chicago (a bitmap face) for the
+   interface, and a readable face for documents. Silkscreen stands in for
+   Chicago, which is Apple's.
+   ========================================================================= */
+:root{
+  --ink:#000;
+  --paper:#fff;
+  --chi:"Silkscreen","Chicago",monospace;
+  --doc:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  /* 50% checkerboard — the original desktop pattern, one pixel on, one off */
+  --desk:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23fff'/%3E%3Crect width='2' height='2' fill='%23000'/%3E%3Crect x='2' y='2' width='2' height='2' fill='%23000'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--desk);background-size:4px 4px;
+  color:var(--ink);font-family:var(--doc);font-size:16px;line-height:1.65;
+  padding:0 0 90px;
+}
+img,video{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+::selection{background:#000;color:#fff}
+
+/* ---------------- menu bar ---------------- */
+.menubar{position:sticky;top:0;z-index:80;background:var(--paper);
+  border-bottom:2px solid var(--ink);font-family:var(--chi);font-size:11px;
+  display:flex;align-items:center;gap:22px;padding:7px 16px;overflow-x:auto;
+  white-space:nowrap;scrollbar-width:none}
+.menubar::-webkit-scrollbar{display:none}
+.menubar a{color:var(--ink);text-decoration:none;padding:3px 6px}
+.menubar a:hover{background:var(--ink);color:var(--paper)}
+.menubar .mark{font-size:13px;margin-right:4px}
+.menubar .right{margin-left:auto;opacity:.55}
+
+/* ---------------- window ---------------- */
+.win{background:var(--paper);border:2px solid var(--ink);
+  box-shadow:5px 5px 0 var(--ink);margin:44px auto;max-width:940px}
+.win.narrow{max-width:720px}
+.titlebar{border-bottom:2px solid var(--ink);display:flex;align-items:center;
+  gap:10px;padding:5px 8px;background:
+   repeating-linear-gradient(to bottom,#000 0 1px,#fff 1px 3px)}
+.titlebar .box{width:13px;height:13px;border:2px solid var(--ink);background:var(--paper);flex:none}
+.titlebar .name{font-family:var(--chi);font-size:11px;background:var(--paper);
+  padding:2px 12px;border:0;letter-spacing:.02em}
+.winbody{padding:30px 34px}
+@media(max-width:700px){.winbody{padding:22px 18px}.win{margin:26px 10px}}
+
+/* ---------------- type ---------------- */
+h1{font-family:var(--chi);font-size:clamp(22px,4.4vw,40px);line-height:1.35;
+  margin:0 0 22px;letter-spacing:0;font-weight:400}
+h2{font-family:var(--chi);font-size:clamp(15px,2.4vw,21px);line-height:1.45;
+  margin:0 0 16px;font-weight:400}
+h3{font-family:var(--chi);font-size:12px;margin:34px 0 12px;font-weight:400}
+p{margin:0 0 16px}
+.doc{max-width:62ch}
+.lead{font-size:18px;line-height:1.6}
+strong{font-weight:600}
+a.lnk{color:var(--ink);text-decoration:none;border-bottom:2px solid var(--ink)}
+a.lnk:hover{background:var(--ink);color:var(--paper)}
+hr{border:0;border-top:2px solid var(--ink);margin:30px 0}
+.rule-dot{border:0;border-top:2px dotted var(--ink);margin:26px 0}
+
+/* ---------------- chapter head ---------------- */
+.chap{display:flex;align-items:center;gap:18px;margin:0 0 24px;flex-wrap:wrap}
+.chap img{width:64px;height:64px;flex:none}
+.chap .no{font-family:var(--chi);font-size:10px;border:2px solid var(--ink);
+  padding:4px 8px}
+
+/* ---------------- ledger ---------------- */
+.ledger{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  border-top:2px solid var(--ink);border-left:2px solid var(--ink)}
+.ledger div{border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);
+  padding:16px 14px}
+.ledger b{font-family:var(--chi);font-size:clamp(17px,3vw,25px);display:block;font-weight:400}
+.ledger span{font-family:var(--chi);font-size:8.5px;line-height:1.9;display:block;
+  margin-top:9px}
+
+/* ---------------- plate ---------------- */
+figure{margin:26px 0}
+figure img,figure video{width:100%;border:2px solid var(--ink);background:var(--paper)}
+figcaption{font-family:var(--chi);font-size:9px;line-height:2;margin-top:10px;
+  padding-left:12px;border-left:2px solid var(--ink)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:640px){.duo{grid-template-columns:1fr}}
+
+/* ---------------- dialog / alert ---------------- */
+.dialog{border:2px solid var(--ink);box-shadow:4px 4px 0 var(--ink);
+  background:var(--paper);padding:20px 22px;margin:30px 0;display:flex;gap:18px}
+.dialog img{width:52px;height:52px;flex:none}
+.dialog h4{font-family:var(--chi);font-size:11px;margin:0 0 10px;font-weight:400;line-height:1.6}
+.dialog p{margin:0 0 10px;font-size:15px}
+.dialog p:last-child{margin:0}
+
+/* ---------------- table ---------------- */
+table{border-collapse:collapse;width:100%;font-size:14px;margin:22px 0}
+th{font-family:var(--chi);font-size:9px;text-align:left;padding:8px 14px 8px 0;
+  border-bottom:2px solid var(--ink);font-weight:400}
+td{padding:10px 14px 10px 0;border-bottom:2px dotted var(--ink)}
+td.n{text-align:right;font-family:var(--chi);font-size:11px}
+tr:last-child td{border-bottom:none}
+
+/* ---------------- bug list ---------------- */
+.bugs{counter-reset:b;margin:22px 0}
+.bugrow{counter-increment:b;display:grid;grid-template-columns:34px 1fr;gap:16px;
+  padding:16px 0;border-bottom:2px dotted var(--ink)}
+.bugrow:last-child{border-bottom:none}
+.bugrow::before{content:counter(b,decimal-leading-zero);font-family:var(--chi);font-size:10px}
+.bugrow h5{margin:0 0 5px;font-family:var(--chi);font-size:10px;font-weight:400;line-height:1.7}
+.bugrow p{margin:0;font-size:14.5px;line-height:1.6}
+
+/* ---------------- button ---------------- */
+.btn{display:inline-block;font-family:var(--chi);font-size:10px;padding:9px 18px;
+  border:2px solid var(--ink);background:var(--paper);color:var(--ink);
+  text-decoration:none;box-shadow:3px 3px 0 var(--ink);margin:6px 10px 6px 0}
+.btn:active,.btn:hover{background:var(--ink);color:var(--paper)}
+
+code{font-family:var(--chi);font-size:11px;border:1px solid var(--ink);padding:1px 5px}
+pre{font-family:var(--chi);font-size:10.5px;line-height:2;border:2px solid var(--ink);
+  padding:18px;overflow-x:auto;background:var(--paper);margin:22px 0}
+pre code{border:none;padding:0;font-size:10.5px}
+ul{padding-left:20px}
+li{margin-bottom:9px}
+.footnote{font-family:var(--chi);font-size:9px;line-height:2.1}
+</style>
+</head>
+<body>
+
+<div class="menubar">
+  <span class="mark">◆</span>
+  <a href="#top">File</a><a href="#gap">Gap</a><a href="#tendon">Tendons</a>
+  <a href="#algo">Algorithms</a><a href="#speed">Speed</a><a href="#bugs">Bugs</a>
+  <a href="index.html">Full Edition</a>
+  <span class="right">Jacob E. Garcia</span>
+</div>
+
+<!-- ==================================================== TITLE ==================================================== -->
+<div class="win" id="top">
+  <div class="titlebar"><span class="box"></span><span class="name">Robotics RL — 1-Bit Edition</span></div>
+  <div class="winbody">
+    <div class="chap">
+      <img src="media/kare/icon_robot.png" alt="Pixel robot">
+      <span class="no">README</span>
+    </div>
+    <h1>Closing the reality gap</h1>
+    <p class="doc lead">Six robotics projects — reinforcement learning written from scratch, tendon
+       actuators modelled in MuJoCo, and a simulator fitted to a physical Franka Panda — drawn in
+       black and white.</p>
+    <p class="doc">This is the same work as the <a class="lnk" href="index.html">full edition</a>,
+       rendered in the visual language Susan Kare built for the original Macintosh. Every icon
+       below is a 32×32 grid plotted square by square, the way she drew hers on graph paper. Every
+       photograph is reduced to one bit per pixel using Bill Atkinson's dithering algorithm, written
+       for the same machine.</p>
+
+    <div class="ledger">
+      <div><b>56.7%</b><span>REALITY GAP<br>CLOSED</span></div>
+      <div><b>9.41x</b><span>SAC SAMPLE<br>EFFICIENCY</span></div>
+      <div><b>28.3x</b><span>JAX<br>THROUGHPUT</span></div>
+      <div><b>632s</b><span>REAL ROBOT<br>MOTION</span></div>
+      <div><b>7</b><span>SILENT<br>BUGS</span></div>
+    </div>
+
+    <p style="margin-top:26px">
+      <a class="btn" href="#gap">Read On</a>
+      <a class="btn" href="https://github.com/JacobEGarcia/robotics-rl-portfolio">Source</a>
+    </p>
+  </div>
+</div>
+
+<!-- ==================================================== I ==================================================== -->
+<div class="win" id="gap">
+  <div class="titlebar"><span class="box"></span><span class="name">1 — Convincing with Evidence</span></div>
+  <div class="winbody">
+    <div class="chap">
+      <img src="media/kare/icon_arm.png" alt="Pixel robot arm">
+      <h2>A simulator that has<br>never been wrong<br>is not a simulator</h2>
+    </div>
+
+    <div class="doc">
+      <p>The DROID dataset records two things most robot logs blur together: what the controller was
+         <strong>commanded</strong> to do, and where the arm actually <strong>went</strong>. They are
+         never the same. Real joints carry friction, rotor inertia, finite stiffness, and delay.</p>
+      <p>So: replay the real commands open-loop through a simulated Panda, measure how far it drifts
+         from the real arm, and fit the simulator until the drift shrinks. The simulator starts from
+         the robot's first measured state and never sees ground truth again.</p>
+    </div>
+
+    <figure>
+      <img src="media/kare/dith_panda.png" alt="Four poses of a Franka Panda, 1-bit Atkinson dithered">
+      <figcaption>PLATE 1 — THE PANDA POSED FROM REAL MEASURED JOINT ANGLES.<br>
+        ATKINSON DITHER, 1 BIT PER PIXEL.</figcaption>
+    </figure>
+
+    <table>
+      <tr><th>Model</th><th style="text-align:right">Open-loop error vs real robot</th></tr>
+      <tr><td>Menagerie default</td><td class="n">0.0431 rad</td></tr>
+      <tr><td><strong>Identified</strong></td><td class="n"><strong>0.0187 rad</strong></td></tr>
+      <tr><td>Held-out reduction</td><td class="n">56.7%</td></tr>
+    </table>
+
+    <div class="doc">
+      <p>Parameters were fitted on 24 episodes and scored on 8 the optimiser never touched. The split
+         is by episode, never by frame — frames inside one trajectory are correlated, and a
+         frame-level split leaks the answer.</p>
+      <p>The identified values are more interesting than the error. Menagerie ships the Panda with
+         <strong>zero dry friction and zero latency</strong>. The data disagrees with both: friction
+         rises from nothing to 3.07, and latency lands at 3.3 steps — about
+         <strong>220 milliseconds</strong> at 15 Hz.</p>
+    </div>
+
+    <figure>
+      <img src="media/s5/fig_params.png" alt="Slope chart of five simulator parameters">
+      <figcaption>PLATE 2 — FIVE PARAMETERS, DEFAULT TO IDENTIFIED.</figcaption>
+    </figure>
+
+    <div class="dialog">
+      <img src="media/kare/icon_gap.png" alt="Pixel brackets">
+      <div>
+        <h4>THE FIRST DATASET HAD NO ANSWER IN IT</h4>
+        <p>An earlier attempt used a different Franka dataset. Its <code>action</code> column turned
+           out to be exactly <code>state[t+1] − state[t]</code> — correlation <strong>1.0000</strong>
+           on every joint.</p>
+        <p>The "commands" were relabelled state differences. Nothing in that dataset was ever measured
+           independently, so fitting a simulator to it would have produced a perfect, meaningless
+           result. A perfect fit is usually evidence of a broken measurement.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================================================== II ==================================================== -->
+<div class="win" id="tendon">
+  <div class="titlebar"><span class="box"></span><span class="name">2 — Convincing with Constraints</span></div>
+  <div class="winbody">
+    <div class="chap">
+      <img src="media/kare/icon_hand.png" alt="Pixel hand">
+      <h2>Tendons do not<br>behave like joints</h2>
+    </div>
+
+    <div class="doc">
+      <p>A tendon pulls but never pushes, so every joint needs an antagonist. It routes over curved
+         surfaces, so its leverage changes with angle. And it drags — so the joint arrives somewhere
+         different depending on which direction it came from.</p>
+    </div>
+
+    <figure>
+      <img src="media/kare/dith_finger.png" alt="Tendon-driven finger at four tensions, 1-bit dithered">
+      <figcaption>PLATE 3 — ONE FINGER, FOUR FLEXOR TENSIONS.<br>
+        BETWEEN FRAMES TWO AND THREE IT SNAPS.</figcaption>
+    </figure>
+
+    <figure>
+      <img src="media/s4/fig_hysteresis.png" alt="Hysteresis loops widening with friction">
+      <figcaption>PLATE 4 — LOOP WIDTH AND DEAD BAND BOTH RISE WITH FRICTION.</figcaption>
+    </figure>
+
+    <div class="dialog">
+      <img src="media/kare/icon_watch.png" alt="Pixel stopwatch">
+      <div>
+        <h4>AT ZERO FRICTION, THE LOOP SHOULD CLOSE. IT DOESN'T.</h4>
+        <p>There is still <strong>0.207 rad</strong> of hysteresis with friction set to zero, which
+           should be impossible. The finger jumps to a flexed pose at 2.05 N going up, but does not
+           fall back until 1.03 N coming down. It is bistable.</p>
+        <p>One tendon spans both joints, so they cannot be commanded independently. Friction
+           hysteresis can be compensated. <strong>Bistability cannot</strong> — it is built into the
+           kinematics.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================================================== III ==================================================== -->
+<div class="win" id="algo">
+  <div class="titlebar"><span class="box"></span><span class="name">3 — Convincing with Fundamentals</span></div>
+  <div class="winbody">
+    <div class="chap">
+      <img src="media/kare/icon_pendulum.png" alt="Pixel pendulum">
+      <h2>Two algorithms,<br>written by hand,<br>on purpose</h2>
+    </div>
+
+    <div class="doc">
+      <p>PPO and SAC, roughly three hundred lines each, no reinforcement-learning library. Both solve
+         the same task. The interesting number is not either one — it is the distance between them.</p>
+    </div>
+
+    <figure>
+      <img src="media/fig_learning.png" alt="PPO and SAC learning curves with crossing points marked">
+      <figcaption>PLATE 5 — SAC CROSSES AT 8,799 STEPS. PPO NEEDS 82,800.<br>
+        THE HORIZONTAL DISTANCE IS THE RESULT.</figcaption>
+    </figure>
+
+    <figure class="duo">
+      <span><video src="media/s1/pendulum_trained.mp4" autoplay loop muted playsinline></video></span>
+      <span><video src="media/sac/pendulum_sac.mp4" autoplay loop muted playsinline></video></span>
+    </figure>
+    <figcaption style="font-family:var(--chi);font-size:9px;line-height:2;padding-left:12px;border-left:2px solid #000">
+      PLATE 6 — LEARNED POLICIES. PPO LEFT, SAC RIGHT.</figcaption>
+
+    <div class="doc" style="margin-top:24px">
+      <p>That <strong>9.41×</strong> gap is an engineering argument. On a physical robot every step
+         costs time and actuator wear, so sample efficiency wins. In a massively parallel simulator
+         samples are nearly free and throughput wins instead.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================================================== IV ==================================================== -->
+<div class="win" id="speed">
+  <div class="titlebar"><span class="box"></span><span class="name">4 — Convincing with Speed</span></div>
+  <div class="winbody">
+    <div class="chap">
+      <img src="media/kare/icon_watch.png" alt="Pixel stopwatch">
+      <h2>The same algorithm,<br>28x faster, on the<br>same processor</h2>
+    </div>
+
+    <div class="doc">
+      <p>The PyTorch version is a loop with the Python interpreter inside it, once per environment
+         step. The JAX version compiles the whole rollout into a scan and vectorises five hundred
+         environments at once. Nothing interpreted remains in the hot path.</p>
+    </div>
+
+    <figure>
+      <img src="media/s6/fig_throughput.png" alt="Throughput comparison, PyTorch versus JAX">
+      <figcaption>PLATE 7 — 1,934 VS 54,808 STEPS PER SECOND. NO GPU INVOLVED.</figcaption>
+    </figure>
+
+    <div class="dialog">
+      <img src="media/kare/icon_bug.png" alt="Pixel bug">
+      <div>
+        <h4>THE PORT REPRODUCED THE ORIGINAL'S BUG, EXACTLY</h4>
+        <p>The first JAX version ran at 196,000 steps per second and learned nothing at all — flat at
+           −1200, the same symptom the PyTorch version had shown, from the same cause: no reward
+           scaling.</p>
+        <p>Two independent implementations failing identically is not embarrassing. It is evidence
+           the two agree.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================================================== V ==================================================== -->
+<div class="win" id="bugs">
+  <div class="titlebar"><span class="box"></span><span class="name">5 — Convincing with Honesty</span></div>
+  <div class="winbody">
+    <div class="chap">
+      <img src="media/kare/icon_bug.png" alt="Pixel bug">
+      <h2>Seven bugs, none of<br>which raised an<br>exception</h2>
+    </div>
+
+    <div class="doc">
+      <p>Every result here was checked against something outside itself — a published baseline, a
+         second implementation, a physical consistency requirement, or data the optimiser never saw.
+         None of the following announced itself. Each produced running code and plausible output.</p>
+    </div>
+
+    <div class="bugs">
+      <div class="bugrow"><div><h5>MISSING REWARD SCALING — PYTORCH</h5>
+        <p>Value loss ~10⁶ against a policy loss of ~10⁻². Gradient clipping handed almost everything
+           to the critic. The policy was starved, not broken.</p></div></div>
+      <div class="bugrow"><div><h5>MISSING REWARD SCALING — JAX</h5>
+        <p>The same bug, found again independently in a different framework.</p></div></div>
+      <div class="bugrow"><div><h5>TENDON SIGN CONVENTION</h5>
+        <p>Routing sets the moment arm's sign, gear sets the force's, and the product decides
+           direction. Two attempts each got one half right.</p></div></div>
+      <div class="bugrow"><div><h5>A SINUSOID THAT WASN'T QUASI-STATIC</h5>
+        <p>Measured phase lag rather than friction, reporting hysteresis that fell as friction rose.
+           Exactly backwards.</p></div></div>
+      <div class="bugrow"><div><h5>WRAP GEOMS LEFT COLLIDABLE</h5>
+        <p>~18% phantom hysteresis. Found only because a second physics backend refuses cylinder-box
+           collisions and failed loudly where the first was silent.</p></div></div>
+      <div class="bugrow"><div><h5>TRUNCATION BOOTSTRAP UNDER AUTORESET</h5>
+        <p>In a vectorised rollout the next step's value belongs to a different trajectory.</p></div></div>
+      <div class="bugrow"><div><h5>A DATASET WITH NO REALITY GAP</h5>
+        <p>Commanded and measured were the same signal, one step apart.</p></div></div>
+    </div>
+
+    <hr class="rule-dot">
+
+    <div class="doc">
+      <h3>REPRODUCIBILITY</h3>
+      <p>Every run writes one append-only log whose first line is a manifest: seed, configuration,
+         git commit, library versions, and a hash of the <em>compiled</em> physics model. Hashing the
+         compiled model catches edits the source alone would hide, so any figure traces to the exact
+         physics that made it. Those logs are committed.</p>
+    </div>
+
+<pre><code>bash scripts/fetch_assets.sh
+python -m s5_sysid.fit --iterations 45
+python -m s4_tendon.hysteresis
+python -m scripts.make_pixel_art</code></pre>
+  </div>
+</div>
+
+<!-- ==================================================== COLOPHON ==================================================== -->
+<div class="win narrow">
+  <div class="titlebar"><span class="box"></span><span class="name">Colophon</span></div>
+  <div class="winbody">
+    <div class="chap"><img src="media/kare/icon_robot.png" alt="Pixel robot"></div>
+    <div class="doc">
+      <p><strong>On the drawing.</strong> The seven icons here are 32×32 grids, authored as literal
+         character maps — <code>#</code> for ink, <code>.</code> for paper — and rendered with
+         nearest-neighbour scaling only. Susan Kare drew hers on graph paper with a pink marker,
+         1,024 squares at a time, working to a stated standard of simplicity, clarity, and beauty.</p>
+      <p><strong>On the photographs.</strong> Every plate is reduced to one bit per pixel using
+         Atkinson dithering, written by Bill Atkinson for the same machine. It discards a quarter of
+         the quantisation error rather than diffusing all of it, which is why early Macintosh images
+         have their particular hard, sparkling look.</p>
+      <p><strong>On the type.</strong> The interface is set in Silkscreen, standing in for Chicago —
+         Kare's bitmap system face, which is Apple's. Documents are set in a smooth face, following
+         the original Macintosh's own division: a bitmap face for the interface, a readable one for
+         the writing.</p>
+      <p><strong>On the source.</strong> Reference: Theresa Günther, <em>How To Become Successful —
+         Learning From Susan Kare</em>, Muthesius University of Fine Arts and Design, 2020.</p>
+    </div>
+
+    <p style="margin-top:26px">
+      <a class="btn" href="index.html">Full Edition</a>
+      <a class="btn" href="https://github.com/JacobEGarcia/robotics-rl-portfolio">Source</a>
+    </p>
+
+    <hr>
+    <p class="footnote">JACOB E. GARCIA · B.S. CYBERSECURITY, DEPAUL UNIVERSITY<br>
+      ROBOT MODELS: MUJOCO MENAGERIE · REAL ROBOT DATA: DROID</p>
+  </div>
+</div>
+
+</body>
+</html>
