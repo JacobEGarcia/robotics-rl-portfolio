@@ -1,0 +1,170 @@
+<!--
+  Two-joint tendon-driven finger with antagonist actuation.
+
+  This model exists to study the things that make tendon-driven robots hard,
+  which is exactly the hardware family Clone Robotics builds (musculotendon
+  androids with artificial muscles rather than geared joints).
+
+  DESIGN NOTES — the parts that are easy to get wrong
+  ===================================================
+
+  1. SPATIAL TENDONS, NOT EQUALITY CONSTRAINTS.
+     A <spatial> tendon routed through sites has real length, and therefore
+     real stiffness, damping, and friction. The lazy alternative — coupling
+     joints with an <equality> constraint — produces kinematically correct
+     motion with none of the compliance or hysteresis that dominates real
+     tendon hardware. The whole point here is the compliance.
+
+  2. GEOM WRAPPING NEEDS A sidesite.
+     When a tendon wraps a <geom>, MuJoCo must decide which side of the
+     cylinder it passes. Without a `sidesite` it picks one, and if it picks
+     wrong the moment arm has the wrong sign — the tendon pulls the joint the
+     wrong way. This is silent: the model compiles and runs.
+     Only spheres and cylinders may be wrap geoms. Meshes cannot.
+
+  3. ANTAGONIST PAIRS, ctrlrange NON-NEGATIVE.
+     Tendons pull; they cannot push. Each joint therefore needs two opposing
+     tendons (flexor and extensor), and each actuator's ctrlrange must start
+     at 0. Allowing negative control would model a tendon pushing a rope,
+     which is physically meaningless and makes results worthless.
+
+  4. frictionloss IS THE HYSTERESIS SOURCE.
+     Tendon frictionloss creates a dead band on direction reversal: commanded
+     displacement that produces no joint motion because the friction must be
+     overcome first. This is what wrecks naive position control on real
+     tendon-driven hands, and it is the parameter S4 exists to characterise.
+-->
+<mujoco model="tendon_finger">
+  <compiler angle="radian" autolimits="true"/>
+
+  <!-- 1 kHz physics. Tendon friction is a stiff, discontinuous effect;
+       at the MuJoCo default of 2 ms the hysteresis loop is visibly
+       distorted by integration error rather than by the physics. -->
+  <option timestep="0.001" integrator="implicitfast" gravity="0 0 -9.81"/>
+
+  <default>
+    <joint type="hinge" axis="0 1 0" damping="0.01" armature="0.001"/>
+    <geom type="capsule" size="0.008" rgba="0.75 0.75 0.78 1" density="1200"/>
+    <site size="0.0015" rgba="0.9 0.2 0.2 1"/>
+    <!-- Tendon defaults. width is visual only. The three dynamics
+         parameters are overridden per-experiment by the sweep script. -->
+    <tendon width="0.002" rgba="0.15 0.15 0.15 1"
+            stiffness="0" damping="0.001" frictionloss="0.0"/>
+  </default>
+
+  <worldbody>
+    <light pos="0.2 -0.3 0.5" dir="-0.3 0.5 -1" diffuse="0.9 0.9 0.9"/>
+    <camera name="side" pos="0.09 -0.42 0.06" xyaxes="1 0 0 0 0.2 1"/>
+
+    <!-- Fixed base -->
+    <body name="base" pos="0 0 0">
+      <geom type="box" size="0.02 0.015 0.008" rgba="0.3 0.3 0.35 1"/>
+
+      <!-- Routing pulleys. These are the wrap geoms: the tendon passes over
+           their curved surface, which is what gives a moment arm that varies
+           with joint angle — the defining feature of a tendon drive and the
+           thing a simple lever model misses. -->
+      <geom name="pulley_prox" type="cylinder" size="0.009 0.011"
+            pos="0.02 0 0" euler="1.5708 0 0" rgba="0.45 0.45 0.5 0.35"
+            contype="0" conaffinity="0"/>
+
+      <!-- Sites anchoring the tendons at the base. -->
+      <site name="anchor_flex"   pos="-0.018 0 -0.010"/>
+      <site name="anchor_extend" pos="-0.018 0  0.010"/>
+
+      <!-- ---------------- proximal phalanx ---------------- -->
+      <body name="proximal" pos="0.02 0 0">
+        <joint name="mcp" range="-0.15 1.5"/>
+        <geom fromto="0 0 0  0.045 0 0"/>
+        <inertial pos="0.0225 0 0" mass="0.012" diaginertia="1e-6 3e-6 3e-6"/>
+
+        <!-- Moment-arm sites: offset perpendicular to the bone axis so the
+             tendon has leverage. Offset magnitude IS the moment arm, and it
+             is the single most important number in the model. -->
+        <site name="prox_flex"   pos="0.004 0 -0.009"/>
+        <site name="prox_extend" pos="0.004 0  0.009"/>
+        <site name="prox_mid_flex"   pos="0.030 0 -0.008"/>
+        <site name="prox_mid_extend" pos="0.030 0  0.008"/>
+
+        <geom name="pulley_dist" type="cylinder" size="0.007 0.009"
+              pos="0.045 0 0" euler="1.5708 0 0" rgba="0.45 0.45 0.5 0.35"
+              contype="0" conaffinity="0"/>
+
+        <!-- ---------------- distal phalanx ---------------- -->
+        <body name="distal" pos="0.045 0 0">
+          <joint name="pip" range="-0.1 1.7"/>
+          <geom fromto="0 0 0  0.032 0 0" size="0.0065"/>
+          <inertial pos="0.016 0 0" mass="0.007" diaginertia="5e-7 1.5e-6 1.5e-6"/>
+
+          <site name="dist_flex"   pos="0.003 0 -0.0075"/>
+          <site name="dist_extend" pos="0.003 0  0.0075"/>
+          <site name="tip"         pos="0.032 0 0" size="0.003" rgba="0.2 0.7 0.3 1"/>
+        </body>
+      </body>
+    </body>
+
+    <!-- sidesite markers. These are NOT decorative: each tells MuJoCo which
+         side of the corresponding pulley its tendon wraps. Remove them and
+         the wrap direction becomes arbitrary. -->
+    <site name="side_prox_flex"   pos="0.02 0 -0.02" size="0.001" rgba="0 0 1 0.3"/>
+    <site name="side_prox_extend" pos="0.02 0  0.02" size="0.001" rgba="0 0 1 0.3"/>
+  </worldbody>
+
+  <tendon>
+    <!-- FLEXOR: base -> over proximal pulley -> along proximal -> to distal.
+         Spanning both joints makes this an "extrinsic" tendon, the same
+         arrangement as the long flexors in a human finger. It is also why
+         the joints are coupled: one tendon, two joints, so they cannot be
+         controlled independently. That under-actuation is characteristic of
+         tendon hands and is precisely what makes control interesting. -->
+    <spatial name="flexor">
+      <site site="anchor_flex"/>
+      <geom geom="pulley_prox" sidesite="side_prox_flex"/>
+      <site site="prox_flex"/>
+      <site site="prox_mid_flex"/>
+      <site site="dist_flex"/>
+    </spatial>
+
+    <!-- EXTENSOR: the antagonist, routed on the opposite side. -->
+    <spatial name="extensor">
+      <site site="anchor_extend"/>
+      <geom geom="pulley_prox" sidesite="side_prox_extend"/>
+      <site site="prox_extend"/>
+      <site site="prox_mid_extend"/>
+      <site site="dist_extend"/>
+    </spatial>
+  </tendon>
+
+  <actuator>
+    <!-- ctrlrange starts at 0: a tendon can pull or go slack, never push.
+
+         gear="-1" is REQUIRED, and the reason is worth stating because it
+         cost a debugging cycle here. MuJoCo applies generalised force
+         qfrc = J^T * (gear * ctrl), where J = d(tendon_length)/dq. A positive
+         actuator force therefore acts along the direction of INCREASING
+         tendon length -- i.e. it pushes. A physical tendon can only pull, so
+         "pull with non-negative ctrl" requires a negative gear.
+
+         Getting this right needs BOTH halves and neither is sufficient alone:
+           * routing (which side of the joint the sites sit on) sets sign(J)
+           * gear sets the sign of the applied force
+         The product decides which way the joint actually moves. Measured
+         here: flexor J = -0.0091, gear = -1, so qfrc = +0.109 N.m -> flexion.
+
+         The failure mode is silent. With the wrong combination the model
+         compiles, runs, and the finger simply creeps to its opposite joint
+         limit -- which is what happened on the first two attempts. Always
+         verify by printing data.ten_J and stepping the sim, never by
+         reading the XML and reasoning about it. -->
+    <motor name="act_flexor"   tendon="flexor"   ctrlrange="0 20" gear="-1"/>
+    <motor name="act_extensor" tendon="extensor" ctrlrange="0 20" gear="-1"/>
+  </actuator>
+
+  <sensor>
+    <jointpos name="mcp_pos" joint="mcp"/>
+    <jointpos name="pip_pos" joint="pip"/>
+    <tendonpos name="flexor_len" tendon="flexor"/>
+    <tendonpos name="extensor_len" tendon="extensor"/>
+    <framepos name="tip_pos" objtype="site" objname="tip"/>
+  </sensor>
+</mujoco>

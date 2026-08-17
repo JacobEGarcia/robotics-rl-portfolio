@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robotics RL &amp; Sim-to-Real — Jacob E. Garcia</title>
+<meta name="description" content="Reinforcement learning from scratch, tendon actuator modeling, and real-to-sim system identification measured against a physical Franka Panda.">
+<style>
+:root{
+  --bg:#070707; --bg2:#0d0d0d; --card:#101010; --line:#1e1e1e; --line2:#2a2a2a;
+  --ink:#f0efed; --dim:#9a9995; --dim2:#6a6966;
+  --blue:#56B4E9; --orange:#E69F00; --green:#34d399; --pink:#CC79A7; --red:#f87171;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1040px;margin:0 auto;padding:0 28px}
+
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:50;background:rgba(7,7,7,.86);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:26px;height:56px;overflow-x:auto;scrollbar-width:none}
+nav .wrap::-webkit-scrollbar{display:none}
+nav a{color:var(--dim);text-decoration:none;font-size:13.5px;white-space:nowrap;transition:color .18s}
+nav a:hover{color:var(--ink)}
+nav .brand{color:var(--ink);font-weight:600;margin-right:auto;letter-spacing:-.01em}
+
+/* ---------- hero ---------- */
+header{padding:110px 0 84px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+header::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(900px 380px at 18% -10%,rgba(86,180,233,.11),transparent 62%),
+             radial-gradient(700px 320px at 88% 6%,rgba(230,158,0,.07),transparent 60%);
+  pointer-events:none}
+h1{font-size:clamp(38px,6.6vw,74px);line-height:1.02;margin:0 0 26px;letter-spacing:-.035em;font-weight:600;position:relative}
+h1 em{font-style:normal;color:var(--dim2)}
+.lede{font-size:clamp(17px,2vw,20px);color:var(--dim);max-width:64ch;margin:0 0 34px;position:relative}
+.byline{font-size:14px;color:var(--dim2);position:relative;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.byline a{color:var(--blue);text-decoration:none}
+.byline a:hover{text-decoration:underline}
+
+/* ---------- hero stats ---------- */
+.herostats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+  background:var(--line);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:48px 0 0;position:relative}
+.herostats div{background:var(--bg2);padding:22px 20px}
+.herostats b{display:block;font-size:30px;letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1.1}
+.herostats span{font-size:12px;color:var(--dim2);letter-spacing:.03em;display:block;margin-top:6px}
+
+/* ---------- sections ---------- */
+section{padding:88px 0;border-bottom:1px solid var(--line)}
+.eyebrow{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim2);
+         margin:0 0 14px;font-weight:600;font-family:var(--mono)}
+h2{font-size:clamp(27px,3.6vw,38px);margin:0 0 18px;letter-spacing:-.028em;font-weight:600;line-height:1.14}
+h3{font-size:19px;margin:38px 0 12px;letter-spacing:-.01em;font-weight:600}
+p{margin:0 0 17px;color:#d8d7d4}
+.big{font-size:18px;color:var(--dim)}
+a.inline{color:var(--blue)}
+
+/* ---------- grid ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:16px;margin:30px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px;transition:border-color .2s}
+.card:hover{border-color:var(--line2)}
+.card h4{margin:0 0 8px;font-size:15.5px;font-weight:600;display:flex;align-items:center;gap:9px}
+.card p{font-size:14px;color:var(--dim);margin:0}
+.dot{width:7px;height:7px;border-radius:50%;flex:none}
+.dot.ok{background:var(--green)} .dot.wait{background:var(--orange)} .dot.off{background:var(--dim2)}
+
+/* ---------- stats ---------- */
+.stats{display:flex;flex-wrap:wrap;gap:1px;background:var(--line);border:1px solid var(--line);
+       border-radius:12px;overflow:hidden;margin:26px 0}
+.stats div{background:var(--bg2);padding:18px 24px;flex:1 1 150px}
+.stats b{display:block;font-size:25px;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
+.stats span{font-size:11.5px;color:var(--dim2);display:block;margin-top:4px;letter-spacing:.02em}
+.up{color:var(--green)} .down{color:var(--orange)} .neutral{color:var(--blue)}
+
+/* ---------- media ---------- */
+figure{margin:30px 0}
+img,video{max-width:100%;height:auto;display:block;border-radius:12px;border:1px solid var(--line);background:var(--bg2)}
+figcaption{font-size:13px;color:var(--dim2);margin-top:11px;line-height:1.6}
+.media2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:720px){.media2{grid-template-columns:1fr}}
+
+/* ---------- callout ---------- */
+.finding{background:linear-gradient(180deg,rgba(230,158,0,.055),transparent);
+  border:1px solid rgba(230,158,0,.2);border-left:2px solid var(--orange);
+  border-radius:0 12px 12px 0;padding:24px 26px;margin:32px 0}
+.finding .eyebrow{color:var(--orange)}
+.finding p:last-child{margin-bottom:0}
+.good{background:linear-gradient(180deg,rgba(52,211,153,.05),transparent);
+  border:1px solid rgba(52,211,153,.2);border-left-color:var(--green)}
+.good .eyebrow{color:var(--green)}
+
+/* ---------- table ---------- */
+.tw{overflow-x:auto;margin:26px 0;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:440px}
+th,td{text-align:left;padding:12px 18px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:none}
+th{background:var(--bg2);font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim2);font-weight:600}
+td{color:#dedddb}
+.num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:13px}
+tr.hl td{background:rgba(86,180,233,.05)}
+
+code{font-family:var(--mono);font-size:.875em;background:#161616;padding:2px 7px;border-radius:5px;color:#d7d6d3}
+pre{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:19px 21px;overflow-x:auto;
+    font-size:13px;font-family:var(--mono);line-height:1.65;margin:22px 0;color:#cfceca}
+pre code{background:none;padding:0}
+blockquote{margin:24px 0;padding:3px 0 3px 22px;border-left:2px solid var(--line2);color:var(--dim);font-style:italic}
+ul{margin:0 0 17px;padding-left:22px;color:#d8d7d4}
+li{margin-bottom:9px}
+li::marker{color:var(--dim2)}
+strong{color:#fff;font-weight:600}
+svg{max-width:100%;height:auto;display:block}
+footer{padding:56px 0 90px;color:var(--dim2);font-size:13.5px}
+footer a{color:var(--dim)}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <span class="brand">Jacob E. Garcia</span>
+  <a href="#s1">PPO</a><a href="#sac">SAC</a><a href="#s4">Tendons</a>
+  <a href="#s5">Sim-to-Real</a><a href="#s6">JAX</a><a href="#s7">Harness</a>
+</div></nav>
+
+<header><div class="wrap">
+  <h1>Reinforcement learning,<br>tendon dynamics,<br><em>and closing the reality gap.</em></h1>
+  <p class="lede">Policy-gradient algorithms written from scratch, musculotendon actuators modeled
+     in MuJoCo, and a simulator fitted to logged measurements from a physical Franka Panda —
+     validated on held-out data.</p>
+  <p class="byline">
+    <a href="https://github.com/JacobEGarcia">github.com/JacobEGarcia</a>
+    <span>·</span><span>B.S. Cybersecurity, DePaul University</span>
+  </p>
+  <div class="herostats">
+    <div><b class="up">56.7%</b><span>REALITY GAP CLOSED</span></div>
+    <div><b class="neutral">9.41×</b><span>SAC SAMPLE EFFICIENCY</span></div>
+    <div><b class="neutral">28.3×</b><span>JAX SPEEDUP</span></div>
+    <div><b>632 s</b><span>REAL ROBOT DATA</span></div>
+    <div><b>7</b><span>SILENT BUGS FOUND</span></div>
+  </div>
+</div></header>
+
+<section>
+  <p class="eyebrow">Overview</p>
+  <h2>Six projects, each validated against something external</h2>
+  <p class="big">Not against itself. A learning curve that rises proves only that a number went up.
+     Every result below is measured against a published baseline, an independent implementation, a
+     physical consistency check, or held-out data the optimizer never saw.</p>
+
+  <div class="grid">
+    <div class="card"><h4><span class="dot ok"></span>PPO from scratch</h4>
+      <p>Pendulum solved. −1196 → −168.8, past the −200 threshold.</p></div>
+    <div class="card"><h4><span class="dot ok"></span>SAC from scratch</h4>
+      <p>9.41× PPO's sample efficiency on identical task and seed.</p></div>
+    <div class="card"><h4><span class="dot ok"></span>Tendon modeling</h4>
+      <p>Friction hysteresis characterised; snap-through bistability found.</p></div>
+    <div class="card"><h4><span class="dot ok"></span>Real-to-sim sysID</h4>
+      <p>56.7% gap reduction on held-out real Franka episodes.</p></div>
+    <div class="card"><h4><span class="dot ok"></span>PPO in JAX</h4>
+      <p>28.3× throughput on the same CPU. Both solve the task.</p></div>
+    <div class="card"><h4><span class="dot ok"></span>Evaluation harness</h4>
+      <p>Open-loop, closed-loop, and hardware behind one interface.</p></div>
+    <div class="card"><h4><span class="dot wait"></span>In-hand reorientation</h4>
+      <p>Needs GPU — ~10⁸ environment steps. Models downloaded.</p></div>
+    <div class="card"><h4><span class="dot off"></span>Domain randomization</h4>
+      <p>Blocked behind in-hand reorientation.</p></div>
+  </div>
+</section>
+
+<!-- ================= S5 first: strongest result ================= -->
+<section id="s5">
+  <p class="eyebrow">Real-to-Sim · System Identification</p>
+  <h2>Fitting MuJoCo to a physical robot</h2>
+  <p class="big">The DROID dataset logs two <strong>independent</strong> signals at 15 Hz: what the
+     controller was commanded, and where the robot actually went. Real joints have friction, rotor
+     inertia, finite gain, and latency, so a robot never perfectly tracks its command. That gap is
+     the physical signature a simulator has to reproduce.</p>
+
+  <figure>
+    <img src="media/s5/panda_strip.png" alt="Four Franka Panda poses reconstructed in MuJoCo from real DROID joint angles">
+    <figcaption>Menagerie's Franka Panda posed from real DROID joint measurements — four frames of one episode.</figcaption>
+  </figure>
+
+  <h3>The measurement</h3>
+  <svg viewBox="0 0 880 190" role="img" aria-label="Open-loop replay pipeline diagram">
+    <defs><marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#6a6966"/></marker></defs>
+    <rect x="6" y="26" width="176" height="62" rx="9" fill="#101010" stroke="#2a2a2a"/>
+    <text x="94" y="52" fill="#f0efed" font-size="13" text-anchor="middle" font-family="system-ui">Real commanded</text>
+    <text x="94" y="72" fill="#6a6966" font-size="11.5" text-anchor="middle" font-family="ui-monospace">action.joint_position</text>
+
+    <line x1="188" y1="57" x2="246" y2="57" stroke="#6a6966" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <rect x="252" y="18" width="186" height="78" rx="9" fill="#101010" stroke="#56B4E9" stroke-opacity=".45"/>
+    <text x="345" y="44" fill="#56B4E9" font-size="13" text-anchor="middle" font-family="system-ui">MuJoCo Panda</text>
+    <text x="345" y="63" fill="#9a9995" font-size="11" text-anchor="middle" font-family="system-ui">open-loop replay</text>
+    <text x="345" y="80" fill="#6a6966" font-size="10.5" text-anchor="middle" font-family="system-ui">never sees ground truth</text>
+
+    <line x1="444" y1="57" x2="502" y2="57" stroke="#6a6966" stroke-width="1.4" marker-end="url(#ar)"/>
+
+    <rect x="508" y="26" width="150" height="62" rx="9" fill="#101010" stroke="#2a2a2a"/>
+    <text x="583" y="52" fill="#f0efed" font-size="13" text-anchor="middle" font-family="system-ui">Simulated joints</text>
+    <text x="583" y="72" fill="#6a6966" font-size="11" text-anchor="middle" font-family="system-ui">where sim went</text>
+
+    <rect x="508" y="112" width="150" height="58" rx="9" fill="#101010" stroke="#2a2a2a"/>
+    <text x="583" y="136" fill="#f0efed" font-size="13" text-anchor="middle" font-family="system-ui">Real measured</text>
+    <text x="583" y="155" fill="#6a6966" font-size="11" text-anchor="middle" font-family="system-ui">where robot went</text>
+
+    <line x1="664" y1="57" x2="716" y2="80" stroke="#6a6966" stroke-width="1.4"/>
+    <line x1="664" y1="140" x2="716" y2="112" stroke="#6a6966" stroke-width="1.4"/>
+    <rect x="722" y="66" width="150" height="60" rx="9" fill="#101010" stroke="#34d399" stroke-opacity=".45"/>
+    <text x="797" y="90" fill="#34d399" font-size="13" text-anchor="middle" font-family="system-ui">Reality gap</text>
+    <text x="797" y="110" fill="#9a9995" font-size="11" text-anchor="middle" font-family="system-ui">CMA-ES minimises</text>
+  </svg>
+
+  <div class="stats">
+    <div><b>0.0431</b><span>BASELINE RMSE (rad)</span></div>
+    <div><b class="up">0.0187</b><span>AFTER SYSID (rad)</span></div>
+    <div><b class="up">56.7%</b><span>HELD-OUT IMPROVEMENT</span></div>
+    <div><b>24 / 8</b><span>TRAIN / TEST EPISODES</span></div>
+  </div>
+
+  <figure>
+    <img src="media/s5/sysid_before_after.png" alt="Simulated versus real joint trajectory before and after system identification">
+    <figcaption>A held-out episode the optimizer never saw, on its worst joint. Fitting and reporting
+      on the same trajectories is overfitting a simulator — the split is by episode, never by frame.</figcaption>
+  </figure>
+
+  <h3>What was identified</h3>
+  <div class="tw"><table>
+    <tr><th>Parameter</th><th class="num">Menagerie default</th><th class="num">Identified</th><th class="num">Ratio</th></tr>
+    <tr><td>Joint damping</td><td class="num">1.000</td><td class="num">5.027</td><td class="num">5.03×</td></tr>
+    <tr><td>Armature (rotor inertia)</td><td class="num">0.100</td><td class="num">0.467</td><td class="num">4.67×</td></tr>
+    <tr><td>Coulomb frictionloss</td><td class="num">0.000</td><td class="num">3.071</td><td class="num">from zero</td></tr>
+    <tr><td>Command latency</td><td class="num">0 frames</td><td class="num">3.30 frames</td><td class="num">220 ms</td></tr>
+    <tr class="hl"><td>Controller gain <code>kp</code></td><td class="num">3142.9</td><td class="num">3218.5</td><td class="num">1.02×</td></tr>
+  </table></div>
+
+  <div class="finding good">
+    <p class="eyebrow">Why this fit is credible</p>
+    <p>Four parameters moved substantially. <strong>One did not.</strong> Controller gain shifted by
+       2% — Menagerie already had it right, and the optimizer left it alone.</p>
+    <p>That asymmetry is the evidence. An optimizer that simply drives every parameter to whatever
+       reduces error would have moved all five. Leaving the already-correct one untouched is what
+       distinguishes identification from curve-fitting.</p>
+    <p>The physically interesting findings: Menagerie ships <strong>zero dry friction</strong>, and
+       real Coulomb friction is substantial. Rotor inertia was underestimated ~4.7× — harmonic
+       drives multiply it by the square of the gear ratio, which is why armature is the most
+       commonly ignored parameter. And 220 ms of latency was entirely unmodeled.</p>
+  </div>
+
+  <div class="finding">
+    <p class="eyebrow">The dataset that had no reality gap</p>
+    <p>The first attempt used <code>lerobot/nyu_franka_play_dataset</code>. Its <code>action</code>
+       column turned out to be exactly <code>state[t+1] − state[t]</code> — correlation
+       <strong>1.0000</strong> on every joint, identical standard deviations. The "actions" were
+       relabeled state deltas. Its end-effector pose was likewise pure forward kinematics of the
+       joint angles, matching MuJoCo's FK to <strong>0.000 m</strong>.</p>
+    <p>That dataset is self-consistent by construction and contains nothing to identify. Fitting to
+       it would have produced a near-perfect result that meant nothing — and collapsed the moment
+       anyone asked what the number represented.</p>
+    <p>The check is now <code>verify_dataset_has_gap()</code>, which raises rather than producing a
+       flattering plot.</p>
+  </div>
+</section>
+
+<!-- ================= S4 ================= -->
+<section id="s4">
+  <p class="eyebrow">Tendon Actuators</p>
+  <h2>Where tendon-driven robots get hard</h2>
+  <p class="big">A 2-DoF finger driven by an opposing flexor/extensor pair of spatial tendons
+     wrapping cylindrical pulleys — the actuation family used in musculotendon androids, rather
+     than geared joints.</p>
+
+  <figure>
+    <img src="media/s4/finger_strip.png" alt="Tendon finger at four flexor tension levels showing snap-through">
+    <figcaption>Flexor tension 0 → 1.5 → 2.2 → 4.0 N. Frames two and three look nearly identical,
+      then the mechanism snaps. That discontinuity is the finding below.</figcaption>
+  </figure>
+
+  <figure>
+    <video src="media/s4/finger_sweep.mp4" autoplay loop muted playsinline></video>
+    <figcaption>Continuous flexor sweep at frictionloss 0.5, with constant extensor co-contraction.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="media/s4/hysteresis.png" alt="Hysteresis loops widening with tendon friction; loop width and dead band both increasing">
+    <figcaption>Quasi-static staircase protocol: 40 force levels up and back, settling to static
+      equilibrium at each. Both metrics increase monotonically with friction.</figcaption>
+  </figure>
+
+  <div class="finding">
+    <p class="eyebrow">0.207 rad of hysteresis at zero friction</p>
+    <p>That should be impossible — with no friction, loading and unloading must coincide. Tracing
+       individual force levels explains it: the finger <strong>snaps between two stable
+       configurations</strong>, jumping up at 2.05 N while loading but not falling back until
+       1.03 N while releasing.</p>
+    <p>This is snap-through bistability from under-actuation. The flexor is an extrinsic tendon
+       spanning both joints — the same arrangement as the long flexors in a human finger — so the
+       joints cannot be commanded independently.</p>
+    <p>The two sources matter differently. Friction hysteresis can be reduced with better routing or
+       compensated with a model. Bistability cannot: it is intrinsic to the kinematics, and a
+       controller has to plan around it.</p>
+  </div>
+
+  <h3>Three silent failures</h3>
+  <ul>
+    <li><strong>Sign convention needs routing and gear to agree.</strong> MuJoCo applies
+        <code>qfrc = Jᵀ·(gear·ctrl)</code>, so positive force acts along <em>increasing</em> tendon
+        length — it pushes. A real tendon only pulls, requiring <code>gear = −1</code> <em>and</em>
+        correct site placement. Two attempts each got one half right; the finger crept to the wrong
+        joint limit while compiling cleanly.</li>
+    <li><strong>0.25 Hz is not quasi-static.</strong> The sinusoidal protocol measured dynamic phase
+        lag, reporting 0.314 rad at zero friction and hysteresis that <em>decreased</em> as friction
+        rose — exactly backwards. Fixed with a settling staircase, which is also how the measurement
+        is made on real hardware.</li>
+    <li><strong>Wrap geoms were colliding.</strong> Routing pulleys are tendon surfaces, not bodies.
+        Excluding them removed ~18% phantom hysteresis. Found only because MJX refuses cylinder-box
+        collisions and failed loudly where plain MuJoCo was silent — porting to a second backend
+        turns out to be an effective model-validation technique.</li>
+  </ul>
+</section>
+
+<!-- ================= S1 ================= -->
+<section id="s1">
+  <p class="eyebrow">PPO · From Scratch</p>
+  <h2>Proximal Policy Optimization</h2>
+  <p class="big">~300 lines of PyTorch: GAE(λ), clipped surrogate objective, orthogonal
+     initialisation, observation normalisation, per-minibatch advantage normalisation. No
+     <code>stable-baselines3</code> — the point was to earn the ability to explain each piece.</p>
+
+  <div class="stats">
+    <div><b class="up">−168.8</b><span>FINAL RETURN (FROM −1196)</span></div>
+    <div><b>0.90</b><span>EXPLAINED VARIANCE</span></div>
+    <div><b>−161.6</b><span>IQM, 95% CI [−192, −136]</span></div>
+    <div><b>82,800</b><span>STEPS TO SOLVE</span></div>
+  </div>
+
+  <div class="media2">
+    <figure style="margin:0">
+      <img src="media/s1/learning_curve.png" alt="PPO learning curve crossing the solved threshold">
+      <figcaption>Validated against the published −200 threshold.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <video src="media/s1/pendulum_trained.mp4" autoplay loop muted playsinline></video>
+      <figcaption>Trained policy, deterministic. Return −126.3.</figcaption>
+    </figure>
+  </div>
+
+  <div class="finding">
+    <p class="eyebrow">The bug that teaches the most</p>
+    <p>The first implementation did not learn at all — <strong>−1196 → −1172</strong> over 20k
+       steps, with policy entropy frozen at 1.418 → 1.416. Nothing errored, and the loss decreased.</p>
+    <p>Cause: <strong>missing reward scaling</strong>. Pendulum returns are ~−1000, making squared
+       value error ~10⁶ against a policy-gradient loss of ~10⁻². With
+       <code>loss = pg_loss + 0.5·v_loss</code> the total was ~100% value loss — and
+       <code>clip_grad_norm_(0.5)</code> then rescaled the <em>entire</em> gradient to norm 0.5,
+       sending nearly all of it to the critic.</p>
+    <p>The policy was not broken. It was starved. Adding a running discounted-return scaler moved
+       explained variance from 0.00 to 0.90 immediately.</p>
+  </div>
+
+  <figure>
+    <img src="media/s1/diagnostics.png" alt="Explained variance, approximate KL, clip fraction, and value loss over training">
+    <figcaption>The four panels that reveal whether PPO is healthy. Explained variance ≤ 0 means the
+      critic is no better than predicting the mean — almost always a bug rather than a hard task.</figcaption>
+  </figure>
+</section>
+
+<!-- ================= SAC ================= -->
+<section id="sac">
+  <p class="eyebrow">SAC · From Scratch</p>
+  <h2>Why sample efficiency decides hardware</h2>
+  <p class="big">Twin Q critics with Polyak-averaged targets, a squashed Gaussian actor with the tanh
+     log-probability correction, and automatic entropy temperature tuning.</p>
+
+  <div class="stats">
+    <div><b>82,800</b><span>PPO STEPS TO −200</span></div>
+    <div><b class="up">8,799</b><span>SAC STEPS TO −200</span></div>
+    <div><b class="up">9.41×</b><span>SAMPLE EFFICIENCY</span></div>
+  </div>
+
+  <div class="media2">
+    <figure style="margin:0">
+      <img src="media/sac/ppo_vs_sac.png" alt="PPO versus SAC learning curves on identical task">
+      <figcaption>Identical task, identical seed. The comparison is the deliverable.</figcaption>
+    </figure>
+    <figure style="margin:0">
+      <video src="media/sac/pendulum_sac.mp4" autoplay loop muted playsinline></video>
+      <figcaption>SAC policy, deterministic. Return −126.6.</figcaption>
+    </figure>
+  </div>
+
+  <p>That ~10× gap is the basis for a real engineering decision. On physical hardware, environment
+     steps cost wall-clock time and actuator wear, so SAC's efficiency usually wins. In a massively
+     parallel simulator, PPO's throughput usually wins.</p>
+
+  <div class="finding">
+    <p class="eyebrow">The correction that fails silently</p>
+    <p>Squashing a Gaussian through <code>tanh</code> is a nonlinear change of variables, so the
+       density needs the log-determinant of the Jacobian:
+       <code>log_prob −= log(1 − tanh(u)² + ε)</code>.</p>
+    <p>Omit it and nothing crashes. The algorithm simply maximises the entropy of a distribution it
+       is not executing, and with automatic temperature tuning the learned <code>α</code> then
+       chases a target that does not correspond to real exploration.</p>
+  </div>
+</section>
+
+<!-- ================= S6 ================= -->
+<section id="s6">
+  <p class="eyebrow">JAX · Throughput</p>
+  <h2>Same algorithm, different program shape</h2>
+  <p class="big">The PyTorch implementation is a loop with the Python interpreter in the hot path.
+     The JAX version is a <code>lax.scan</code> over 512 vectorised environments with the entire
+     update compiled into one <code>jit</code>ed function. Nothing in the inner loop is interpreted.</p>
+
+  <figure>
+    <img src="media/s6/throughput.png" alt="Throughput comparison and final return for PyTorch versus JAX PPO">
+    <figcaption>28.3× on the same CPU, with both implementations solving the task. No GPU is
+      involved — this isolates the benefit of program shape from hardware.</figcaption>
+  </figure>
+
+  <div class="stats">
+    <div><b>1,934</b><span>PYTORCH STEPS/S</span></div>
+    <div><b class="up">54,808</b><span>JAX STEPS/S</span></div>
+    <div><b class="up">28.3×</b><span>SPEEDUP, SAME CPU</span></div>
+    <div><b>1.2 s</b><span>JIT COMPILE (ONE-OFF)</span></div>
+  </div>
+
+  <div class="finding good">
+    <p class="eyebrow">The port reproduced the PyTorch bug exactly</p>
+    <p>The first JAX version did not learn: flat at ~−1200 while running at 196k steps/s. Identical
+       symptom, identical cause — no reward scaling.</p>
+    <p>That the same bug appeared independently in a completely different framework is itself
+       evidence the two implementations agree. Writing the algorithm twice is a correctness check
+       that no amount of re-reading one implementation provides.</p>
+  </div>
+
+  <p>A second bug was specific to the vectorised setting. Pendulum has no terminal state — every
+     episode end is a truncation, so the value must always be bootstrapped. But in a JAX rollout the
+     environment autoresets <em>inside</em> the scan, so <code>values[t+1]</code> on a truncated step
+     belongs to a different trajectory. The fix captures the true next state's value before reset:</p>
+<pre><code>nv    = jnp.where(trunc, boot, next_value)   # bootstrap the real continuation
+delta = reward + gamma * nv - value_t
+gae   = jnp.where(trunc, delta, gae)         # accumulator still resets</code></pre>
+  <p>The accumulator reset and the value bootstrap are two separate decisions. Conflating them is
+     the standard form of this bug.</p>
+</section>
+
+<!-- ================= S7 ================= -->
+<section id="s7">
+  <p class="eyebrow">Infrastructure</p>
+  <h2>Three questions, one interface</h2>
+  <blockquote>Design metrics and benchmarks to evaluate policies in open loop, in simulation, and on
+    the real robot — so progress is measurable at every stage.</blockquote>
+  <p>Those are three different questions, and conflating them is how sim-to-real projects fool
+     themselves. All three share one interface and one log schema, so a simulation number and a
+     hardware number are directly comparable.</p>
+
+  <svg viewBox="0 0 880 230" role="img" aria-label="Evaluation harness architecture">
+    <rect x="330" y="8" width="220" height="52" rx="9" fill="#101010" stroke="#56B4E9" stroke-opacity=".45"/>
+    <text x="440" y="32" fill="#56B4E9" font-size="13.5" text-anchor="middle" font-family="ui-monospace">EvalBackend</text>
+    <text x="440" y="50" fill="#6a6966" font-size="11" text-anchor="middle" font-family="system-ui">one interface, one log schema</text>
+
+    <line x1="440" y1="62" x2="440" y2="82" stroke="#2a2a2a" stroke-width="1.4"/>
+    <line x1="146" y1="82" x2="734" y2="82" stroke="#2a2a2a" stroke-width="1.4"/>
+    <line x1="146" y1="82" x2="146" y2="100" stroke="#2a2a2a" stroke-width="1.4"/>
+    <line x1="440" y1="82" x2="440" y2="100" stroke="#2a2a2a" stroke-width="1.4"/>
+    <line x1="734" y1="82" x2="734" y2="100" stroke="#2a2a2a" stroke-width="1.4"/>
+
+    <rect x="26" y="100" width="240" height="106" rx="9" fill="#101010" stroke="#2a2a2a"/>
+    <text x="146" y="126" fill="#f0efed" font-size="13" text-anchor="middle" font-family="system-ui">Open-loop replay</text>
+    <text x="146" y="150" fill="#9a9995" font-size="11.5" text-anchor="middle" font-family="system-ui">recorded actions, no feedback</text>
+    <text x="146" y="170" fill="#6a6966" font-size="11" text-anchor="middle" font-family="system-ui">isolates the model —</text>
+    <text x="146" y="187" fill="#6a6966" font-size="11" text-anchor="middle" font-family="system-ui">policy training cannot fix this</text>
+
+    <rect x="320" y="100" width="240" height="106" rx="9" fill="#101010" stroke="#2a2a2a"/>
+    <text x="440" y="126" fill="#f0efed" font-size="13" text-anchor="middle" font-family="system-ui">Closed-loop simulation</text>
+    <text x="440" y="150" fill="#9a9995" font-size="11.5" text-anchor="middle" font-family="system-ui">policy in the loop, seeded</text>
+    <text x="440" y="170" fill="#6a6966" font-size="11" text-anchor="middle" font-family="system-ui">weakest alone — a policy can</text>
+    <text x="440" y="187" fill="#6a6966" font-size="11" text-anchor="middle" font-family="system-ui">exploit simulator artifacts</text>
+
+    <rect x="614" y="100" width="240" height="106" rx="9" fill="#0d0d0d" stroke="#2a2a2a" stroke-dasharray="4 4"/>
+    <text x="734" y="126" fill="#9a9995" font-size="13" text-anchor="middle" font-family="system-ui">Hardware</text>
+    <text x="734" y="150" fill="#6a6966" font-size="11.5" text-anchor="middle" font-family="system-ui">deliberate stub</text>
+    <text x="734" y="170" fill="#6a6966" font-size="11" text-anchor="middle" font-family="system-ui">interface fixed before</text>
+    <text x="734" y="187" fill="#6a6966" font-size="11" text-anchor="middle" font-family="system-ui">hardware exists, not after</text>
+  </svg>
+
+  <h3>Reproducibility</h3>
+  <ul>
+    <li>Every run writes one JSONL file whose first line is a manifest — seed, config, git SHA,
+        library versions, and a hash of the <em>compiled</em> MuJoCo model.</li>
+    <li>Hashing the compiled model catches edits the XML alone would hide, so a plot can always be
+        tied to the exact physics that produced it.</li>
+    <li>Metrics are pure functions of the log, never computed inline during training — a metric can
+        be redefined and every historical run re-evaluated without retraining.</li>
+    <li>Results report the interquartile mean with bootstrap confidence intervals rather than
+        mean ± std over three seeds, following Agarwal et al.,
+        <em>Deep RL at the Edge of the Statistical Precipice</em>.</li>
+  </ul>
+</section>
+
+<section>
+  <p class="eyebrow">Reproduce</p>
+  <h2>Everything runs on a laptop</h2>
+<pre><code>pip install "gymnasium[mujoco]" torch mujoco jax optax \
+            scipy matplotlib cma pandas pyarrow
+
+python -m s1_ppo.train      --env Pendulum-v1 --total-steps 150000
+python -m sac_scratch.train  --env Pendulum-v1 --total-steps 30000
+python -m s4_tendon.hysteresis
+python -m s5_sysid.fit       --iterations 45
+python -m s6_brax_jax.train  --total-steps 8000000 --num-envs 512</code></pre>
+  <p>Each command writes a timestamped run directory under <code>runs/</code> containing the full
+     JSONL log and any checkpoints. No GPU is required for any result on this page.</p>
+</section>
+
+<footer><div class="wrap">
+  Built with MuJoCo, PyTorch, and JAX. Real robot data from
+  <a href="https://droid-dataset.github.io/">DROID</a>; models from
+  <a href="https://github.com/google-deepmind/mujoco_menagerie">MuJoCo Menagerie</a>.
+</div></footer>
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+{"type": "manifest", "run_id": "20260816-141310_s4_tendon_seed0_9b1ff887", "project": "s4_tendon", "seed": 0, "config": {"model": "finger.xml", "friction_values": [0.0, 0.2, 0.5, 1.0], "drive_freq_hz": 0.25, "peak_force": 4.0}, "environment": {"python_version": "3.11.9", "platform": "Windows-10-10.0.26200-SP0", "numpy_version": "2.4.6", "torch_version": "2.13.0+cpu", "mujoco_version": "3.11.0", "torch_device": "cpu", "git_sha": null, "git_dirty": true}, "started_at": "2026-08-16T14:13:10"}
+{"type": "warning", "t": 0.071, "message": "Working tree is dirty; git_sha does not fully describe this run."}
+{"type": "sweep", "t": 0.071, "frictionloss": 0.0, "hysteresis_width_rad": 0.25332790155701784, "dead_band_N": 2.564102564102564, "max_flexion_rad": 0.8049098017404976, "model_hash": "e8ebd43200946158"}
+{"type": "sweep", "t": 0.073, "frictionloss": 0.2, "hysteresis_width_rad": 0.408453535377982, "dead_band_N": 2.564102564102564, "max_flexion_rad": 0.804760200375799, "model_hash": "e1713c3e9c0d8691"}
+{"type": "sweep", "t": 0.073, "frictionloss": 0.5, "hysteresis_width_rad": 0.5773401926753217, "dead_band_N": 2.871794871794872, "max_flexion_rad": 0.7981136883453438, "model_hash": "8ee5ba4330ac6e54"}
+{"type": "sweep", "t": 0.073, "frictionloss": 1.0, "hysteresis_width_rad": 0.676628275811835, "dead_band_N": 2.9743589743589745, "max_flexion_rad": 0.7936296911147188, "model_hash": "cac81798636a86f5"}
+{"type": "figure", "t": 0.254, "path": "media\\s4\\hysteresis.png"}
+{"type": "run_end", "wall_seconds": 0.254, "failed": false, "error": null}

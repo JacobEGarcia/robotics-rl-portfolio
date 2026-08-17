@@ -1,0 +1,20 @@
+# Third-party assets — fetched, not vendored. See scripts/fetch_assets.sh
+# MuJoCo Menagerie is 2.3 GB and is itself a git repository; DROID episodes
+# belong to the DROID dataset and are redistributable but pointless to mirror.
+assets/menagerie/
+assets/data/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Run artifacts are NOT ignored — runs/ holds the JSONL logs and checkpoints
+# that back every number on the site, and they total ~1.2 MB. Reproducibility
+# claims are worth more than a slightly smaller repository.

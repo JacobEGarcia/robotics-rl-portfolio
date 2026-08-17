@@ -1,0 +1,30 @@
+{"type": "manifest", "run_id": "20260816-213228_s6_ppo_jax_seed0_b61d5f69", "project": "s6_ppo_jax", "seed": 0, "config": {"algo": "ppo_jax", "env": "PendulumJax", "num_envs": 512, "rollout_steps": 32, "total_steps": 8000000, "device": "cpu:0"}, "environment": {"python_version": "3.11.9", "platform": "Windows-10-10.0.26200-SP0", "numpy_version": "2.4.6", "torch_version": "2.13.0+cpu", "mujoco_version": "3.11.0", "torch_device": "cpu", "git_sha": null, "git_dirty": true}, "started_at": "2026-08-16T21:32:28"}
+{"type": "warning", "t": 0.162, "message": "Working tree is dirty; git_sha does not fully describe this run."}
+{"type": "compile", "t": 1.394, "seconds": 1.2313203811645508}
+{"type": "episode", "t": 7.374, "step": 344064, "ret": -1112.0230674743652, "mean_step_reward": -5.560115337371826, "steps_per_sec": 57541.56930585747}
+{"type": "episode", "t": 13.317, "step": 671744, "ret": -1050.613784790039, "mean_step_reward": -5.253068923950195, "steps_per_sec": 56344.15620659948}
+{"type": "episode", "t": 19.282, "step": 999424, "ret": -557.960033416748, "mean_step_reward": -2.7898001670837402, "steps_per_sec": 55873.97556117424}
+{"type": "episode", "t": 25.311, "step": 1327104, "ret": -0.4934553522616625, "mean_step_reward": -0.0024672767613083124, "steps_per_sec": 55488.89449171393}
+{"type": "episode", "t": 31.308, "step": 1654784, "ret": -858.2709312438965, "mean_step_reward": -4.291354656219482, "steps_per_sec": 55318.90122495518}
+{"type": "episode", "t": 37.271, "step": 1982464, "ret": -197.21994400024414, "mean_step_reward": -0.9860997200012207, "steps_per_sec": 55257.836591403546}
+{"type": "episode", "t": 43.222, "step": 2310144, "ret": -6.9504596292972565, "mean_step_reward": -0.03475229814648628, "steps_per_sec": 55229.61725982571}
+{"type": "episode", "t": 49.208, "step": 2637824, "ret": -0.8226044476032257, "mean_step_reward": -0.0041130222380161285, "steps_per_sec": 55169.12097020588}
+{"type": "episode", "t": 55.257, "step": 2965504, "ret": -0.6433619186282158, "mean_step_reward": -0.003216809593141079, "steps_per_sec": 55056.88087338727}
+{"type": "episode", "t": 61.234, "step": 3293184, "ret": -835.0978851318359, "mean_step_reward": -4.17548942565918, "steps_per_sec": 55033.56234065252}
+{"type": "episode", "t": 67.204, "step": 3620864, "ret": -157.7629566192627, "mean_step_reward": -0.7888147830963135, "steps_per_sec": 55020.05970464906}
+{"type": "episode", "t": 73.208, "step": 3948544, "ret": -3.4718070179224014, "mean_step_reward": -0.017359035089612007, "steps_per_sec": 54983.58225290502}
+{"type": "episode", "t": 79.231, "step": 4276224, "ret": -0.3985437098890543, "mean_step_reward": -0.0019927185494452715, "steps_per_sec": 54938.52057849197}
+{"type": "episode", "t": 85.226, "step": 4603904, "ret": -0.4404663108289242, "mean_step_reward": -0.002202331554144621, "steps_per_sec": 54918.832137394755}
+{"type": "episode", "t": 91.185, "step": 4931584, "ret": -839.5723342895508, "mean_step_reward": -4.197861671447754, "steps_per_sec": 54924.0829628601}
+{"type": "episode", "t": 97.148, "step": 5259264, "ret": -139.14010524749756, "mean_step_reward": -0.6957005262374878, "steps_per_sec": 54924.90592531592}
+{"type": "episode", "t": 103.14, "step": 5586944, "ret": -0.51310108974576, "mean_step_reward": -0.0025655054487288, "steps_per_sec": 54911.07308396546}
+{"type": "episode", "t": 109.126, "step": 5914624, "ret": -0.24180866312235594, "mean_step_reward": -0.0012090433156117797, "steps_per_sec": 54901.321830475856}
+{"type": "episode", "t": 115.133, "step": 6242304, "ret": -0.11057296069338918, "mean_step_reward": -0.0005528648034669459, "steps_per_sec": 54883.00387356679}
+{"type": "episode", "t": 121.129, "step": 6569984, "ret": -800.7378578186035, "mean_step_reward": -4.003689289093018, "steps_per_sec": 54871.82126522921}
+{"type": "episode", "t": 127.107, "step": 6897664, "ret": -98.04178476333618, "mean_step_reward": -0.4902089238166809, "steps_per_sec": 54868.63962113117}
+{"type": "episode", "t": 133.108, "step": 7225344, "ret": -0.9577665477991104, "mean_step_reward": -0.004788832738995552, "steps_per_sec": 54856.669047554315}
+{"type": "episode", "t": 139.127, "step": 7553024, "ret": -0.19003169145435095, "mean_step_reward": -0.0009501584572717547, "steps_per_sec": 54838.21757772276}
+{"type": "episode", "t": 145.159, "step": 7880704, "ret": -0.30027939938008785, "mean_step_reward": -0.0015013969969004393, "steps_per_sec": 54817.23675178636}
+{"type": "episode", "t": 147.274, "step": 7995392, "ret": -542.9204940795898, "mean_step_reward": -2.714602470397949, "steps_per_sec": 54808.09593406588}
+{"type": "result", "t": 149.45, "final_return": -197.60459899902344, "throughput_steps_per_sec": 54808.09593406588, "total_env_steps": 7995392, "wall_seconds": 145.87976217269897, "compile_seconds": 1.2313203811645508, "device": "cpu:0"}
+{"type": "run_end", "wall_seconds": 149.451, "failed": false, "error": null}

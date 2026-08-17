@@ -1,0 +1,18 @@
+{
+  "baseline": {
+    "damping": 1.0,
+    "armature": 0.09999999999999999,
+    "frictionloss": 0.0,
+    "kp": 3142.8571428571427,
+    "latency_steps": 0.0
+  },
+  "identified": {
+    "damping": 5.026888335167177,
+    "armature": 0.4668852959636945,
+    "frictionloss": 3.071393231655809,
+    "kp": 3218.4641616769864,
+    "latency_steps": 3.2958813837112193
+  },
+  "baseline_test_rmse": 0.04308363662748072,
+  "fitted_test_rmse": 0.01865260568891506
+}

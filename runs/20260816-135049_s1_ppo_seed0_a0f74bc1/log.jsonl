@@ -1,0 +1,116 @@
+{"type": "manifest", "run_id": "20260816-135049_s1_ppo_seed0_a0f74bc1", "project": "s1_ppo", "seed": 0, "config": {"env": "Pendulum-v1", "algo": "ppo_from_scratch", "total_steps": 20480, "num_envs": 1, "rollout_steps": 2048, "gamma": 0.99, "gae_lambda": 0.95, "clip_coef": 0.2, "entropy_coef": 0.0, "value_coef": 0.5, "max_grad_norm": 0.5, "learning_rate": 0.0003, "anneal_lr": true, "update_epochs": 10, "num_minibatches": 32, "target_kl": 0.015, "hidden_sizes": [64, 64]}, "environment": {"python_version": "3.11.9", "platform": "Windows-10-10.0.26200-SP0", "numpy_version": "2.4.6", "torch_version": "2.13.0+cpu", "mujoco_version": "3.11.0", "torch_device": "cpu", "git_sha": null, "git_dirty": true}, "started_at": "2026-08-16T13:50:49"}
+{"type": "warning", "t": 0.2, "message": "Working tree is dirty; git_sha does not fully describe this run."}
+{"type": "episode", "t": 0.259, "episode": 0, "step": 200, "ret": -1098.840770820739, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 0.292, "episode": 1, "step": 400, "ret": -1600.6824079455157, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 0.327, "episode": 2, "step": 600, "ret": -1283.5261637225678, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 0.361, "episode": 3, "step": 800, "ret": -875.6602910421618, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 0.398, "episode": 4, "step": 1000, "ret": -965.8125786265762, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 0.438, "episode": 5, "step": 1200, "ret": -1256.938501150805, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 0.484, "episode": 6, "step": 1400, "ret": -1539.8234699202594, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 0.532, "episode": 7, "step": 1600, "ret": -968.9861468944232, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 0.566, "episode": 8, "step": 1800, "ret": -1401.3587122773488, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 0.613, "episode": 9, "step": 2000, "ret": -968.905705151983, "length": 200, "terminated": false, "truncated": true}
+{"type": "update", "t": 1.208, "iteration": 0, "step": 2048, "pg_loss": -0.0024592381290858612, "v_loss": 4551.718367004394, "entropy": 1.4180194411426783, "approx_kl": 0.0019684943748870865, "clipfrac": 0.015576171875, "lr": 0.0003, "early_stop": 0.0, "explained_variance": -0.006234288215637207}
+{"type": "episode", "t": 1.24, "episode": 10, "step": 2200, "ret": -1596.740306494539, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 1.283, "episode": 11, "step": 2400, "ret": -980.771673345473, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 1.328, "episode": 12, "step": 2600, "ret": -877.7767358004673, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 1.372, "episode": 13, "step": 2800, "ret": -1732.2559166139695, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 1.412, "episode": 14, "step": 3000, "ret": -747.5783127888453, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 1.444, "episode": 15, "step": 3200, "ret": -1068.4589850231143, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 1.475, "episode": 16, "step": 3400, "ret": -1353.39909196959, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 1.507, "episode": 17, "step": 3600, "ret": -900.4758674417419, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 1.538, "episode": 18, "step": 3800, "ret": -909.991950918579, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 1.573, "episode": 19, "step": 4000, "ret": -1621.1495378007824, "length": 200, "terminated": false, "truncated": true}
+{"type": "update", "t": 2.127, "iteration": 1, "step": 4096, "pg_loss": -0.0014915448482497595, "v_loss": 4029.0075149536133, "entropy": 1.41419959962368, "approx_kl": 0.000832384146633558, "clipfrac": 0.0037109375, "lr": 0.00027, "early_stop": 0.0, "explained_variance": 0.16640526056289673}
+{"type": "episode", "t": 2.149, "episode": 20, "step": 4200, "ret": -1000.9592063616997, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 2.192, "episode": 21, "step": 4400, "ret": -998.4266381636345, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 2.238, "episode": 22, "step": 4600, "ret": -991.090130606045, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 2.283, "episode": 23, "step": 4800, "ret": -1191.2970401438636, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 2.333, "episode": 24, "step": 5000, "ret": -1538.4954930447427, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 2.367, "episode": 25, "step": 5200, "ret": -1319.0274924943067, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 2.401, "episode": 26, "step": 5400, "ret": -1349.6595742843656, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 2.432, "episode": 27, "step": 5600, "ret": -874.851271072083, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 2.464, "episode": 28, "step": 5800, "ret": -901.7131946859976, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 2.498, "episode": 29, "step": 6000, "ret": -1161.83068266984, "length": 200, "terminated": false, "truncated": true}
+{"type": "update", "t": 3.047, "iteration": 2, "step": 6144, "pg_loss": -0.0007948978207423351, "v_loss": 3593.7866928100584, "entropy": 1.4184411682188511, "approx_kl": 0.0007532561401603743, "clipfrac": 0.003369140625, "lr": 0.00023999999999999998, "early_stop": 0.0, "explained_variance": 0.01380312442779541}
+{"type": "episode", "t": 3.06, "episode": 30, "step": 6200, "ret": -972.2039539582369, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 3.103, "episode": 31, "step": 6400, "ret": -1526.4826510247185, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 3.144, "episode": 32, "step": 6600, "ret": -1014.549165162733, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 3.184, "episode": 33, "step": 6800, "ret": -1291.6767688320758, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 3.227, "episode": 34, "step": 7000, "ret": -966.3664513946931, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 3.263, "episode": 35, "step": 7200, "ret": -898.2892528673234, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 3.295, "episode": 36, "step": 7400, "ret": -1071.1865337011614, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 3.329, "episode": 37, "step": 7600, "ret": -831.3428986283167, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 3.362, "episode": 38, "step": 7800, "ret": -1075.8121308627035, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 3.394, "episode": 39, "step": 8000, "ret": -1725.7135118289955, "length": 200, "terminated": false, "truncated": true}
+{"type": "update", "t": 3.964, "iteration": 3, "step": 8192, "pg_loss": -0.002152379947074223, "v_loss": 3984.7348052978514, "entropy": 1.4201245654374361, "approx_kl": 0.001527557207737118, "clipfrac": 0.010302734375, "lr": 0.00020999999999999998, "early_stop": 0.0, "explained_variance": 0.0029762983322143555}
+{"type": "episode", "t": 3.967, "episode": 40, "step": 8200, "ret": -1250.5498989605078, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 4.011, "episode": 41, "step": 8400, "ret": -988.4803923749442, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 4.056, "episode": 42, "step": 8600, "ret": -891.3553872596146, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 4.1, "episode": 43, "step": 8800, "ret": -1065.3857526882473, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 4.145, "episode": 44, "step": 9000, "ret": -1510.1204517076055, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 4.184, "episode": 45, "step": 9200, "ret": -1497.1367283221366, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 4.216, "episode": 46, "step": 9400, "ret": -1805.0581292966083, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 4.247, "episode": 47, "step": 9600, "ret": -1690.6719617156582, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 4.28, "episode": 48, "step": 9800, "ret": -1369.1991319590195, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 4.313, "episode": 49, "step": 10000, "ret": -1542.3173720209215, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 4.345, "episode": 50, "step": 10200, "ret": -1004.3691381168227, "length": 200, "terminated": false, "truncated": true}
+{"type": "update", "t": 4.876, "iteration": 4, "step": 10240, "pg_loss": -0.0035936807544203475, "v_loss": 5159.437526702881, "entropy": 1.413037384673953, "approx_kl": 0.0021515929576708, "clipfrac": 0.018603515625, "lr": 0.00017999999999999998, "early_stop": 0.0, "explained_variance": 0.001718282699584961}
+{"type": "episode", "t": 4.91, "episode": 51, "step": 10400, "ret": -1280.31740442808, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 4.955, "episode": 52, "step": 10600, "ret": -1003.5804067851693, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 4.997, "episode": 53, "step": 10800, "ret": -757.4645299353284, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 5.038, "episode": 54, "step": 11000, "ret": -1614.9551175269726, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 5.08, "episode": 55, "step": 11200, "ret": -1021.1116217787674, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 5.112, "episode": 56, "step": 11400, "ret": -869.1583008023968, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 5.143, "episode": 57, "step": 11600, "ret": -1092.2360244621732, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 5.174, "episode": 58, "step": 11800, "ret": -1583.8370610054574, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 5.204, "episode": 59, "step": 12000, "ret": -1277.1422760370422, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 5.237, "episode": 60, "step": 12200, "ret": -1010.0386627760557, "length": 200, "terminated": false, "truncated": true}
+{"type": "update", "t": 5.787, "iteration": 5, "step": 12288, "pg_loss": -0.0006181305056088604, "v_loss": 3943.6355010986326, "entropy": 1.4153713420033456, "approx_kl": 0.0003700834698975086, "clipfrac": 0.001025390625, "lr": 0.00015, "early_stop": 0.0, "explained_variance": 0.003449380397796631}
+{"type": "episode", "t": 5.813, "episode": 61, "step": 12400, "ret": -1597.0525513664707, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 5.859, "episode": 62, "step": 12600, "ret": -1073.9345994141306, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 5.904, "episode": 63, "step": 12800, "ret": -1299.1921380810115, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 5.95, "episode": 64, "step": 13000, "ret": -1393.1804733262486, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 5.993, "episode": 65, "step": 13200, "ret": -1027.6481950383074, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 6.026, "episode": 66, "step": 13400, "ret": -1300.6479561816059, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 6.057, "episode": 67, "step": 13600, "ret": -892.8368790653836, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 6.089, "episode": 68, "step": 13800, "ret": -1260.9594347712823, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 6.122, "episode": 69, "step": 14000, "ret": -1505.0160436834408, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 6.155, "episode": 70, "step": 14200, "ret": -1101.8367662545281, "length": 200, "terminated": false, "truncated": true}
+{"type": "update", "t": 6.702, "iteration": 6, "step": 14336, "pg_loss": -0.0012327520802500659, "v_loss": 4158.067866516113, "entropy": 1.4216853111982346, "approx_kl": 0.0006243633775739, "clipfrac": 0.002587890625, "lr": 0.00011999999999999999, "early_stop": 0.0, "explained_variance": 0.001655280590057373}
+{"type": "episode", "t": 6.719, "episode": 71, "step": 14400, "ret": -1278.8360070060307, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 6.762, "episode": 72, "step": 14600, "ret": -980.7709265382543, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 6.807, "episode": 73, "step": 14800, "ret": -1629.4468839233723, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 6.852, "episode": 74, "step": 15000, "ret": -1041.8612862698922, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 6.896, "episode": 75, "step": 15200, "ret": -1739.9066666558003, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 6.93, "episode": 76, "step": 15400, "ret": -1538.619008770084, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 6.962, "episode": 77, "step": 15600, "ret": -1101.1718572018876, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 6.992, "episode": 78, "step": 15800, "ret": -1440.8943151492176, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 7.025, "episode": 79, "step": 16000, "ret": -1364.3246225405064, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 7.058, "episode": 80, "step": 16200, "ret": -963.6690755445741, "length": 200, "terminated": false, "truncated": true}
+{"type": "update", "t": 7.628, "iteration": 7, "step": 16384, "pg_loss": -0.0006657099656877108, "v_loss": 4591.718264770508, "entropy": 1.4208818156272174, "approx_kl": 0.00023838884953875095, "clipfrac": 4.8828125e-05, "lr": 9e-05, "early_stop": 0.0, "explained_variance": 0.001278519630432129}
+{"type": "episode", "t": 7.631, "episode": 81, "step": 16400, "ret": -721.8815399562219, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 7.674, "episode": 82, "step": 16600, "ret": -1097.736229162438, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 7.716, "episode": 83, "step": 16800, "ret": -862.8031111156089, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 7.762, "episode": 84, "step": 17000, "ret": -1321.746572599055, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 7.801, "episode": 85, "step": 17200, "ret": -1006.827950368934, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 7.84, "episode": 86, "step": 17400, "ret": -1004.5978530266518, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 7.873, "episode": 87, "step": 17600, "ret": -1500.0872505656957, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 7.906, "episode": 88, "step": 17800, "ret": -1070.8182920330355, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 7.938, "episode": 89, "step": 18000, "ret": -1458.8145986884213, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 7.97, "episode": 90, "step": 18200, "ret": -1341.6813338254087, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 8.003, "episode": 91, "step": 18400, "ret": -1354.1010111014946, "length": 200, "terminated": false, "truncated": true}
+{"type": "update", "t": 8.535, "iteration": 8, "step": 18432, "pg_loss": -0.0005807911657029763, "v_loss": 3993.0583465576174, "entropy": 1.4184038680046798, "approx_kl": 0.00023337649181485177, "clipfrac": 0.0, "lr": 5.999999999999998e-05, "early_stop": 0.0, "explained_variance": 0.0011916160583496094}
+{"type": "episode", "t": 8.572, "episode": 92, "step": 18600, "ret": -1039.6266091363548, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 8.615, "episode": 93, "step": 18800, "ret": -937.0522658708154, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 8.659, "episode": 94, "step": 19000, "ret": -1053.846098631704, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 8.704, "episode": 95, "step": 19200, "ret": -1165.0524325400886, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 8.745, "episode": 96, "step": 19400, "ret": -917.938414032715, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 8.776, "episode": 97, "step": 19600, "ret": -1697.9784061896073, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 8.808, "episode": 98, "step": 19800, "ret": -1409.2685747323194, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 8.839, "episode": 99, "step": 20000, "ret": -1667.6914111052026, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 8.872, "episode": 100, "step": 20200, "ret": -930.8708768962159, "length": 200, "terminated": false, "truncated": true}
+{"type": "episode", "t": 8.906, "episode": 101, "step": 20400, "ret": -901.554338445719, "length": 200, "terminated": false, "truncated": true}
+{"type": "update", "t": 9.456, "iteration": 9, "step": 20480, "pg_loss": -0.0005211414929362946, "v_loss": 3980.984735107422, "entropy": 1.4160208236426115, "approx_kl": 8.310650300700218e-05, "clipfrac": 0.0, "lr": 2.999999999999999e-05, "early_stop": 0.0, "explained_variance": 0.0010749101638793945}
+{"type": "checkpoint", "t": 9.477, "path": "runs\\20260816-135049_s1_ppo_seed0_a0f74bc1\\policy.pt"}
+{"type": "run_end", "wall_seconds": 9.477, "failed": false, "error": null}

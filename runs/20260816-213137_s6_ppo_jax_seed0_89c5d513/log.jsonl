@@ -1,0 +1,9 @@
+{"type": "manifest", "run_id": "20260816-213137_s6_ppo_jax_seed0_89c5d513", "project": "s6_ppo_jax", "seed": 0, "config": {"algo": "ppo_jax", "env": "PendulumJax", "num_envs": 256, "rollout_steps": 32, "total_steps": 600000, "device": "cpu:0"}, "environment": {"python_version": "3.11.9", "platform": "Windows-10-10.0.26200-SP0", "numpy_version": "2.4.6", "torch_version": "2.13.0+cpu", "mujoco_version": "3.11.0", "torch_device": "cpu", "git_sha": null, "git_dirty": true}, "started_at": "2026-08-16T21:31:37"}
+{"type": "warning", "t": 0.146, "message": "Working tree is dirty; git_sha does not fully describe this run."}
+{"type": "compile", "t": 0.911, "seconds": 0.763146162033081}
+{"type": "episode", "t": 1.779, "step": 172032, "ret": -1147.078800201416, "mean_step_reward": -5.73539400100708, "steps_per_sec": 197997.26576634793}
+{"type": "episode", "t": 2.631, "step": 335872, "ret": -1102.5262832641602, "mean_step_reward": -5.512631416320801, "steps_per_sec": 195186.32154169492}
+{"type": "episode", "t": 3.482, "step": 499712, "ret": -1022.9612350463867, "mean_step_reward": -5.114806175231934, "steps_per_sec": 194327.00568004447}
+{"type": "episode", "t": 3.998, "step": 598016, "ret": -1069.4806098937988, "mean_step_reward": -5.347403049468994, "steps_per_sec": 193683.2396765332}
+{"type": "result", "t": 5.051, "final_return": -1069.3912353515625, "throughput_steps_per_sec": 193608.1903541743, "total_env_steps": 598016, "wall_seconds": 3.0887949466705322, "compile_seconds": 0.763146162033081, "device": "cpu:0"}
+{"type": "run_end", "wall_seconds": 5.051, "failed": false, "error": null}
