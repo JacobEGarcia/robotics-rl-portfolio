@@ -243,6 +243,12 @@ def main() -> None:
         a = mean + std * jax.random.normal(k, mean.shape)
         return a, log_prob(p, obs, a), value(p, obs)
 
+    # Hoisted deliberately. Calling jax.jit(value)(...) inside the rollout loop
+    # builds a fresh wrapper every iteration, so nothing ever hits the
+    # compilation cache and the model recompiles once per iteration. On a model
+    # whose compile costs minutes that would dominate the entire run.
+    value_jit = jax.jit(value)
+
     @jax.jit
     def update(p, opt_s, obs, act_b, logp_old, adv, ret):
         def loss_fn(pp):
@@ -290,7 +296,7 @@ def main() -> None:
         values = np.stack(val_buf)
 
         obs_last = obs_v(state)
-        last_v = np.asarray(jax.jit(value)(params, obs_last))
+        last_v = np.asarray(value_jit(params, obs_last))
 
         # GAE. The truncation-vs-termination distinction from s6 applies here
         # too: a timeout is not a terminal state and its value must still be
