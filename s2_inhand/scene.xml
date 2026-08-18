@@ -1,0 +1,96 @@
+<mujoco model="leap_rh_inhand_cube">
+  <!--
+    S2: in-hand cube reorientation on the LEAP right hand.
+
+    Mounting note. Menagerie's `right_hand.xml` fixes the palm at
+    pos="0 0 0.1" quat="0 1 0 0", which leaves the fingers pointing along +x
+    rather than palm-up. Rather than fork the upstream model (which would
+    silently diverge from Menagerie and make the model un-updatable), the hand
+    is left exactly as shipped and gravity is expressed in the hand's frame.
+
+    The palm normal was measured, not guessed: curling every finger moves the
+    index/middle/ring fingertips along (-0.896, 0, 0.444), so that unit vector
+    is the direction the palm faces. Gravity is set to 9.81 along the negative
+    of it, which is physically identical to bolting the hand palm-up in a
+    gravity field. `tools/measure_palm.py` reproduces the measurement.
+
+    Floor is removed. With the hand rotated in its own frame the world floor
+    plane is meaningless, and a dropped cube should fall away freely so the
+    drop termination fires cleanly rather than the cube landing on a surface
+    and scoring partial reward from the ground.
+  -->
+  <include file="../assets/menagerie/leap_hand/right_hand.xml"/>
+
+  <!--
+    MuJoCo resolves `meshdir` relative to the TOP-LEVEL file, not the file the
+    directive appears in, so the `meshdir="./assets/"` inside right_hand.xml
+    would be read as `s2_inhand/assets/` and fail. Re-point it here, after the
+    include, so the later directive wins.
+  -->
+  <compiler angle="radian" meshdir="../assets/menagerie/leap_hand/assets/"/>
+
+  <option gravity="8.788 0 -4.354" integrator="implicitfast" cone="elliptic" impratio="100"/>
+
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="140" elevation="-20"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072"/>
+    <material name="cube_mat" rgba="0.85 0.35 0.2 1"/>
+    <material name="cube_mark" rgba="0.95 0.95 0.95 1"/>
+  </asset>
+
+  <worldbody>
+    <light pos="-0.3 0 0.5" dir="0.6 0 -0.8" directional="true"/>
+
+    <!--
+      Cube half-size 0.025 (a 5 cm cube). LEAP's fingertips span roughly
+      0.09 m across the index-to-ring row, so a 5 cm cube is graspable with
+      margin on either side. Density 400 gives about 50 g, light enough that
+      the hand can reorient it and heavy enough that contact is not numerically
+      degenerate.
+
+      The three thin marker geoms are visual-only (contype/conaffinity 0,
+      density 0) and exist purely so orientation is readable in a rendered
+      frame. They contribute no mass and no contacts.
+    -->
+    <body name="cube" pos="0 0.005 0.18">
+      <freejoint name="cube_free"/>
+      <inertial pos="0 0 0" mass="0.05" diaginertia="2.083e-5 2.083e-5 2.083e-5"/>
+      <geom name="cube_geom" type="box" size="0.025 0.025 0.025" material="cube_mat"
+            friction="1.0 0.005 0.0001" solimp="0.99 0.995 0.001" solref="0.005 1"/>
+      <geom name="cube_x" type="box" size="0.026 0.004 0.004" material="cube_mark"
+            contype="0" conaffinity="0" density="0" group="1"/>
+      <geom name="cube_y" type="box" size="0.004 0.026 0.004" material="cube_mark"
+            contype="0" conaffinity="0" density="0" group="1"/>
+    </body>
+  </worldbody>
+
+  <keyframe>
+    <!--
+      `grasp` is the reset pose: fingers partially flexed around the cube so
+      episodes start from contact rather than from free-fall. Joint order is
+      index, middle, ring, thumb (mcp, rot, pip, dip per finger; cmc, axl, mcp,
+      ipl for the thumb), then the cube's 7-DOF free joint.
+
+      These numbers were found by a grid search over finger flexion and cube
+      placement, not chosen by eye. `tools/find_grasp.py` reproduces it. This
+      configuration drifts 7 mm over 2 s of settling with a maximum cube
+      penetration of 1.3 mm.
+
+      Initial penetration matters more than it looks. Configurations that start
+      the cube 10 mm or more inside a finger geom do not merely settle badly,
+      they eject the cube at tens of metres per second as the constraint solver
+      resolves the overlap on the first step. Several grid points blew up that
+      way. Any change to cube size, flexion, or placement must be re-checked
+      for penetration at reset, not just for whether the episode looks fine.
+    -->
+    <key name="grasp"
+         qpos="0.6 0 0.6 0.6  0.6 0 0.6 0.6  0.6 0 0.6 0.6  1.1 0.4 0.6 0.3
+               0 0.005 0.18  1 0 0 0"
+         ctrl="0.6 0 0.6 0.6  0.6 0 0.6 0.6  0.6 0 0.6 0.6  1.1 0.4 0.6 0.3"/>
+  </keyframe>
+</mujoco>

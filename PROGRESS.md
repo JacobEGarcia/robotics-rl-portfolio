@@ -8,10 +8,10 @@
 | **S4** | MuJoCo tendon modeling | **Done, validated** | `media/s4/`, `s4_tendon/README.md` |
 | **S5** | Real-to-sim sysID | **Done, validated** | `media/s5/` |
 | **S6** | PPO in JAX | **Done, validated** | `media/s6/`, `s6_brax_jax/README.md` |
-| **S2** | In-hand reorientation | Blocked — needs GPU (~10⁸ steps) | LEAP/Shadow models downloaded |
-| **S3** | Domain randomization | Blocked — depends on S2 | — |
+| **S2** | In-hand reorientation | **Built, unit-validated, untrained** — needs GPU | `s2_inhand/`, see README |
+| **S3** | Domain randomization | **Randomization built and validated**; eval blocked on S2 | `s3_domain_rand/` |
 
-**Six of eight complete.** Site published at `docs/` (GitHub Pages ready).
+**Six of eight complete and validated. S2 and S3 are now written and unit-tested but untrained.** Site published at `docs/` (GitHub Pages ready).
 
 Every completed project was validated against something external — a published
 baseline, an independent implementation, a physical consistency check, or
@@ -96,3 +96,49 @@ verified working on this machine, so the path is open. Needs the Hugging Face
 `jobs` scope.
 
 Not an authoring problem. Compute only.
+
+
+---
+
+## S2 / S3 — built 2026-08-18, not yet trained
+
+Both projects now exist as code with their correctness properties tested. What
+is missing in both cases is a GPU, not authoring.
+
+**S2** (`s2_inhand/`): LEAP-hand cube reorientation on MJX. Validated: grasp
+stability (7.4 mm drift over 5 s, 1.3 mm max penetration), grasp pose found by
+36-point grid search, palm direction measured rather than assumed, quaternion
+metric correct including the q = -q fold, curriculum sampling respects its cap,
+and the model compiles and steps under MJX. **Not validated: that a policy
+learns the task.**
+
+**S3** (`s3_domain_rand/`): domain randomization with a held-out set that is
+disjoint by construction and defined before training. Verified disjoint on all
+five randomized parameters, with 50.7% of held-out draws below the training
+band so both failure directions are probed.
+
+### Three more silent failures found
+
+Continuing the count from the seven above; same character, none raised.
+
+8. **Initial penetration is a cliff.** A cube starting >=10 mm inside a finger
+   geom is ejected at tens of m/s when the solver resolves the overlap, drifting
+   20 m in 2 s. Adjacent grid points looked fine. Low drift alone is not a valid
+   acceptance test; penetration at reset must be checked separately.
+9. **`meshdir` resolves against the top-level file, not the file it appears
+   in.** Including Menagerie's `right_hand.xml` from another directory silently
+   looks for `s2_inhand/assets/` and fails to load.
+10. **Held-out sampling that only draws above the training band** tests one
+    direction and reports half a result. Fixed by drawing from both sides and
+    asserting the ~50/50 split.
+
+### Measured, and worth stating plainly
+
+`mjx.step` on this model compiles in ~151 s and then runs ~4 s per step
+unbatched on CPU. That is not a throughput number, it is the reason S2 cannot
+run here. Single-env MJX being slower than MuJoCo CPU is expected and is the
+honest caveat from S6 restated.
+
+LEAP's collision geometry turned out to be 68 boxes against only 4 meshes,
+which is far friendlier to MJX than the 91-geom count suggests. The model
+rewrite I expected to need was not necessary.
