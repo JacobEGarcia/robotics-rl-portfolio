@@ -234,6 +234,7 @@ def main() -> None:
     steps_per_iter = args.num_envs * args.rollout_steps
     step_count = start_step
     next_ckpt = start_step + args.ckpt_every
+    iters = 0
     t0 = time.time()
 
     @jax.jit
@@ -339,7 +340,12 @@ def main() -> None:
             curriculum = min(args.curr_max, curriculum + args.curr_step)
             print(f"  curriculum -> {curriculum:.2f} rad", flush=True)
 
-        if step_count % (steps_per_iter * 10) < steps_per_iter:
+        # Always print the first iteration, then every tenth. The first one is
+        # the only evidence that the loop closed at all, and a modulo-only
+        # condition silently prints nothing on short runs, which makes the
+        # smoke gate unfalsifiable.
+        iters += 1
+        if iters == 1 or iters % 10 == 0:
             el = time.time() - t0
             sps = (step_count - start_step) / max(el, 1e-6)
             print(f"step {step_count:>12,}  reward {float(np.mean(rew_buf[-1])):+8.3f}  "
