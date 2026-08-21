@@ -13,7 +13,10 @@ Fairness rules, fixed before results were seen:
   cosine decay, batch 256. No per-arm tuning, no early stopping (there is
   no validation set at a 10-demo budget to stop on honestly).
 * Identical evaluation: 100 episodes, seeds 500_000..500_099, so every arm
-  faces the same 100 sampled stack instances - paired, not marginal.
+  faces the same 100 sampled stack instances. Per-episode outcomes are
+  stored, and `analysis.py` reports the paired difference (pretrained minus
+  scratch, episode for episode) with its own interval - not two marginal
+  intervals eyeballed for overlap.
 * Scratch baselines compute observation statistics from their own demo
   budget. Handing them the pretraining statistics would leak information
   the scratch condition is defined not to have.
@@ -62,12 +65,15 @@ def _transfer_cell(job: dict) -> dict:
     torch.manual_seed(job["seed"])
     rng = np.random.default_rng(job["seed"])
 
-    demos = load_split(
-        Path(job["corpus"]) / "stack_demos",
-        max_episodes=job["budget"],
-        val=False,
-        val_fraction=0.0,
-    )
+    # Zero-shot arms (budget 0) load no demonstrations at all.
+    demos = None
+    if job["budget"] > 0:
+        demos = load_split(
+            Path(job["corpus"]) / "stack_demos",
+            max_episodes=job["budget"],
+            val=False,
+            val_fraction=0.0,
+        )
 
     if job["pretrain_dir"] is not None:
         policy, _ = load_checkpoint(Path(job["pretrain_dir"]) / "policy.pt")
@@ -89,7 +95,7 @@ def _transfer_cell(job: dict) -> dict:
             loss.backward()
             opt.step()
 
-    ci, _ = eval_policy(
+    ci, records = eval_policy(
         policy, "stack", n_episodes=EVAL_EPISODES, base_seed=EVAL_BASE_SEED
     )
     return {
@@ -101,6 +107,9 @@ def _transfer_cell(job: dict) -> dict:
         "ci_low": ci.low,
         "ci_high": ci.high,
         "n": ci.n,
+        # Per-episode outcomes, in seed order, so arms can be compared
+        # paired - this is the data a "blind A/B" claim rests on.
+        "episodes": [int(bool(r["success"])) for r in records],
     }
 
 

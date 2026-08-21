@@ -36,7 +36,7 @@ def _eval_cell(job: dict) -> list[dict]:
     env = TabletopEnv()
     rows = []
     for family in PRETRAIN_FAMILIES:
-        ci, _ = eval_policy(
+        ci, records = eval_policy(
             policy, family, n_episodes=EVAL_EPISODES, base_seed=EVAL_BASE_SEED, env=env
         )
         rows.append(
@@ -49,6 +49,7 @@ def _eval_cell(job: dict) -> list[dict]:
                 "ci_low": ci.low,
                 "ci_high": ci.high,
                 "n": ci.n,
+                "episodes": [int(bool(r["success"])) for r in records],
             }
         )
     return rows

@@ -163,3 +163,43 @@ def summarize(events: list[dict]) -> dict:
         "return_best_episode": float(np.max(rets)),
         "return_mean_all": float(np.mean(rets)),
     }
+
+
+def wilson_interval(successes: int, n: int, *, confidence: float = 0.95) -> Interval:
+    """
+    Wilson score interval for a binomial proportion.
+
+    Bootstrap percentile intervals degenerate on Bernoulli data at the
+    extremes: a cell scoring 0/100 or 100/100 resamples to itself every
+    time and reports a zero-width interval, asserting certainty exactly
+    where a reader most needs to see uncertainty (the true 95% interval for
+    0/100 reaches up to ~3.6%). Wilson's interval has correct coverage
+    across the whole range, including p = 0 and p = 1, and is the standard
+    recommendation (Brown, Cai & DasGupta 2001) for exactly this case.
+    """
+    if n == 0:
+        return Interval(float("nan"), float("nan"), float("nan"), 0)
+    from scipy.stats import norm
+
+    z = norm.ppf(1 - (1 - confidence) / 2)
+    p_hat = successes / n
+    denom = 1 + z * z / n
+    centre = (p_hat + z * z / (2 * n)) / denom
+    half = z * np.sqrt(p_hat * (1 - p_hat) / n + z * z / (4 * n * n)) / denom
+    return Interval(p_hat, max(0.0, centre - half), min(1.0, centre + half), n)
+
+
+def paired_difference(a: np.ndarray, b: np.ndarray, *, resamples: int = 10_000, seed: int = 0) -> Interval:
+    """
+    Bootstrap CI for mean(a - b) over PAIRED per-episode outcomes.
+
+    Two policies evaluated on identical instance sequences yield paired
+    outcomes; the interval on their per-episode difference is what a
+    paired ("A/B") comparison actually reports. Comparing two marginal
+    intervals for overlap is both less powerful and, strictly, wrong.
+    """
+    a = np.asarray(a, dtype=float)
+    b = np.asarray(b, dtype=float)
+    if a.shape != b.shape:
+        raise ValueError("paired outcomes must align episode-for-episode")
+    return bootstrap_ci(a - b, statistic=lambda v: float(np.mean(v)), resamples=resamples, seed=seed)

@@ -9,10 +9,13 @@ Training recipe, and why each choice is what it is:
   grid gets the identical recipe; only capacity and data vary.
 
 * Budget scales with data (30 epoch-equivalents, clamped to [8k, 60k]
-  steps) with early stopping on held-in validation loss (patience 8 evals)
-  and best-checkpoint restoration. Small datasets overfit long before the
-  cap and stop early; large ones train to the cap. This approximates the
-  train-to-convergence regime scaling laws are stated in.
+  steps), always run to completion, with the best held-in-validation
+  checkpoint restored at the end. An earlier draft early-stopped on val
+  loss; review showed that made the effective recipe differ by cell - the
+  8k floor meant small-data cells could never stop early and always saw
+  the full cosine anneal, while overfitting mid-size cells broke out
+  mid-anneal. Fixed budget + best-checkpoint selection treats every cell
+  identically, which is the property a scaling comparison needs.
 
 * Validation is measured two ways every 1000 steps:
     val        held-out episodes of the five pretraining families
@@ -42,8 +45,8 @@ from .dataset import Split, load_split, normalisation_stats  # noqa: E402
 from .model import Policy, save_checkpoint  # noqa: E402
 
 EVAL_EVERY = 1000
-PATIENCE = 8
 BATCH = 256
+EVAL_CAP = 60_000  # max timesteps per evaluation subset
 
 
 def evaluate(policy: Policy, split: Split, idx: np.ndarray) -> float:
@@ -98,10 +101,17 @@ def train_run(
         return 1e-5 + 0.5 * (base_lr - 1e-5) * (1 + math.cos(math.pi * min(t, 1.0)))
 
     # Fixed evaluation subsets: the same indices every eval, so the val
-    # curve moves only when the model does.
-    eval_rng = np.random.default_rng(0)
-    val_idx = eval_rng.choice(len(val), size=min(len(val), 40_000), replace=False)
-    wh_idx = eval_rng.choice(len(withheld), size=min(len(withheld), 40_000), replace=False)
+    # curve moves only when the model does. Each subset gets its OWN
+    # generator: drawing both from one generator would make the withheld
+    # subset depend on len(val) - i.e. on the data scale - so every point
+    # on the hours axis would be scored on a different withheld subset.
+    # (Found in review; the withheld pool is the study's headline metric.)
+    val_idx = np.random.default_rng(0).choice(
+        len(val), size=min(len(val), EVAL_CAP), replace=False
+    )
+    wh_idx = np.random.default_rng(1).choice(
+        len(withheld), size=min(len(withheld), EVAL_CAP), replace=False
+    )
 
     config = {
         "size": size,
@@ -119,8 +129,8 @@ def train_run(
     with RunLogger("s8_bc", config=config, seed=seed, root=Path(runs_root)) as log:
         best_val = float("inf")
         best_withheld = float("inf")
+        best_step = 0
         best_state = None
-        bad_evals = 0
         t0 = time.time()
         running = 0.0
 
@@ -151,16 +161,10 @@ def train_run(
                 )
                 running = 0.0
                 if v < best_val:
-                    best_val, best_withheld = v, w
+                    best_val, best_withheld, best_step = v, w, step
                     best_state = {
                         k: t.detach().clone() for k, t in policy.state_dict().items()
                     }
-                    bad_evals = 0
-                else:
-                    bad_evals += 1
-                    if bad_evals >= PATIENCE:
-                        log.event("early_stop", step=step)
-                        break
 
         if best_state is not None:
             policy.load_state_dict(best_state)
@@ -172,6 +176,7 @@ def train_run(
             "train_samples": len(train),
             "best_val": best_val,
             "best_withheld": best_withheld,
+            "best_step": best_step,
             "steps_trained": step,
             "wall_seconds": round(time.time() - t0, 1),
         }

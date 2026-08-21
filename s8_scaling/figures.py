@@ -36,10 +36,13 @@ SIZE_LABELS = {}  # filled from results (params per size)
 
 
 def load_sweep(runs_root: Path) -> list[dict]:
-    rows = []
-    for result in runs_root.glob("*_s8_bc_*/result.json"):
-        rows.append(json.loads(result.read_text()))
-    return rows
+    """One row per (size, hours, seed); if a cell was rerun, the latest wins."""
+    latest: dict[tuple, tuple[str, dict]] = {}
+    for result in sorted(runs_root.glob("*_s8_bc_*/result.json")):
+        r = json.loads(result.read_text())
+        key = (r["size"], float(r["hours"]), int(r["seed"]))
+        latest[key] = (result.parent.name, r)  # sorted: later timestamp wins
+    return [r for _, r in latest.values()]
 
 
 def _by_size(rows: list[dict], metric: str) -> dict[str, tuple[np.ndarray, np.ndarray, np.ndarray]]:
@@ -89,7 +92,7 @@ def fig_scaling(rows: list[dict], out: Path, metric: str, title: str, fit_sizes=
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.set_xlabel("pretraining data (hours of demonstrated experience)")
-    ax.set_ylabel("next-action prediction MSE")
+    ax.set_ylabel("8-step action-chunk prediction MSE")
     ax.set_title(title)
     ax.legend(fontsize=8.5, ncol=2)
     fig.savefig(out)

@@ -21,7 +21,7 @@ because a fixed-yaw gripper closing on a randomly yawed cube grabs the
 corner-to-corner diagonal, from which the cube pivots out - grasping is a
 5-DoF problem even on a tabletop of boxes.
 
-Observation: 67-D state vector, layout documented in `obs_layout()`.
+Observation: 69-D state vector, layout documented in `obs_layout()`.
 State-based observation is a deliberate scope decision: the object of study
 is scaling *phenomenology* (power laws, ossification, transfer), which
 needs hundreds of training runs on a CPU. Pixels would burn the compute
@@ -115,6 +115,29 @@ class TabletopEnv:
         self._site_point = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_SITE, "goal_point")
         self._site_zone = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_SITE, "goal_zone")
 
+        # Compiled defaults of every object field reset_to() may overwrite, so
+        # a parked object can be restored exactly. Without this, an episode's
+        # physics would depend on which family ran before it in the same env
+        # (a 10 cm pillar parked at a 5 cm-tall object's height sits inside
+        # the table and bounces for the whole of the next episode).
+        m = self.model
+        self._defaults = {
+            name: {
+                "size": m.geom_size[self._geom_ids[name]].copy(),
+                "mass": float(m.body_mass[self._body_ids[name]]),
+                "inertia": m.body_inertia[self._body_ids[name]].copy(),
+                "friction": m.geom_friction[self._geom_ids[name]].copy(),
+            }
+            for name in OBJECT_NAMES
+        }
+        # MuJoCo combines contact friction by taking the geom with the higher
+        # `priority`; at equal priority it takes the elementwise maximum. The
+        # table (0.8) and Menagerie's fingertip pads (1.0) would therefore mask
+        # most of the sampled [0.6, 1.2] friction range. Giving the objects
+        # priority 1 makes the sampled coefficient the one that acts.
+        for name in OBJECT_NAMES:
+            m.geom_priority[self._geom_ids[name]] = 1
+
         self.instance: TaskInstance | None = None
         self._setpoint = np.zeros(3)
         self._prev_action = np.zeros(ACT_DIM)
@@ -143,23 +166,18 @@ class TabletopEnv:
         # S5 pattern: vary physics through model fields, never recompile.
         for name in OBJECT_NAMES:
             adr = self._qpos_adr[name]
+            gid, bid = self._geom_ids[name], self._body_ids[name]
             if name in inst.objects:
                 p = inst.objects[name]
                 half = np.asarray(p["half"], dtype=float)
-                gid, bid = self._geom_ids[name], self._body_ids[name]
-                m.geom_size[gid] = half
-                m.body_mass[bid] = p["mass"]
-                # Box inertia about its centre, from mass and half-sizes.
-                a, b, c = half
-                m.body_inertia[bid] = (
-                    p["mass"] / 3.0 * np.array([b * b + c * c, a * a + c * c, a * a + b * b])
-                )
-                m.geom_friction[gid, 0] = p["friction"]
+                self._set_box(gid, bid, half, p["mass"], p["friction"])
                 yaw = p["yaw"]
                 d.qpos[adr : adr + 3] = [p["xy"][0], p["xy"][1], half[2] + 0.001]
                 d.qpos[adr + 3 : adr + 7] = [np.cos(yaw / 2), 0, 0, np.sin(yaw / 2)]
             else:
-                d.qpos[adr : adr + 3] = [*PARK[name], 0.05]
+                dflt = self._defaults[name]
+                self._set_box(gid, bid, dflt["size"], dflt["mass"], dflt["friction"][0])
+                d.qpos[adr : adr + 3] = [*PARK[name], dflt["size"][2] + 0.001]
                 d.qpos[adr + 3 : adr + 7] = [1, 0, 0, 0]
 
         # Goal markers: a floating point for 3-D goals, a zone for table goals.
@@ -213,6 +231,29 @@ class TabletopEnv:
         reward = 1.0 if success else 0.0
         info = {"success": self._succeeded, "steps": self._steps}
         return self._obs(), reward, terminated, truncated, info
+
+    def _set_box(self, gid: int, bid: int, half, mass: float, friction: float) -> None:
+        """
+        Write a box's size, mass, inertia and friction into the model.
+
+        Sizes are compiled into two collision constants that must be kept
+        consistent by hand: `geom_rbound` (bounding-sphere radius, used by the
+        plane and sphere broadphase tests) and `geom_aabb` (used by the BVH
+        broadphase). Writing `geom_size` alone leaves a pillar taller than its
+        XML size with its table contact culled - it settles embedded in the
+        table with the contact flickering on one tick in five. Found by an
+        adversarial review before any corpus was trained on, and verified.
+        """
+        m = self.model
+        half = np.asarray(half, dtype=float)
+        m.geom_size[gid] = half
+        m.geom_rbound[gid] = float(np.linalg.norm(half))
+        m.geom_aabb[gid] = np.concatenate([[0.0, 0.0, 0.0], half])
+        m.body_mass[bid] = mass
+        a, b, c = half
+        # Box inertia about its centre, from mass and half-sizes.
+        m.body_inertia[bid] = mass / 3.0 * np.array([b * b + c * c, a * a + c * c, a * a + b * b])
+        m.geom_friction[gid, 0] = friction
 
     # ------------------------------------------------------------ observation
 

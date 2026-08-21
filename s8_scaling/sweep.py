@@ -41,6 +41,7 @@ def _run_cell(job: dict) -> dict:
         seed=job["seed"],
         corpus=job["corpus"],
         threads=job["threads"],
+        runs_root=job["runs_root"],
     )
 
 
@@ -72,6 +73,7 @@ def main() -> None:
             "seed": seed,
             "corpus": args.corpus,
             "threads": args.threads,
+            "runs_root": args.runs_root,
         }
         for size in SIZES
         for hours in HOURS

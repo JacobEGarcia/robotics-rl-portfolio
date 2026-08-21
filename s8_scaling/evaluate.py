@@ -2,9 +2,10 @@
 Closed-loop evaluation through the S7 harness.
 
 Every number this module produces goes through `common.backends.SimClosedLoop`
-and `common.metrics.success_rate` - the same interface and the same statistic
-definitions as every other project in this portfolio. Success rates carry
-bootstrap confidence intervals; nothing here invents its own metric.
+and `common.metrics` - the same interface and the same statistic definitions
+as every other project in this portfolio. Success rates carry Wilson score
+intervals (bootstrap intervals degenerate at 0% and 100% on Bernoulli data),
+and per-episode records are returned so paired comparisons can be computed.
 
 The paired-comparison protocol ("blind A/B" in the write-up): evaluations
 use seed range [base_seed, base_seed + n). Seed i deterministically maps to
@@ -24,7 +25,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from common.backends import SimClosedLoop  # noqa: E402
-from common.metrics import Interval, bootstrap_ci  # noqa: E402
+from common.metrics import Interval, wilson_interval  # noqa: E402
 
 from .env import TabletopEnv  # noqa: E402
 from .model import ChunkedPolicyAdapter, Policy  # noqa: E402
@@ -65,5 +66,5 @@ def eval_policy(
         success_fn=lambda info: bool(info.get("success", False)),
     )
     records = backend.evaluate(n_episodes, base_seed=base_seed)
-    flags = np.array([float(r["success"]) for r in records])
-    return bootstrap_ci(flags, statistic=lambda v: float(np.mean(v))), records
+    successes = sum(int(bool(r["success"])) for r in records)
+    return wilson_interval(successes, len(records)), records

@@ -104,10 +104,11 @@ def collect_corpus(
     Collect at least `target_hours` of successful demonstrations, spread
     evenly across `families`, and write the corpus directory.
 
-    Episodes are collected in interleaved seed order and stored family-
-    round-robin, so "the first H hours" of this corpus is a well-defined,
-    family-balanced subset - the property that makes the data-scaling axis
-    a chain of strict prefixes rather than six unrelated datasets.
+    Episodes are stored interleaved so that cumulative hours per family stay
+    balanced at every prefix, so "the first H hours" of this corpus is a
+    well-defined, family-balanced (in time) subset - the property that makes
+    the data-scaling axis a chain of strict prefixes rather than seven
+    unrelated datasets.
     """
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -167,18 +168,24 @@ def collect_corpus(
             )
     print()
 
-    # Interleave families round-robin so any prefix is balanced.
+    # Interleave families so that every PREFIX is balanced in hours, not in
+    # episode count: at each step emit the next episode of whichever family
+    # has the least cumulative time so far. Expert episodes differ several-
+    # fold in length (a reach is ~1 s, a place ~4 s), so an episode-count
+    # round-robin would make small prefixes place-heavy in time and the
+    # corpus tail reach-heavy once short families ran out - a family-mixture
+    # confound riding on the data-scale axis. (Found in review.)
     order = []
     counters = {f: 0 for f in families}
+    seconds = {f: 0.0 for f in families}
     while True:
-        advanced = False
-        for f in families:
-            if counters[f] < len(results[f]["meta"]):
-                order.append((f, counters[f]))
-                counters[f] += 1
-                advanced = True
-        if not advanced:
+        live = [f for f in families if counters[f] < len(results[f]["meta"])]
+        if not live:
             break
+        f = min(live, key=lambda fam: seconds[fam])
+        order.append((f, counters[f]))
+        seconds[f] += results[f]["meta"][counters[f]][0] * SECONDS_PER_STEP
+        counters[f] += 1
 
     obs_all, act_all, episodes = [], [], []
     cursor = 0
