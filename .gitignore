@@ -18,3 +18,14 @@ Thumbs.db
 # Run artifacts are NOT ignored — runs/ holds the JSONL logs and checkpoints
 # that back every number on the site, and they total ~1.2 MB. Reproducibility
 # claims are worth more than a slightly smaller repository.
+
+# S8 — regenerable bulk artifacts. The corpus is ~800 MB and fully
+# reproducible from data_engine.py + the seed ranges documented there;
+# per-run checkpoints of the 70-cell sweep total ~500 MB. The JSONL logs
+# and result.json files that back the published numbers ARE committed.
+s8_scaling/corpus/
+s8_scaling/collection.log
+s8_scaling/tools/*.png
+s8_scaling/tools/*.mp4
+runs/*_s8_bc_*/policy.pt
+runs/*_s8_transfer_*/policy.pt

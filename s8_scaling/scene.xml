@@ -1,0 +1,101 @@
+<mujoco model="s8_tabletop_panda">
+  <!--
+    S8: tabletop manipulation universe for the behavior-cloning scaling study.
+
+    The floor plane IS the tabletop. The Panda base sits directly on it at the
+    origin, which is physically identical to bolting the robot to a table and
+    keeps every workspace coordinate in one frame with z=0 at the surface.
+
+    Three free objects cover every task family:
+      cube_a  - the manipulated cube (grasp / push / place / stack)
+      cube_b  - stacking base and distractor
+      pillar  - tall block for the topple family
+    Objects not used by a family are parked far outside the workspace rather
+    than removed, so the compiled model - and therefore its hash in the run
+    manifest - is identical across all families. Per-instance variation
+    (sizes, masses, frictions, poses) is written into model fields at reset,
+    the same approach S5 uses for system identification, so no per-episode
+    recompile is needed.
+  -->
+  <include file="../assets/menagerie/franka_emika_panda/panda.xml"/>
+
+  <!--
+    MuJoCo resolves `meshdir` relative to the TOP-LEVEL file, not the file the
+    directive appears in. Re-point it here, after the include, so this
+    directive wins over the one inside panda.xml.
+  -->
+  <compiler angle="radian" meshdir="../assets/menagerie/franka_emika_panda/assets" autolimits="true"/>
+
+  <!--
+    implicitfast + elliptic cones + impratio 100: the combination that keeps a
+    two-finger grasp from creeping at 2 ms timesteps without resorting to the
+    noslip solver, which would hide friction parameters from the physics.
+    impratio 10 was tried first and still let cubes creep centimetres per
+    second through a 23 N grasp on long vertical carries; 100 is the value
+    S2's in-hand scene already settled on for exactly this failure mode.
+  -->
+  <option timestep="0.002" integrator="implicitfast" cone="elliptic" impratio="100"/>
+
+  <visual>
+    <headlight diffuse="0.5 0.5 0.5" ambient="0.35 0.35 0.35" specular="0.1 0.1 0.1"/>
+    <global azimuth="130" elevation="-25" offwidth="1280" offheight="720"/>
+    <quality shadowsize="4096"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="0.08 0.09 0.11" rgb2="0.03 0.03 0.04" width="256" height="256"/>
+    <texture name="tabletop" type="2d" builtin="checker" rgb1="0.23 0.22 0.20" rgb2="0.26 0.25 0.23" width="512" height="512"/>
+    <material name="tabletop" texture="tabletop" texrepeat="8 8" reflectance="0.05"/>
+    <material name="cube_a_mat" rgba="0.85 0.30 0.20 1"/>
+    <material name="cube_b_mat" rgba="0.20 0.45 0.85 1"/>
+    <material name="pillar_mat" rgba="0.85 0.70 0.20 1"/>
+  </asset>
+
+  <worldbody>
+    <light pos="0.6 -0.4 1.5" dir="-0.3 0.2 -1" diffuse="0.7 0.7 0.7" specular="0.2 0.2 0.2" castshadow="true"/>
+    <light pos="-0.4 0.6 1.2" dir="0.4 -0.5 -1" diffuse="0.35 0.35 0.35" specular="0 0 0" castshadow="false"/>
+
+    <geom name="table" type="plane" size="3 3 0.05" material="tabletop" friction="0.8 0.005 0.0001"/>
+
+    <body name="cube_a" pos="0.45 0.10 0.025">
+      <freejoint name="cube_a_joint"/>
+      <geom name="cube_a_geom" type="box" size="0.022 0.022 0.022" mass="0.08"
+            material="cube_a_mat" friction="0.9 0.005 0.0001"/>
+    </body>
+
+    <body name="cube_b" pos="0.45 -0.10 0.025">
+      <freejoint name="cube_b_joint"/>
+      <geom name="cube_b_geom" type="box" size="0.024 0.024 0.024" mass="0.10"
+            material="cube_b_mat" friction="0.9 0.005 0.0001"/>
+    </body>
+
+    <body name="pillar" pos="0.55 0.0 0.08">
+      <freejoint name="pillar_joint"/>
+      <geom name="pillar_geom" type="box" size="0.02 0.02 0.08" mass="0.12"
+            material="pillar_mat" friction="0.9 0.005 0.0001"/>
+    </body>
+
+    <!-- Goal visualisations only: no contype/conaffinity, physics never sees them. -->
+    <site name="goal_point" pos="0.45 0 0.2" size="0.018" rgba="0.2 0.9 0.4 0.55" type="sphere"/>
+    <!-- Cylinder site size is (radius, half-height): a thin 5 cm disc. -->
+    <site name="goal_zone" pos="0.45 0 0.001" size="0.05 0.002" rgba="0.2 0.9 0.4 0.30" type="cylinder"/>
+
+    <camera name="main" pos="1.25 -0.95 0.85" xyaxes="0.61 0.79 0 -0.34 0.26 0.90"/>
+    <camera name="side" pos="0.45 -1.25 0.45" xyaxes="1 0 0 0 0.30 0.95"/>
+    <camera name="top" pos="0.45 0 1.4" xyaxes="0 -1 0 1 0 0"/>
+  </worldbody>
+
+  <keyframe>
+    <!--
+      Ready pose: the classic Franka "ready" configuration, TCP roughly above
+      the workspace centre pointing straight down, gripper open (ctrl 255).
+      qpos layout: 7 arm + 2 fingers + 3 free objects x 7.
+    -->
+    <key name="s8_home"
+         qpos="0 -0.7853 0 -2.3561 0 1.5707 0.7853 0.04 0.04
+               0.45 0.10 0.025 1 0 0 0
+               0.45 -0.10 0.025 1 0 0 0
+               0.55 0.0 0.08 1 0 0 0"
+         ctrl="0 -0.7853 0 -2.3561 0 1.5707 0.7853 255"/>
+  </keyframe>
+</mujoco>
