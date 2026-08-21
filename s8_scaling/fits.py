@@ -60,29 +60,37 @@ def fit_pure(d: np.ndarray, loss: np.ndarray) -> PowerLawFit:
 
 
 def fit_offset(d: np.ndarray, loss: np.ndarray) -> PowerLawFit | None:
-    """Offset power law, seeded from the pure fit. None if it fails."""
+    """
+    Offset power law, seeded from the pure fit. None if it fails.
+
+    Fitted in the parametrisation L = A * D^-alpha + L_inf, where A is the
+    loss at one unit of data - a quantity of sane magnitude. The (Dc/D)^alpha
+    form's Dc is astronomically small or large for small alpha (here Dc is
+    ~1e-14 hours for alpha ~0.13), which puts any reasonable bound on it out
+    of reach of the optimiser's initial point. Dc is recovered afterwards.
+    """
     d = np.asarray(d, dtype=float)
     loss = np.asarray(loss, dtype=float)
     seed = fit_pure(d, loss)
 
-    def f(x, alpha, d_c, l_inf):
-        return (d_c / x) ** alpha + l_inf
+    def f(x, alpha, a, l_inf):
+        return a * x ** (-alpha) + l_inf
 
+    a0 = float(seed.d_c**seed.alpha) if np.isfinite(seed.d_c) else float(loss[0])
     try:
         popt, _ = curve_fit(
             f,
             d,
             loss,
-            p0=[seed.alpha, seed.d_c, 0.5 * loss.min()],
-            bounds=([1e-3, 1e-6, 0.0], [10.0, 1e6, loss.min()]),
-            maxfev=20_000,
+            p0=[max(seed.alpha, 0.05), a0, 0.5 * float(loss.min())],
+            bounds=([1e-3, 1e-8, 0.0], [10.0, 1e3, float(loss.min())]),
+            maxfev=50_000,
         )
     except (RuntimeError, ValueError):
         return None
+    alpha, a, l_inf = (float(v) for v in popt)
     pred = f(d, *popt)
     ss_res = np.sum((loss - pred) ** 2)
     ss_tot = np.sum((loss - loss.mean()) ** 2)
     r2 = 1.0 - ss_res / ss_tot if ss_tot > 0 else float("nan")
-    return PowerLawFit(
-        alpha=float(popt[0]), d_c=float(popt[1]), l_inf=float(popt[2]), r2=float(r2), form="offset"
-    )
+    return PowerLawFit(alpha=alpha, d_c=a ** (1.0 / alpha), l_inf=l_inf, r2=float(r2), form="offset")

@@ -1,0 +1,37 @@
+35 checkpoints x 5 families
+[   79s]  l/32.0h mean success 0.84
+[   80s]  l/8.0 h mean success 0.80
+[   80s] xl/32.0h mean success 0.83
+[   81s] xl/8.0 h mean success 0.78
+[   81s]  l/16.0h mean success 0.82
+[   82s]  m/32.0h mean success 0.78
+[   82s]  m/16.0h mean success 0.81
+[   82s]  l/4.0 h mean success 0.78
+[   83s]  m/8.0 h mean success 0.79
+[   83s] xl/16.0h mean success 0.83
+[   83s] xl/4.0 h mean success 0.78
+[   85s] xl/2.0 h mean success 0.73
+[   85s]  l/2.0 h mean success 0.78
+[   93s] xl/1.0 h mean success 0.72
+[  154s]  m/4.0 h mean success 0.76
+[  159s]  s/8.0 h mean success 0.76
+[  160s]  s/16.0h mean success 0.72
+[  161s]  m/2.0 h mean success 0.75
+[  162s]  l/0.5 h mean success 0.67
+[  162s]  l/1.0 h mean success 0.69
+[  162s]  s/32.0h mean success 0.71
+[  163s]  m/1.0 h mean success 0.68
+[  165s]  s/4.0 h mean success 0.72
+[  166s] xl/0.5 h mean success 0.66
+[  170s]  t/16.0h mean success 0.60
+[  173s]  t/32.0h mean success 0.57
+[  179s]  t/8.0 h mean success 0.58
+[  180s]  t/4.0 h mean success 0.58
+[  236s]  m/0.5 h mean success 0.67
+[  243s]  s/2.0 h mean success 0.60
+[  244s]  s/1.0 h mean success 0.54
+[  249s]  s/0.5 h mean success 0.51
+[  256s]  t/1.0 h mean success 0.51
+[  256s]  t/2.0 h mean success 0.48
+[  257s]  t/0.5 h mean success 0.48
+wrote s8_scaling\results\multitask.json

@@ -1,8 +1,9 @@
 # Robotics RL &amp; Sim-to-Real
 
-Reinforcement learning implemented from scratch, tendon actuator modeling in
-MuJoCo, and real-to-sim system identification measured against logged data from
-a physical Franka Panda.
+Scaling laws for behaviour cloning measured end-to-end on a CPU, reinforcement
+learning implemented from scratch, tendon actuator modeling in MuJoCo, and
+real-to-sim system identification measured against logged data from a physical
+Franka Panda.
 
 **[Read the write-up →](https://jacobegarcia.github.io/robotics-rl-portfolio/)**
 
@@ -15,6 +16,7 @@ result.
 
 | Project | Result |
 |---|---|
+| **[S8 — Scaling laws for BC](s8_scaling/)** | Power-law data scaling (R² up to 0.99, one exponent α ≈ 0.14 across a 290× range of model sizes), capacity ossification, and transfer to a withheld task — 70-run grid, 34 h of procedurally generated manipulation data, all on CPU |
 | **[S5 — Real-to-sim sysID](s5_sysid/)** | **56.7%** reality-gap reduction on held-out real robot episodes |
 | **[S6 — PPO in JAX](s6_brax_jax/)** | **28.3×** throughput on the same CPU; both implementations solve the task |
 | **[SAC from scratch](sac_scratch/)** | **9.41×** PPO's sample efficiency, identical task and seed |
@@ -72,6 +74,10 @@ bash scripts/fetch_assets.sh   # Menagerie + 32 DROID episodes
 ## Run
 
 ```bash
+python -m s8_scaling.data_engine --hours 33     # ~10 min on 32 cores
+python -m s8_scaling.sweep                      # 70-run grid
+python -m s8_scaling.reeval && python -m s8_scaling.transfer && python -m s8_scaling.eval_sweep
+python -m s8_scaling.analysis && python -m s8_scaling.figures --dark
 python -m s1_ppo.train       --env Pendulum-v1 --total-steps 150000
 python -m sac_scratch.train  --env Pendulum-v1 --total-steps 30000
 python -m s4_tendon.hysteresis
@@ -90,6 +96,7 @@ what the published numbers are computed from.
 
 ```
 common/          evaluation harness, logging, metrics, plotting, recording
+s8_scaling/      behaviour-cloning scaling study: data engine, grid, transfer
 s1_ppo/          PPO in PyTorch
 sac_scratch/     SAC in PyTorch
 s4_tendon/       tendon-driven finger model and friction characterisation

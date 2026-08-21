@@ -3,10 +3,11 @@ Corpus loading with the two properties the scaling axes depend on.
 
 1. Prefix subsets. `load_split(hours=H)` takes episodes in stored order
    until H hours accumulate. Because the data engine interleaved families
-   round-robin, every prefix is family-balanced, and the 1-hour dataset is
-   literally the first hour of the 32-hour dataset. Scaling curves compare
-   nested datasets, not six independently sampled ones - otherwise dataset-
-   to-dataset sampling luck is confounded with the effect of scale.
+   so that cumulative hours stay balanced, every prefix is family-balanced
+   in time, and the 1-hour dataset is literally the first hour of the
+   32-hour dataset. Scaling curves compare nested datasets, not seven
+   independently sampled ones - otherwise dataset-to-dataset sampling luck
+   is confounded with the effect of scale.
 
 2. Leakage-free splits. Train/val is split by *episode*, not by timestep,
    using a hash of the episode seed. Adjacent timesteps of one episode are
@@ -28,7 +29,7 @@ from pathlib import Path
 import numpy as np
 
 from .data_engine import SECONDS_PER_STEP
-from .env import ACT_DIM, OBS_DIM
+from .env import ACT_DIM
 
 CHUNK = 8  # action-chunk length K: the policy predicts K future actions
 

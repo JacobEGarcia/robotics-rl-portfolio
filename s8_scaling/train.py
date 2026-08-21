@@ -8,7 +8,7 @@ Training recipe, and why each choice is what it is:
   asking "or did you just tune the small runs harder?"  Every cell of the
   grid gets the identical recipe; only capacity and data vary.
 
-* Budget scales with data (30 epoch-equivalents, clamped to [8k, 60k]
+* Budget scales with data (30 epoch-equivalents, clamped to [8k, 150k]
   steps), always run to completion, with the best held-in-validation
   checkpoint restored at the end. An earlier draft early-stopped on val
   loss; review showed that made the effective recipe differ by cell - the
@@ -70,7 +70,7 @@ def train_run(
     seed: int,
     corpus: str = "s8_scaling/corpus",
     threads: int = 4,
-    max_steps_cap: int = 60_000,
+    max_steps_cap: int = 150_000,
     runs_root: str = "runs",
 ) -> dict:
     torch.set_num_threads(threads)
