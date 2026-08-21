@@ -30,9 +30,9 @@ sizes × 7 data scales × 2 seeds, one recipe, all on CPU.
 |---|---|
 | data-scaling curves, common val set | near-straight in log-log, α 0.13–0.18, R² 0.96–0.99 (seven points per curve; no "law" claimed) |
 | 8→16 h doubling (uniform recipe) | every size gains 8.7–11.9% — **no ossification threshold found** |
-| capacity | past 160k params nothing measurable at any data scale; 32 h: three largest within 3.5% |
+| capacity | 0.5 h: xl 15% ahead of 160k; 2–16 h: nothing past 160k (larger 1–9% worse); 32 h: three largest within 3.4% |
 | withheld (stack) zero-shot error at 8 epochs | t −33%, xl −40% over 64× data |
-| specialisation | xl withheld error rises after 7.5 (8 h) / 5.4 (32 h) epochs while held-in val falls |
+| specialisation (xl, seed 0) | withheld error minimum at 7.5 (8 h) / 5.4 (32 h) epochs, sustained rise from 14 / 10, while held-in val trends down |
 | transfer, 580k, 100 demos | scratch 11% → 42% at 32 h, paired **+32 pts [+24, +40]**; 20/21 cells p<0.05, 18 Bonferroni |
 | transfer, 3.26M, 100 demos | 25% scratch; pretraining −6 to +8, none significant; helps at 10/30 demos |
 | multi-task closed loop, xl @ 32 h, seed 0 | reach 100 / push 74 / lift 82 / place 78 / topple 100 % |

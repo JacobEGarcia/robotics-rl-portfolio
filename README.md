@@ -16,7 +16,7 @@ result.
 
 | Project | Result |
 |---|---|
-| **[S8 — Scaling laws for BC](s8_scaling/)** | 70-run size×data grid on 34 h of procedural manipulation data: near-power-law curves (α 0.13–0.18, R² 0.96–0.99), **+32 pt** paired transfer gain on a withheld task (20/21 cells significant), specialisation after ~10 epochs — and no ossification threshold found. All on CPU |
+| **[S8 — Scaling laws for BC](s8_scaling/)** | 70-run size×data grid on 34 h of procedural manipulation data: near-power-law curves (α 0.13–0.18, R² 0.96–0.99), **+32 pt** paired transfer gain on a withheld task (20/21 cells significant), specialisation within 15 epochs — and no ossification threshold found. All on CPU |
 | **[S5 — Real-to-sim sysID](s5_sysid/)** | **56.7%** reality-gap reduction on held-out real robot episodes |
 | **[S6 — PPO in JAX](s6_brax_jax/)** | **28.3×** throughput on the same CPU; both implementations solve the task |
 | **[SAC from scratch](sac_scratch/)** | **9.41×** PPO's sample efficiency, identical task and seed |

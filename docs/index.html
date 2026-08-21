@@ -317,12 +317,13 @@ footer a:hover{color:var(--amber)}
 
   <figure class="plate bleed">
     <img src="media/s8/fig3_capacity.png" alt="Two panels: error versus data per model size, and error versus parameters per data scale">
-    <figcaption><b>Plate 4 · Capacity</b>The same grid cut the other way. At half an hour and one
-      hour the largest model is nominally best; from two to sixteen hours the 160k-parameter
+    <figcaption><b>Plate 4 · Capacity</b>The same grid cut the other way. At half an hour the largest
+      model is clearly best and at one hour nominally so; from two to sixteen hours the 160k-parameter
       model is best and the two larger ones are one to nine percent <em>worse</em>; at thirty-two
-      hours the three largest are within 3.5% of each other, inside their seed spread. Past 160k
-      parameters, capacity buys nothing measurable in this universe at any data scale tried. The
-      floor is set by the task and the demonstrators, not by the model.</figcaption>
+      hours the three largest are within 3.4% of each other, a gap the largest model's own seed
+      spread (3.5%) covers. Capacity helps when data is scarcest — at half an hour the largest
+      model is 15% ahead of the 160k one — and buys nothing from two to sixteen hours. The floor
+      there is set by the task and the demonstrators, not by the model.</figcaption>
   </figure>
 
   <div class="col">
@@ -348,8 +349,8 @@ footer a:hover{color:var(--amber)}
   <figure class="plate">
     <img src="media/s8/fig7_specialisation.png" alt="Withheld-family error over training steps for the largest model at four data scales">
     <figcaption><b>Plate 6 · Specialisation, seen from inside</b>The largest model's withheld-family
-      error <em>over training</em>, while its held-in validation loss falls monotonically the whole
-      time. With eight hours of data the withheld error bottoms out at 0.050 after 16,000 steps
+      error <em>over training</em> (seed 0), while its held-in validation loss trends downward and
+      keeps its best checkpoint near the end of the budget. With eight hours of data the withheld error bottoms out at 0.050 after 16,000 steps
       (7.5 epochs), begins a sustained climb at about 30,000 (14 epochs), and ends its thirty
       epochs at 0.122 — worse than it started. With thirty-two hours it bottoms out at 0.046 after
       46,000 steps (5.4 epochs), holds until about 87,000 (10 epochs), and climbs to 0.077 by the
@@ -454,10 +455,10 @@ footer a:hover{color:var(--amber)}
        are scripted, two seeds are not many, and the largest model here would be a rounding error
        in a foundation model's parameter count. What appeared: near-straight loss curves with
        similar exponents across a 290× range of model size, specialisation away from an unseen
-       task after roughly ten passes over the data, and pretraining that buys downstream success
-       where demonstrations are scarce relative to capacity. What did not: an ossification
-       threshold, or any return to capacity past 160k parameters. Both halves of that list are
-       the result.</p>
+       task within the first fifteen passes over the data, and pretraining that buys downstream
+       success where demonstrations are scarce relative to capacity. What did not: an
+       ossification threshold, or any return to capacity past 160k parameters between two and
+       sixteen hours of data. Both halves of that list are the result.</p>
   </div>
 </div></article>
 
@@ -758,7 +759,7 @@ footer a:hover{color:var(--amber)}
          thirty-two hours. Re-scoring every checkpoint on one common held-out set made every
          curve monotone.</p></div></div>
     <div class="bug"><div>
-      <h5>A step floor that doubled one cell's epochs</h5>
+      <h5>A step floor that doubled the half-hour cells' epochs</h5>
       <p>The training budget was "thirty epochs, clamped to at least 8,000 steps". At half an hour
          of data the floor bound, and those cells trained sixty epochs — twice the recipe — at
          exactly the scale where the largest model's pretraining appeared to <em>hurt</em>

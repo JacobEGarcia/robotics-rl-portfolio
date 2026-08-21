@@ -71,8 +71,8 @@ Normalisation statistics are computed per-run on that run's own training
 subset, never on the full corpus.
 
 Policies predict 8-step action chunks (standard in manipulation BC), and
-closed-loop evaluation executes chunks receding-horizon through the S7
-`SimClosedLoop` backend.
+closed-loop evaluation executes each full chunk and then re-plans from live
+state (every 8 control steps, 0.4 s) through the S7 `SimClosedLoop` backend.
 
 ## The experiments
 
@@ -113,24 +113,26 @@ place 98%, topple 100% (stack, for the withheld corpora: 96%).
 | xl | 3.26M | 0.0158 | 0.0089 | 0.128 | 0.979 | 11.9% | 12.6% |
 
 Curves are near-straight in log-log with exponents 0.13–0.18 (standard errors
-≈ 0.01); seven points per curve do not establish a power law or a shared
+0.007–0.018); seven points per curve do not establish a power law or a shared
 exponent, and the write-up does not claim either. Over the 8→16 h doubling,
 where every cell trains the identical recipe, all sizes gain 8.7–11.9%. The
 small models' gains shrink only in the 16→32 h doubling, which is the one
 where the 150k-step cap binds (17.6 epochs) — so **no ossification threshold
-is claimed**. Capacity: xl is nominally best at 0.5–1 h; from 2 to 16 h the
-160k model is best and the larger two are 1–9% worse; at 32 h the three
-largest are within 3.5% (inside seed spread).
+is claimed**. Capacity: xl is clearly best at 0.5 h (15% ahead of the 160k
+model, 5% ahead of 582k) and nominally best at 1 h; from 2 to 16 h the 160k
+model is best and the larger two are 1–9% worse; at 32 h the three largest
+are within 3.4%, a gap xl's own seed spread (3.5%) covers.
 
 **Zero-shot prediction error on the withheld family (stack), at 8 epochs** —
 a selection rule fixed without looking at the withheld family (the minimum
 over training is an oracle choice whose bias grows with data scale; it is in
 `summary.md` for transparency only). t: 0.143 → 0.095 (−33%); xl: 0.082 →
-0.049 (−40%); R² 0.80–0.88. Over training, xl's withheld error bottoms out
-at 16k steps (7.5 epochs) with 8 h of data and at 46k steps (5.4 epochs) with
-32 h, then climbs (to 0.122 and 0.077) while held-in validation keeps
-falling: 4× the data bought 2.9× the steps before specialisation, within a
-factor of 1.4 in epochs.
+0.049 (−40%); R² 0.80–0.88. Over training (seed 0), xl's withheld error
+bottoms out at 16k steps (7.5 epochs) with 8 h of data and at 46k steps (5.4
+epochs) with 32 h, begins a sustained rise at ~30k and ~87k steps (14 and 10
+epochs), and ends at 0.122 and 0.077 while held-in validation keeps trending
+down: 4× the data bought 2.9× the steps before specialisation, within a
+factor of 1.4 in epochs (seed 1: 2.3× and 1.7×).
 
 **Transfer to stack, 580k policy.** Success is the mean of 2 seeds (Wilson
 95% at n = 100 instances; both seeds see the same 100 instances). Paired
@@ -164,7 +166,8 @@ place 78%, topple 100% (mean 87%); t at 0.5 h: mean 38%.
 **What this is not.** State-based observations, MLP policies, scripted
 demonstrators, two seeds, one CPU. The claims are about the experimental
 method and the shapes it reveals at this scale — and the two it does not:
-an ossification threshold, and any return to capacity past 160k parameters.
+an ossification threshold, and any return to capacity past 160k parameters
+between 2 and 16 h of data.
 
 ## Reproduce
 
@@ -175,8 +178,8 @@ python -m s8_scaling.data_engine --out s8_scaling/corpus --hours 33
 # 2. the pretraining grid (5 sizes x 7 scales x 2 seeds; resumable)
 python -m s8_scaling.sweep
 
-# 3. closed-loop evaluation of every checkpoint
-python -m s8_scaling.reeval        # score every checkpoint on the common val set
+# 3. score every checkpoint on the common val set (open loop), then closed loop
+python -m s8_scaling.reeval
 python -m s8_scaling.eval_sweep
 
 # 4. transfer scaling on the withheld family
