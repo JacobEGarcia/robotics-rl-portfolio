@@ -55,21 +55,32 @@ def main() -> None:
         policy.eval()
         v = evaluate(policy, common_val, val_idx)
         w = evaluate(policy, withheld, wh_idx)
-        _, events = read_log(run_dir)
+        manifest, events = read_log(run_dir)
         evs = [e for e in events if e.get("type") == "eval"]
         wh_curve = [e["withheld_loss"] for e in evs]
+        # Withheld loss at a FIXED epoch count (8 epochs, the nearest logged
+        # evaluation). A selection rule that never looks at the withheld
+        # family: taking the minimum over training would be an oracle
+        # choice on the test family whose bias grows with the number of
+        # evaluations, i.e. with data scale. Found in review.
+        train_samples = manifest["config"]["train_samples"]
+        target_step = 8 * train_samples / 256
+        nearest = min(evs, key=lambda e: abs(e["step"] - target_step)) if evs else None
         out = {
             "val_common": v,
             "withheld_at_checkpoint": w,
+            "withheld_at_8ep": float(nearest["withheld_loss"]) if nearest else float("nan"),
+            "withheld_at_8ep_step": int(nearest["step"]) if nearest else -1,
             "withheld_min": float(min(wh_curve)) if wh_curve else float("nan"),
             "withheld_min_step": int(evs[int(np.argmin(wh_curve))]["step"]) if wh_curve else -1,
             "withheld_final": float(wh_curve[-1]) if wh_curve else float("nan"),
+            "epochs_trained": float(evs[-1]["step"] * 256 / train_samples) if evs else float("nan"),
             "common_val_timesteps": int(len(val_idx)),
         }
         (run_dir / "common_eval.json").write_text(json.dumps(out, indent=2))
         print(
             f"{cfg['size']:>2}/{cfg['hours']:<4}h val_common {v:.4f}  "
-            f"withheld ckpt {w:.4f}  min {out['withheld_min']:.4f} @ {out['withheld_min_step']}"
+            f"withheld ckpt {w:.4f}  @8ep {out['withheld_at_8ep']:.4f}  min {out['withheld_min']:.4f}"
         )
 
 

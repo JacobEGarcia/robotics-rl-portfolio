@@ -48,7 +48,7 @@ def _cells(rows: list[dict], metric: str) -> dict[str, dict[float, list[float]]]
 def scaling_fits(rows: list[dict]) -> dict:
     out = {}
     params = {r["size"]: r["n_params"] for r in rows}
-    for metric in ("val_common", "withheld_min", "best_val", "best_withheld"):
+    for metric in ("val_common", "withheld_at_8ep", "withheld_min", "best_val", "best_withheld"):
         if not all(metric in r for r in rows):
             continue
         cells = _cells(rows, metric)
@@ -78,54 +78,87 @@ def scaling_fits(rows: list[dict]) -> dict:
 
 
 def transfer_summary(path: Path) -> dict | None:
+    """
+    Transfer cells and paired comparisons.
+
+    Statistics, and why each is what it is:
+      * Success per cell is the mean over training seeds; its Wilson interval
+        is computed at n = 100, the number of distinct evaluation instances.
+        Both seeds face the SAME 100 instances, so pooling them as n = 200
+        would double-count instance sampling.
+      * The paired difference averages (pretrained - scratch) over seeds
+        per instance first, then bootstraps over the 100 instances. It
+        captures evaluation noise conditional on these trained policies;
+        training-seed variance (2 seeds) is only partially represented.
+      * An exact McNemar test on the pooled discordant pairs is reported
+        alongside, because a percentile bootstrap cannot reach zero when
+        there are only a handful of discordant pairs, all one way.
+      * With 21 paired comparisons per model size, the Bonferroni threshold
+        is 0.05 / 21; cells passing it are counted and listed.
+    """
     if not path.exists():
         return None
+    from scipy.stats import binomtest
+
     rows = json.loads(path.read_text())
     by = defaultdict(list)
     for r in rows:
         by[(float(r["pretrain_hours"]), int(r["budget"]))].append(r)
 
-    def pooled(key):
+    n_inst = len(rows[0]["episodes"]) if rows else 0
+
+    def cell_stats(key):
         rs = by.get(key, [])
         if not rs:
             return None
-        eps = np.concatenate([r["episodes"] for r in rs])
-        ci = wilson_interval(int(eps.sum()), len(eps))
-        return {"success": ci.point, "low": ci.low, "high": ci.high, "n": ci.n, "seeds": len(rs)}
+        per_seed = np.array([np.mean(r["episodes"]) for r in rs])
+        mean_rate = float(per_seed.mean())
+        ci = wilson_interval(int(round(mean_rate * n_inst)), n_inst)
+        return {
+            "success": mean_rate, "low": ci.low, "high": ci.high,
+            "n_instances": n_inst, "seeds": len(rs),
+            "per_seed": per_seed.tolist(),
+        }
 
     hours_axis = sorted({h for h, _ in by if h > 0})
     budgets = sorted({b for _, b in by if b > 0})
-    summary = {"hours": hours_axis, "budgets": budgets, "cells": {}, "paired": {}}
+    summary = {"hours": hours_axis, "budgets": budgets, "cells": {}, "paired": {},
+               "n_comparisons": len(hours_axis) * len(budgets)}
     for h in [0.0] + hours_axis:
         for b in [0] + budgets:
-            cell = pooled((h, b))
+            cell = cell_stats((h, b))
             if cell:
                 summary["cells"][f"{h}h/{b}"] = cell
 
-    # Paired: pretrained (each hours) minus scratch, same budget, matched by
-    # seed so that both arms faced the identical 100 instances.
+    alpha_bonf = 0.05 / max(summary["n_comparisons"], 1)
     for b in budgets:
         for h in hours_axis:
-            a_all, b_all = [], []
+            diffs_by_seed, disc_pos, disc_neg = [], 0, 0
             for r in by.get((h, b), []):
-                scratch = [s for s in by.get((0.0, b), []) if s["seed"] == r["seed"]]
+                scratch = [s_ for s_ in by.get((0.0, b), []) if s_["seed"] == r["seed"]]
                 if not scratch:
                     continue
-                a_all.append(r["episodes"])
-                b_all.append(scratch[0]["episodes"])
-            if a_all:
-                a = np.concatenate(a_all)
-                bb = np.concatenate(b_all)
-                d = paired_difference(a, bb)
-                summary["paired"][f"{h}h/{b}"] = {
-                    "difference": d.point,
-                    "low": d.low,
-                    "high": d.high,
-                    "n_pairs": d.n,
-                    # Discordant pairs are what carries the paired evidence.
-                    "pretrained_only_wins": int(np.sum((a == 1) & (bb == 0))),
-                    "scratch_only_wins": int(np.sum((a == 0) & (bb == 1))),
-                }
+                a = np.asarray(r["episodes"], dtype=float)
+                bb = np.asarray(scratch[0]["episodes"], dtype=float)
+                diffs_by_seed.append(a - bb)
+                disc_pos += int(np.sum((a == 1) & (bb == 0)))
+                disc_neg += int(np.sum((a == 0) & (bb == 1)))
+            if not diffs_by_seed:
+                continue
+            per_instance = np.mean(diffs_by_seed, axis=0)  # seed-averaged, length n_inst
+            d = paired_difference(per_instance, np.zeros_like(per_instance))
+            n_disc = disc_pos + disc_neg
+            p_mcnemar = float(binomtest(disc_pos, n_disc, 0.5).pvalue) if n_disc else 1.0
+            summary["paired"][f"{h}h/{b}"] = {
+                "difference": d.point, "low": d.low, "high": d.high, "n_instances": d.n,
+                "pretrained_only_wins": disc_pos, "scratch_only_wins": disc_neg,
+                "p_mcnemar_exact": p_mcnemar,
+                "significant_005": p_mcnemar < 0.05,
+                "significant_bonferroni": p_mcnemar < alpha_bonf,
+            }
+    summary["bonferroni_alpha"] = alpha_bonf
+    summary["n_significant_005"] = sum(v["significant_005"] for v in summary["paired"].values())
+    summary["n_significant_bonferroni"] = sum(v["significant_bonferroni"] for v in summary["paired"].values())
     return summary
 
 
@@ -144,7 +177,8 @@ def multitask_summary(path: Path) -> dict | None:
 def render_markdown(summary: dict) -> str:
     md = ["# S8 results summary\n"]
     md.append("## Data scaling: power-law fits (mean over seeds)\n")
-    for metric, title in (("withheld_min", "withheld family (stack), zero-shot, best over training"),
+    for metric, title in (("withheld_at_8ep", "withheld family (stack), zero-shot, at 8 epochs (fixed rule)"),
+                          ("withheld_min", "withheld family (stack), minimum over training (ORACLE selection on the test family; reported for transparency only)"),
                           ("val_common", "validation on the common held-out set"),
                           ("best_withheld", "withheld family at the best-val checkpoint (raw)"),
                           ("best_val", "own-prefix validation (raw, NOT comparable across scales)")):
@@ -160,10 +194,22 @@ def render_markdown(summary: dict) -> str:
                 f"{100*s['gain_last_doubling']:.1f}% |"
             )
         md.append("")
+        md.append("Per-doubling fractional improvement (each column is one doubling of data):\n")
+        any_size = next(iter(summary["scaling"].get(metric, {}).values()), None)
+        if any_size:
+            hrs = any_size["hours"]
+            md.append("| size | " + " | ".join(f"{hrs[i]:g}→{hrs[i+1]:g} h" for i in range(len(hrs) - 1)) + " |")
+            md.append("|---|" + "---|" * (len(hrs) - 1))
+            for size, s in summary["scaling"].get(metric, {}).items():
+                m_ = s["mean"]
+                md.append(f"| {size} | " + " | ".join(f"{100*(1 - m_[i+1]/m_[i]):.1f}%" for i in range(len(m_) - 1)) + " |")
+            md.append("")
 
-    if summary.get("transfer"):
-        t = summary["transfer"]
-        md.append("## Transfer: stack success (pooled over seeds, Wilson 95% CI)\n")
+    for key, title in (("transfer", "580k (l) policy"), ("transfer_xl", "3.26M (xl) policy")):
+        t = summary.get(key)
+        if not t:
+            continue
+        md.append(f"## Transfer, {title}: stack success (mean of seeds; Wilson 95% at n = 100 instances)\n")
         header = "| pretraining | " + " | ".join(f"{b} demos" for b in [0] + t["budgets"]) + " |"
         md.append(header)
         md.append("|---|" + "---|" * (len(t["budgets"]) + 1))
@@ -175,19 +221,25 @@ def render_markdown(summary: dict) -> str:
             label = "scratch" if h == 0.0 else f"{h:g} h"
             md.append(f"| {label} | " + " | ".join(cells) + " |")
         md.append("")
-        md.append("### Paired difference, pretrained − scratch (same instances, same seed)\n")
+        md.append("### Paired difference, pretrained − scratch (seed-averaged per instance; bootstrap over 100 instances; exact McNemar p)\n")
         md.append("| pretraining | " + " | ".join(f"{b} demos" for b in t["budgets"]) + " |")
         md.append("|---|" + "---|" * len(t["budgets"]))
         for h in t["hours"]:
             cells = []
             for b in t["budgets"]:
                 p = t["paired"].get(f"{h}h/{b}")
-                cells.append("—" if p is None else f"{100*p['difference']:+.0f} pts [{100*p['low']:+.0f}, {100*p['high']:+.0f}]")
+                if p is None:
+                    cells.append("—")
+                else:
+                    star = "**" if p["significant_bonferroni"] else ("*" if p["significant_005"] else "")
+                    cells.append(f"{100*p['difference']:+.0f} pts [{100*p['low']:+.0f}, {100*p['high']:+.0f}] p={p['p_mcnemar_exact']:.3f}{star}")
             md.append(f"| {h:g} h | " + " | ".join(cells) + " |")
         md.append("")
+        md.append(f"{t['n_significant_005']} of {t['n_comparisons']} comparisons significant at p < 0.05 (*); "
+                  f"{t['n_significant_bonferroni']} survive Bonferroni at p < {t['bonferroni_alpha']:.4f} (**).\n")
 
     if summary.get("multitask"):
-        md.append("## Multi-task closed-loop success (50 episodes per family)\n")
+        md.append("## Multi-task closed-loop success (seed-0 checkpoints, 50 episodes per family, Wilson half-width ~12 pts)\n")
         md.append("| checkpoint | " + " | ".join(PRETRAIN_FAMILIES) + " | mean |")
         md.append("|---|" + "---|" * (len(PRETRAIN_FAMILIES) + 1))
         for key in sorted(summary["multitask"]):
@@ -204,6 +256,7 @@ def main() -> None:
         "n_runs": len(rows),
         "scaling": scaling_fits(rows) if rows else {},
         "transfer": transfer_summary(RESULTS / "transfer.json"),
+        "transfer_xl": transfer_summary(RESULTS / "transfer_xl.json"),
         "multitask": multitask_summary(RESULTS / "multitask.json"),
     }
     RESULTS.mkdir(parents=True, exist_ok=True)

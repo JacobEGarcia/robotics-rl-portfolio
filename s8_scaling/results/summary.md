@@ -2,7 +2,14 @@
 
 ## Data scaling: power-law fits (mean over seeds)
 
-### withheld family (stack), zero-shot, best over training
+### withheld family (stack), zero-shot, at 8 epochs (fixed rule)
+
+| size | params | loss @ first | loss @ last | α (pure) | R² | α (offset) | L∞ | gain last doubling |
+|---|---|---|---|---|---|---|---|---|
+
+Per-doubling fractional improvement (each column is one doubling of data):
+
+### withheld family (stack), minimum over training (ORACLE selection on the test family; reported for transparency only)
 
 | size | params | loss @ first | loss @ last | α (pure) | R² | α (offset) | L∞ | gain last doubling |
 |---|---|---|---|---|---|---|---|---|
@@ -11,6 +18,16 @@
 | m | 159,784 | 0.0870 | 0.0595 | 0.090 | 0.957 | 0.414 | 0.0537 | 5.2% |
 | l | 581,672 | 0.0787 | 0.0571 | 0.075 | 0.975 | 0.331 | 0.0502 | 3.8% |
 | xl | 3,261,480 | 0.0810 | 0.0454 | 0.140 | 0.942 | 0.541 | 0.0406 | 2.2% |
+
+Per-doubling fractional improvement (each column is one doubling of data):
+
+| size | 0.5→1 h | 1→2 h | 2→4 h | 4→8 h | 8→16 h | 16→32 h |
+|---|---|---|---|---|---|---|
+| t | 5.0% | 6.2% | 9.1% | 10.9% | -5.3% | 0.8% |
+| s | 3.7% | 11.2% | 7.0% | 6.0% | 4.4% | -1.6% |
+| m | 8.5% | 8.5% | 7.3% | 6.0% | 1.0% | 5.2% |
+| l | 8.8% | 5.6% | 3.7% | 6.5% | 2.9% | 3.8% |
+| xl | 14.3% | 15.8% | 6.1% | 10.3% | 6.0% | 2.2% |
 
 ### validation on the common held-out set
 
@@ -22,6 +39,16 @@
 | l | 581,672 | 0.0168 | 0.0088 | 0.145 | 0.985 | 0.303 | 0.0061 | 11.9% |
 | xl | 3,261,480 | 0.0165 | 0.0089 | 0.136 | 0.983 | 0.221 | 0.0046 | 12.6% |
 
+Per-doubling fractional improvement (each column is one doubling of data):
+
+| size | 0.5→1 h | 1→2 h | 2→4 h | 4→8 h | 8→16 h | 16→32 h |
+|---|---|---|---|---|---|---|
+| t | 2.1% | 13.4% | 13.8% | 10.1% | 10.3% | 2.4% |
+| s | 3.9% | 15.8% | 14.9% | 9.8% | 9.5% | 2.5% |
+| m | 12.5% | 12.9% | 9.3% | 8.4% | 9.1% | 6.1% |
+| l | 16.4% | 7.6% | 9.6% | 6.8% | 8.9% | 11.9% |
+| xl | 15.4% | 5.8% | 9.5% | 5.5% | 9.6% | 12.6% |
+
 ### withheld family at the best-val checkpoint (raw)
 
 | size | params | loss @ first | loss @ last | α (pure) | R² | α (offset) | L∞ | gain last doubling |
@@ -31,6 +58,16 @@
 | m | 159,784 | 0.0895 | 0.0639 | 0.072 | 0.899 | 0.559 | 0.0633 | 8.7% |
 | l | 581,672 | 0.0797 | 0.0795 | -0.004 | 0.015 | 0.001 | 0.0719 | -1.0% |
 | xl | 3,261,480 | 0.0838 | 0.1519 | -0.121 | 0.348 | 0.001 | 0.0625 | -94.9% |
+
+Per-doubling fractional improvement (each column is one doubling of data):
+
+| size | 0.5→1 h | 1→2 h | 2→4 h | 4→8 h | 8→16 h | 16→32 h |
+|---|---|---|---|---|---|---|
+| t | 5.1% | 5.8% | 9.3% | 8.9% | -6.2% | -3.1% |
+| s | 2.2% | 12.2% | 6.9% | 3.4% | 3.3% | -5.8% |
+| m | 9.0% | 8.7% | 3.4% | 5.7% | -3.4% | 8.7% |
+| l | 5.0% | 3.2% | 2.0% | -2.1% | -7.3% | -1.0% |
+| xl | 12.2% | 15.1% | -0.9% | -56.8% | 21.3% | -94.9% |
 
 ### own-prefix validation (raw, NOT comparable across scales)
 
@@ -42,32 +79,71 @@
 | l | 581,672 | 0.0179 | 0.0088 | 0.146 | 0.842 | 0.878 | 0.0088 | 4.6% |
 | xl | 3,261,480 | 0.0177 | 0.0088 | 0.137 | 0.807 | 0.843 | 0.0088 | 7.7% |
 
-## Transfer: stack success (pooled over seeds, Wilson 95% CI)
+Per-doubling fractional improvement (each column is one doubling of data):
+
+| size | 0.5→1 h | 1→2 h | 2→4 h | 4→8 h | 8→16 h | 16→32 h |
+|---|---|---|---|---|---|---|
+| t | 17.7% | 4.5% | 18.3% | 7.9% | 10.8% | -2.0% |
+| s | 19.4% | 7.9% | 18.7% | 7.2% | 9.8% | -2.7% |
+| m | 29.2% | 4.9% | 14.4% | 2.9% | 9.7% | -0.5% |
+| l | 33.0% | -0.6% | 12.9% | 2.6% | 10.1% | 4.6% |
+| xl | 34.4% | -5.2% | 13.6% | 1.8% | 7.9% | 7.7% |
+
+## Transfer, 580k (l) policy: stack success (mean of seeds; Wilson 95% at n = 100 instances)
 
 | pretraining | 0 demos | 10 demos | 30 demos | 100 demos |
 |---|---|---|---|---|
-| scratch | — | 0% [0, 2] | 5% [3, 9] | 11% [7, 16] |
-| 0.5 h | 0% [0, 3] | 2% [1, 5] | 12% [8, 17] | 20% [15, 27] |
-| 1 h | 0% [0, 3] | 5% [3, 9] | 16% [12, 22] | 22% [17, 29] |
-| 2 h | 1% [0, 4] | 10% [7, 16] | 18% [13, 24] | 27% [21, 34] |
-| 4 h | 2% [1, 4] | 8% [5, 12] | 18% [13, 23] | 32% [25, 38] |
-| 8 h | 0% [0, 2] | 10% [6, 14] | 24% [19, 31] | 36% [30, 43] |
-| 16 h | 4% [2, 7] | 14% [10, 20] | 31% [25, 38] | 36% [30, 43] |
-| 32 h | 2% [1, 6] | 16% [11, 21] | 22% [17, 29] | 42% [36, 49] |
+| scratch | — | 0% [0, 4] | 5% [2, 11] | 11% [6, 19] |
+| 0.5 h | 0% [0, 4] | 2% [1, 7] | 12% [7, 20] | 20% [13, 29] |
+| 1 h | 0% [0, 4] | 5% [2, 11] | 16% [10, 24] | 22% [15, 31] |
+| 2 h | 1% [0, 5] | 11% [6, 19] | 18% [12, 27] | 27% [19, 36] |
+| 4 h | 2% [1, 7] | 8% [4, 15] | 18% [12, 27] | 32% [24, 42] |
+| 8 h | 0% [0, 4] | 10% [6, 17] | 24% [17, 33] | 36% [27, 46] |
+| 16 h | 3% [1, 8] | 15% [9, 23] | 31% [23, 41] | 36% [27, 46] |
+| 32 h | 2% [1, 7] | 16% [10, 24] | 22% [15, 31] | 42% [33, 52] |
 
-### Paired difference, pretrained − scratch (same instances, same seed)
+### Paired difference, pretrained − scratch (seed-averaged per instance; bootstrap over 100 instances; exact McNemar p)
 
 | pretraining | 10 demos | 30 demos | 100 demos |
 |---|---|---|---|
-| 0.5 h | +2 pts [+0, +4] | +6 pts [+2, +12] | +10 pts [+2, +16] |
-| 1 h | +5 pts [+2, +8] | +11 pts [+5, +17] | +12 pts [+5, +18] |
-| 2 h | +10 pts [+6, +15] | +13 pts [+6, +20] | +16 pts [+8, +23] |
-| 4 h | +8 pts [+4, +12] | +12 pts [+6, +18] | +20 pts [+13, +28] |
-| 8 h | +10 pts [+6, +14] | +20 pts [+13, +26] | +25 pts [+18, +32] |
-| 16 h | +14 pts [+10, +20] | +26 pts [+18, +33] | +26 pts [+18, +33] |
-| 32 h | +16 pts [+10, +20] | +18 pts [+11, +24] | +32 pts [+24, +40] |
+| 0.5 h | +2 pts [+0, +4] p=0.125 | +6 pts [+0, +12] p=0.024* | +10 pts [+2, +17] p=0.011* |
+| 1 h | +5 pts [+2, +8] p=0.002** | +11 pts [+4, +18] p=0.001** | +12 pts [+4, +19] p=0.001** |
+| 2 h | +10 pts [+6, +15] p=0.000** | +13 pts [+6, +20] p=0.000** | +16 pts [+8, +24] p=0.000** |
+| 4 h | +8 pts [+4, +12] p=0.000** | +12 pts [+6, +20] p=0.000** | +20 pts [+12, +29] p=0.000** |
+| 8 h | +10 pts [+6, +14] p=0.000** | +20 pts [+12, +27] p=0.000** | +25 pts [+16, +33] p=0.000** |
+| 16 h | +14 pts [+10, +19] p=0.000** | +26 pts [+18, +34] p=0.000** | +26 pts [+18, +34] p=0.000** |
+| 32 h | +16 pts [+11, +20] p=0.000** | +18 pts [+10, +24] p=0.000** | +32 pts [+24, +40] p=0.000** |
 
-## Multi-task closed-loop success (50 episodes per family)
+20 of 21 comparisons significant at p < 0.05 (*); 18 survive Bonferroni at p < 0.0024 (**).
+
+## Transfer, 3.26M (xl) policy: stack success (mean of seeds; Wilson 95% at n = 100 instances)
+
+| pretraining | 0 demos | 10 demos | 30 demos | 100 demos |
+|---|---|---|---|---|
+| scratch | — | 0% [0, 4] | 4% [2, 10] | 25% [18, 34] |
+| 0.5 h | 0% [0, 4] | 3% [1, 8] | 10% [6, 17] | 15% [9, 23] |
+| 1 h | 0% [0, 4] | 6% [3, 12] | 8% [4, 15] | 22% [15, 31] |
+| 2 h | 2% [1, 7] | 11% [6, 19] | 12% [7, 20] | 24% [17, 33] |
+| 4 h | 0% [0, 4] | 10% [6, 17] | 11% [6, 19] | 20% [13, 29] |
+| 8 h | 0% [0, 4] | 15% [9, 23] | 17% [11, 26] | 29% [21, 39] |
+| 16 h | 2% [1, 7] | 15% [9, 23] | 23% [16, 32] | 32% [24, 42] |
+| 32 h | 3% [1, 8] | 10% [6, 17] | 27% [19, 36] | 29% [21, 39] |
+
+### Paired difference, pretrained − scratch (seed-averaged per instance; bootstrap over 100 instances; exact McNemar p)
+
+| pretraining | 10 demos | 30 demos | 100 demos |
+|---|---|---|---|
+| 0.5 h | +2 pts [+0, +5] p=0.125 | +6 pts [+0, +12] p=0.029* | -10 pts [-18, -2] p=0.015* |
+| 1 h | +5 pts [+2, +9] p=0.002** | +5 pts [+0, +10] p=0.064 | -2 pts [-11, +6] p=0.609 |
+| 2 h | +10 pts [+6, +14] p=0.000** | +8 pts [+2, +14] p=0.005* | -1 pts [-10, +8] p=0.897 |
+| 4 h | +10 pts [+6, +14] p=0.000** | +7 pts [+2, +12] p=0.009* | -4 pts [-12, +3] p=0.298 |
+| 8 h | +14 pts [+10, +19] p=0.000** | +14 pts [+8, +20] p=0.000** | +4 pts [-5, +12] p=0.457 |
+| 16 h | +14 pts [+9, +20] p=0.000** | +20 pts [+13, +26] p=0.000** | +8 pts [-2, +16] p=0.115 |
+| 32 h | +9 pts [+5, +14] p=0.000** | +24 pts [+16, +30] p=0.000** | +4 pts [-5, +12] p=0.470 |
+
+13 of 21 comparisons significant at p < 0.05 (*); 9 survive Bonferroni at p < 0.0024 (**).
+
+## Multi-task closed-loop success (seed-0 checkpoints, 50 episodes per family, Wilson half-width ~12 pts)
 
 | checkpoint | reach | push | lift | place | topple | mean |
 |---|---|---|---|---|---|---|

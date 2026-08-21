@@ -8,9 +8,9 @@ Training recipe, and why each choice is what it is:
   asking "or did you just tune the small runs harder?"  Every cell of the
   grid gets the identical recipe; only capacity and data vary.
 
-* Budget scales with data (30 epoch-equivalents, clamped to [8k, 150k]
-  steps), always run to completion, with the best held-in-validation
-  checkpoint restored at the end. An earlier draft early-stopped on val
+* Budget scales with data (30 epoch-equivalents, capped at 150k steps),
+  always run to completion, with the best held-in-validation checkpoint
+  restored at the end. An earlier draft early-stopped on val
   loss; review showed that made the effective recipe differ by cell - the
   8k floor meant small-data cells could never stop early and always saw
   the full cosine anneal, while overfitting mid-size cells broke out
@@ -86,9 +86,13 @@ def train_run(
     mean, std = normalisation_stats(train)
     policy.set_normalisation(mean, std)
 
-    # 30 epoch-equivalents, clamped: enough to converge small data without
-    # giving large data a bigger per-sample compute budget than it needs.
-    max_steps = int(np.clip(30 * len(train) / BATCH, 8_000, max_steps_cap))
+    # 30 epoch-equivalents, capped. No floor: an earlier draft clamped to a
+    # minimum of 8k steps, which silently gave the 0.5 h cells sixty epochs -
+    # twice the recipe - at exactly the data scale where the small models'
+    # curves looked flattest and the largest model's pretraining looked
+    # harmful. Found in review; every cell now gets the same epoch budget
+    # unless the cap binds (it binds only at 32 h: 17.6 epochs).
+    max_steps = int(min(30 * len(train) / BATCH, max_steps_cap))
     warmup = 500
     base_lr = 1e-3
 

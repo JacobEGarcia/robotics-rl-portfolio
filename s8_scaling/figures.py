@@ -204,7 +204,7 @@ def fig_transfer(transfer_json: Path, out: Path) -> None:
     ax.set_xscale("log")
     ax.set_ylim(-0.02, 0.62)
     ax.set_xlabel("pretraining data (hours), stack never included")
-    ax.set_ylabel("stack success rate (100 paired episodes)")
+    ax.set_ylabel("stack success rate (mean of 2 seeds, 100 instances each)")
     ax.set_title("transfer scaling: pretraining hours buy downstream success")
     ax.legend(fontsize=8.5, loc="upper left")
     fig.savefig(out)
@@ -228,7 +228,7 @@ def fig_multitask(multitask_json: Path, out: Path, size: str = "xl") -> None:
     ax.set_xscale("log")
     ax.set_ylim(-0.02, 1.02)
     ax.set_xlabel("pretraining data (hours)")
-    ax.set_ylabel("success rate (50 episodes)")
+    ax.set_ylabel("success rate (50 episodes, seed-0 checkpoint)")
     ax.set_title(f"one {size} policy, five tasks: closed-loop success vs data")
     ax.legend(fontsize=8.5, loc="lower right")
     fig.savefig(out)
@@ -298,8 +298,8 @@ def main() -> None:
     rows = load_sweep(Path(args.runs_root))
     if rows and all("val_common" in r for r in rows):
         fig_scaling(
-            rows, out / "fig1_withheld_scaling.png", "withheld_min",
-            "zero-shot prediction error on the withheld family (stack)",
+            rows, out / "fig1_withheld_scaling.png", "withheld_at_8ep",
+            "zero-shot prediction error on the withheld family (stack), at 8 epochs",
             fit_sizes=("t", "xl"),
         )
         fig_scaling(

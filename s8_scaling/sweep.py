@@ -2,10 +2,10 @@
 The scaling grid: 5 model sizes x 7 data scales x 2 seeds = 70 runs.
 
 Step budget is 30 epoch-equivalents, capped at 150k steps. The cap binds
-only at 32 h (15.5 epochs); every other cell trains its full 30 epochs.
-(A first pass used a 60k cap, which bound at 16 h and 32 h - 14 and 7
-epochs - and those cells were rerun with the higher cap, so the recipe is
-uniform everywhere the claims are made.)
+only at 32 h (17.6 epochs); every other cell trains its full 30 epochs.
+(A first pass used a 60k cap and an 8k floor; the cells those bound -
+0.5 h, 8 h, 16 h, 32 h - were rerun, so the recipe is uniform everywhere
+except the stated 32 h cap.)
 
 Scheduling: a process pool of 6 workers, 5 torch threads each (30 threads
 on a 32-core box, leaving headroom for the OS). Runs are dispatched
