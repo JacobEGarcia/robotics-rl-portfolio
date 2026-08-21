@@ -1,0 +1,11 @@
+{
+  "val_common": 0.018116212567687036,
+  "withheld_at_checkpoint": 0.09333641678492229,
+  "withheld_at_8ep": 0.10696411013205846,
+  "withheld_at_8ep_step": 1000,
+  "withheld_min": 0.09138772103389105,
+  "withheld_min_step": 3000,
+  "withheld_final": 0.09333641780217489,
+  "epochs_trained": 29.95378225004388,
+  "common_val_timesteps": 60000
+}

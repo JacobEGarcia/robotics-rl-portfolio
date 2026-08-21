@@ -140,7 +140,7 @@ def fig_capacity(rows: list[dict], out: Path) -> None:
     ax1.set_yscale("log")
     ax1.set_xlabel("data (hours)")
     ax1.set_ylabel("common validation MSE (8-step chunk)")
-    ax1.set_title("capacity saturation: small models flatten")
+    ax1.set_title("validation error vs data, per model size")
     ax1.legend(fontsize=8)
 
     # loss vs params at each data scale
@@ -157,7 +157,7 @@ def fig_capacity(rows: list[dict], out: Path) -> None:
     ax2.set_yscale("log")
     ax2.set_xlabel("model parameters")
     ax2.set_ylabel("common validation MSE (8-step chunk)")
-    ax2.set_title("returns to capacity grow with data")
+    ax2.set_title("validation error vs parameters, per data scale")
     ax2.legend(fontsize=8, title="data", title_fontsize=8)
     fig.tight_layout()
     fig.savefig(out)

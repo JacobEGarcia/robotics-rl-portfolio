@@ -16,7 +16,7 @@ result.
 
 | Project | Result |
 |---|---|
-| **[S8 — Scaling laws for BC](s8_scaling/)** | Power-law data scaling (R² up to 0.99, one exponent α ≈ 0.14 across a 290× range of model sizes), capacity ossification, and transfer to a withheld task — 70-run grid, 34 h of procedurally generated manipulation data, all on CPU |
+| **[S8 — Scaling laws for BC](s8_scaling/)** | 70-run size×data grid on 34 h of procedural manipulation data: near-power-law curves (α 0.13–0.18, R² 0.96–0.99), **+32 pt** paired transfer gain on a withheld task (20/21 cells significant), specialisation after ~10 epochs — and no ossification threshold found. All on CPU |
 | **[S5 — Real-to-sim sysID](s5_sysid/)** | **56.7%** reality-gap reduction on held-out real robot episodes |
 | **[S6 — PPO in JAX](s6_brax_jax/)** | **28.3×** throughput on the same CPU; both implementations solve the task |
 | **[SAC from scratch](sac_scratch/)** | **9.41×** PPO's sample efficiency, identical task and seed |
@@ -37,7 +37,7 @@ an independent implementation, a physical consistency check, or held-out data
 the optimiser never saw. A learning curve that rises proves only that a number
 went up.
 
-That discipline found **twelve bugs, none of which raised an exception**:
+That discipline found **thirteen bugs, none of which raised an exception**:
 
 1. **Missing reward scaling** (PyTorch PPO) — value loss of ~10⁶ against a
    policy loss of ~10⁻² meant `clip_grad_norm_` sent nearly the entire gradient
@@ -72,6 +72,9 @@ That discipline found **twelve bugs, none of which raised an exception**:
     from 16 h to 32 h. Re-scored on one common set, every curve is monotone.
 12. **Confidence intervals of zero width** (S8) — percentile bootstrap on
     success flags collapses at 0% and 100%. Replaced with Wilson intervals.
+13. **A step floor that doubled one cell's epochs** (S8) — "30 epochs, at
+    least 8k steps" gave the 0.5 h cells 60 epochs, at the one scale where
+    pretraining looked harmful. Rerun uniformly, the effect is not significant.
 
 ---
 
@@ -87,7 +90,7 @@ bash scripts/fetch_assets.sh   # Menagerie + 32 DROID episodes
 ## Run
 
 ```bash
-python -m s8_scaling.data_engine --hours 33     # ~10 min on 32 cores
+python -m s8_scaling.data_engine --hours 33     # ~16 min on 32 cores
 python -m s8_scaling.sweep                      # 70-run grid
 python -m s8_scaling.reeval && python -m s8_scaling.transfer && python -m s8_scaling.eval_sweep
 python -m s8_scaling.analysis && python -m s8_scaling.figures --dark

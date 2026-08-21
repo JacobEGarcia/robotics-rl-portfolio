@@ -19,11 +19,33 @@ N_S8_PLATES = 9
 WORDS = ["One", "Two", "Three", "Four", "Five", "Six", "Seven"]
 
 
+def replace_chapter(fragment_path: str, ledger: dict[str, str] | None = None) -> None:
+    """Swap the existing S8 article for a new fragment; optionally update ledger numbers."""
+    index = Path("docs/index.html")
+    html = index.read_text(encoding="utf-8")
+    start = html.index("<!-- ============================================ I — SCALING")
+    end = html.index("<!-- ============================================ I — REALITY GAP")
+    chapter = Path(fragment_path).read_text(encoding="utf-8")
+    html = html[:start] + chapter + "\n" + html[end:]
+    for old, new in (ledger or {}).items():
+        assert old in html, old
+        html = html.replace(old, new)
+    index.write_text(html, encoding="utf-8")
+    dst = Path("docs/media/s8")
+    for fig in Path("s8_scaling/figures/dark").glob("*.png"):
+        shutil.copy(fig, dst / fig.name)
+    for vid in ("data_engine.mp4", "policy.mp4"):
+        src = Path("s8_scaling/media") / vid
+        if src.exists():
+            shutil.copy(src, dst / vid)
+    print("replaced S8 chapter and refreshed media")
+
+
 def main(fragment_path: str) -> None:
     index = Path("docs/index.html")
     html = index.read_text(encoding="utf-8")
     if 'id="scaling"' in html:
-        raise SystemExit("S8 chapter already spliced")
+        raise SystemExit("S8 chapter already spliced; use replace_chapter()")
     chapter = Path(fragment_path).read_text(encoding="utf-8")
 
     # --- renumber existing chapters (highest first so replacements don't chain)

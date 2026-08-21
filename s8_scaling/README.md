@@ -61,10 +61,10 @@ strict prefixes — nested datasets, not seven independent samples.
 
 ## The grid
 
-Five MLP policy sizes (11k → 3.3M parameters, geometric) × seven data
-scales × two seeds, one fixed recipe (AdamW, warmup+cosine, 30
-epoch-equivalents capped at 150k steps — the cap binds only at 32 h — with
-the best held-in-validation checkpoint restored).
+Five MLP policy sizes (11k → 3.3M parameters, roughly log-spaced) × seven
+data scales × two seeds, one fixed recipe (AdamW, warmup+cosine, 30
+epoch-equivalents capped at 150k steps — the cap binds only at 32 h, at 17.6
+epochs — with the best held-in-validation checkpoint restored).
 Splits are by episode, not timestep — adjacent timesteps are nearly
 identical, and a timestep-level split lets validation reward memorisation.
 Normalisation statistics are computed per-run on that run's own training
@@ -85,73 +85,91 @@ closed-loop evaluation executes chunks receding-horizon through the S7
    model stop converting data into loss?
 3. **Transfer scaling** — pretrained checkpoints post-trained on {10, 30,
    100} stack demonstrations vs identical training from scratch, evaluated
-   closed-loop on 100 paired episodes (identical instance sequences for
-   every arm; seeds fixed before results were seen).
-4. **Multi-task closed-loop** — success rate of each grid checkpoint on all
-   five pretraining families, 50 episodes each, Wilson intervals.
+   closed-loop on 100 paired instances (identical instance sequences for
+   every arm; seeds fixed before results were seen), with seed-averaged
+   paired differences, exact McNemar tests and a Bonferroni threshold.
+4. **Multi-task closed-loop** — success rate of each seed-0 grid checkpoint
+   on all five pretraining families, 50 episodes each, Wilson intervals.
 
 ## Results
 
 All numbers below are copied from `results/summary.md`, which `analysis.py`
-regenerates from the committed run logs. Figures are in `figures/`.
+regenerates from the committed run logs and results files. Figures are in
+`figures/`.
 
 **Corpus.** 33.8 h of demonstrations, 74,393 episodes, 2.44 M control steps,
-equal hours per family at every prefix; collected at >100× realtime on 28
-processes. Expert acceptance rates: reach 100%, push 78%, lift 80%,
+equal hours per family at every prefix; collected in 944 s at 129× realtime
+on 28 processes. Expert acceptance rates: reach 100%, push 78%, lift 80%,
 place 98%, topple 100% (stack, for the withheld corpora: 96%).
 
 **Data scaling (common held-out validation set, mean of 2 seeds).**
 
-| size | params | 0.5 h | 32 h | α (pure) | R² |
+| size | params | 0.5 h | 32 h | α (pure) | R² | 8→16 h gain | 16→32 h gain |
+|---|---|---|---|---|---|---|---|
+| t  | 11k   | 0.0268 | 0.0132 | 0.175 | 0.968 | 9.3% | 2.4% |
+| s  | 31k   | 0.0235 | 0.0111 | 0.184 | 0.957 | 8.7% | 2.5% |
+| m  | 160k  | 0.0182 | 0.0091 | 0.160 | 0.962 | 9.0% | 6.1% |
+| l  | 582k  | 0.0166 | 0.0088 | 0.142 | 0.987 | 9.7% | 11.9% |
+| xl | 3.26M | 0.0158 | 0.0089 | 0.128 | 0.979 | 11.9% | 12.6% |
+
+Curves are near-straight in log-log with exponents 0.13–0.18 (standard errors
+≈ 0.01); seven points per curve do not establish a power law or a shared
+exponent, and the write-up does not claim either. Over the 8→16 h doubling,
+where every cell trains the identical recipe, all sizes gain 8.7–11.9%. The
+small models' gains shrink only in the 16→32 h doubling, which is the one
+where the 150k-step cap binds (17.6 epochs) — so **no ossification threshold
+is claimed**. Capacity: xl is nominally best at 0.5–1 h; from 2 to 16 h the
+160k model is best and the larger two are 1–9% worse; at 32 h the three
+largest are within 3.5% (inside seed spread).
+
+**Zero-shot prediction error on the withheld family (stack), at 8 epochs** —
+a selection rule fixed without looking at the withheld family (the minimum
+over training is an oracle choice whose bias grows with data scale; it is in
+`summary.md` for transparency only). t: 0.143 → 0.095 (−33%); xl: 0.082 →
+0.049 (−40%); R² 0.80–0.88. Over training, xl's withheld error bottoms out
+at 16k steps (7.5 epochs) with 8 h of data and at 46k steps (5.4 epochs) with
+32 h, then climbs (to 0.122 and 0.077) while held-in validation keeps
+falling: 4× the data bought 2.9× the steps before specialisation, within a
+factor of 1.4 in epochs.
+
+**Transfer to stack, 580k policy.** Success is the mean of 2 seeds (Wilson
+95% at n = 100 instances; both seeds see the same 100 instances). Paired
+differences are seed-averaged per instance, bootstrapped over the 100
+instances, with an exact McNemar test on discordant pairs.
+
+| pretraining | 0 demos | 10 demos | 30 demos | 100 demos | paired Δ @ 100 |
 |---|---|---|---|---|---|
-| t  | 11k   | 0.0230 | 0.0132 | 0.151 | 0.971 |
-| s  | 31k   | 0.0203 | 0.0111 | 0.162 | 0.967 |
-| m  | 160k  | 0.0168 | 0.0091 | 0.148 | 0.985 |
-| l  | 582k  | 0.0168 | 0.0088 | 0.145 | 0.985 |
-| xl | 3.26M | 0.0165 | 0.0089 | 0.136 | 0.983 |
+| scratch | — | 0% | 5% | 11% | — |
+| 0.5 h | 0% | 2% | 11% | 22% | +10 [+3, +18] |
+| 8 h  | 2% | 10% | 23% | 34% | +22 [+14, +30] |
+| 32 h | 2% | 16% | 22% | 42% | **+32 [+24, +40]** |
 
-One data exponent across a 290× range of model sizes. Over the last doubling
-(16 → 32 h) the two smallest models gain 2–3%, the three largest 6–13%. At
-≤ 8 h the best model size is 160k parameters and larger is slightly worse; at
-32 h the optimum has moved to 582k.
+20 of 21 paired comparisons are significant at p < 0.05; 18 survive
+Bonferroni (p < 0.0024). At 100 demos the gain rises with every doubling of
+pretraining (+10 → +32); at 10 and 30 demos it rises broadly but not
+monotonically.
 
-**Zero-shot prediction error on the withheld family (stack), best over
-training.** t: 0.121 → 0.091 (α = 0.08). xl: 0.081 → 0.045 (α = 0.14).
-Withheld error *rises* late in training once a model has made roughly ten
-passes over its data — at ~25k steps for 8 h and ~90k steps for 32 h — while
-held-in validation keeps falling: specialisation is a function of epochs, not
-hours, and a checkpoint selected by held-in loss is a specialised one.
+**Transfer, 3.26M policy.** From scratch it reaches 25% on 100 demos, and
+pretraining does not significantly change that at any scale (paired −6 to
++8, every interval spans zero). At 10 and 30 demos pretraining is worth +2 to
++14 and +5 to +24 points; 12 of 21 comparisons significant, 9 after
+Bonferroni. An earlier draft reported 0.5 h of pretraining as significantly
+harmful; that cell had trained 60 epochs under a step floor, and after the
+uniform rerun the effect is −6 [−14, +2], p = 0.13.
 
-**Transfer to stack, 580k policy, 100 paired episodes per cell (Wilson 95%).**
-
-| pretraining | 0 demos | 10 demos | 30 demos | 100 demos |
-|---|---|---|---|---|
-| scratch | — | 0% | 5% | 11% |
-| 8 h  | 0% | 10% | 24% | 36% |
-| 32 h | 2% | 16% | 22% | 42% |
-
-Paired difference (pretrained − scratch, same instances, same seed) at 100
-demos: +25 pts [+18, +32] after 8 h, **+32 pts [+24, +40]** after 32 h. Every
-cell of the 7 × 3 grid has a paired interval excluding zero.
-
-For the 3.26M policy the picture is sharper: from scratch it reaches 25% on
-100 demos and pretraining adds nothing significant (+4 to +8, intervals span
-zero), while 0.5 h of pretraining *hurts* (−10 [−18, −2]); at 10 demos
-pretraining is worth +9 to +14, and at 30 demos it lifts success from 4% to
-27%. Pretraining pays where data is scarce relative to capacity.
-
-**Multi-task closed loop, one policy, 50 episodes per family.** xl at 32 h:
-reach 100%, push 74%, lift 82%, place 78%, topple 100% (mean 87%); t at
-0.5 h: mean 48%.
+**Multi-task closed loop, seed-0 checkpoints, 50 episodes per family**
+(Wilson half-width ≈ 12 pts). xl at 32 h: reach 100%, push 74%, lift 82%,
+place 78%, topple 100% (mean 87%); t at 0.5 h: mean 38%.
 
 **What this is not.** State-based observations, MLP policies, scripted
-demonstrators, one CPU. The claims are about the experimental method and the
-shapes it reveals at this scale, not about what a 10B-parameter model does.
+demonstrators, two seeds, one CPU. The claims are about the experimental
+method and the shapes it reveals at this scale — and the two it does not:
+an ossification threshold, and any return to capacity past 160k parameters.
 
 ## Reproduce
 
 ```bash
-# 1. collect the corpora (~10 min on 32 cores; ~230x realtime)
+# 1. collect the corpora (~16 min on 32 cores; ~130x realtime)
 python -m s8_scaling.data_engine --out s8_scaling/corpus --hours 33
 
 # 2. the pretraining grid (5 sizes x 7 scales x 2 seeds; resumable)

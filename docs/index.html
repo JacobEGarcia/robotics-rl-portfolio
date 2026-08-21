@@ -209,12 +209,12 @@ footer a:hover{color:var(--amber)}
 <!-- ============================================ LEDGER ============================================ -->
 <section class="ledger"><div class="sheet">
   <div class="ledgergrid">
-    <figure><span class="n amber">0.98</span><span class="l">R² of the power-law fit<br>over a 64× data range</span></figure>
-    <figure><span class="n sky">+32<span style="font-size:26px"> pts</span></span><span class="l">Paired transfer gain<br>from pretraining</span></figure>
+    <figure><span class="n amber">+32<span style="font-size:26px"> pts</span></span><span class="l">Paired transfer gain<br>from 32 h of pretraining</span></figure>
+    <figure><span class="n sky">20<span style="font-size:26px"> / 21</span></span><span class="l">Paired comparisons significant<br>18 after Bonferroni</span></figure>
     <figure><span class="n">56.7%</span><span class="l">Reality gap closed<br>on held-out data</span></figure>
     <figure><span class="n sage">28.3×</span><span class="l">JAX throughput<br>same CPU</span></figure>
     <figure><span class="n">70</span><span class="l">Training runs<br>in the scaling grid</span></figure>
-    <figure><span class="n">12</span><span class="l">Silent bugs found<br>none raised an exception</span></figure>
+    <figure><span class="n">13</span><span class="l">Silent bugs found<br>none raised an exception</span></figure>
   </div>
 </div></section>
 
@@ -224,8 +224,9 @@ footer a:hover{color:var(--amber)}
     <p class="chapno">Chapter One</p>
     <h2>Scaling laws, at <i>tabletop</i> scale</h2>
     <p class="deck">Robot foundation models are reported to follow power laws: more pretraining data,
-       predictably less error, and small models that stop absorbing while large ones keep going. Do
-       the same laws appear in a manipulation universe small enough to sweep end-to-end on one CPU?</p>
+       predictably less error, and small models that stop absorbing while large ones keep going. Which
+       of those shapes appear in a manipulation universe small enough to sweep end-to-end on one CPU —
+       and which do not?</p>
 
     <p class="opening">Generalist's GEN-0 report measured its scaling claims on 270,000 hours of
        real manipulation data and models past ten billion parameters. Those numbers are out of
@@ -233,14 +234,16 @@ footer a:hover{color:var(--amber)}
        model size and data scale, validation error on a task family the model never sees,
        post-training on that family with small demonstration budgets, and closed-loop evaluation
        with the statistics done properly. Every one of those pieces can be built honestly at small
-       scale. This chapter builds them.</p>
+       scale. This chapter builds them, and reports what they showed — including the two
+       phenomena they did not.</p>
 
     <p>The universe is a Franka Panda on a tabletop and six task families — reach, push, lift, place,
        topple, and stack — with every episode procedurally resampled: object sizes, masses,
        frictions, poses, and goals. The policy never sees the same tabletop twice. Five families
-       form the pretraining corpus. <strong>Stack is withheld entirely.</strong> It composes skills
-       the corpus contains — reach above, grasp, carry, release precisely — in a combination the
-       corpus never shows, which is exactly what a transfer target should be.</p>
+       form the pretraining corpus. <strong>Stack is withheld entirely.</strong> Its component
+       skills are all in the corpus — place is already reach, grasp, carry and release into a
+       zone — but the target is a second cube, the tolerance is tighter and the release is raised.
+       The skills transfer; the task does not come for free, as the zero-shot numbers below show.</p>
   </div>
 
   <figure class="plate bleed">
@@ -252,9 +255,9 @@ footer a:hover{color:var(--amber)}
   </figure>
 
   <div class="col">
-    <p>Twenty-eight simulator processes collect the corpus at over a hundred times real time:
+    <p>Twenty-eight simulator processes collect the corpus at 129 times real time:
        <strong>33.8 hours</strong> of demonstrated experience, 74,393 episodes, 2.4 million control
-       steps, in about ten minutes. It is stored so that cumulative hours per family stay balanced
+       steps, in a quarter of an hour. It is stored so that cumulative hours per family stay balanced
        at every prefix. That detail is the whole data-scaling axis: the 1-hour dataset is literally
        the first hour of the 32-hour dataset, and seven nested prefixes are compared rather than
        seven independently sampled datasets whose sampling luck would be confounded with scale.</p>
@@ -263,50 +266,63 @@ footer a:hover{color:var(--amber)}
   <figure class="plate">
     <img src="media/s8/fig6_datacard.png" alt="Data card: hours per family and expert acceptance rate per family">
     <figcaption><b>Plate 2 · The data card</b>Equal hours per family by construction. Acceptance
-      rates of 78–100%: the grasping and pushing families are the ones the experts sometimes fail,
-      which is also where the learned policies are weakest.</figcaption>
+      rates run from 78% (push) to 100% (reach, topple); the rejected attempts are counted on the
+      card because a data engine's rejection rate is a fact about its data distribution.</figcaption>
   </figure>
 
   <div class="col">
     <h3>The grid</h3>
-    <p>Five policy sizes from 11 thousand to 3.3 million parameters — a 290× range — times seven
+    <p>Five policy sizes from 11 thousand to 3.3 million parameters, roughly log-spaced, times seven
        data scales from half an hour to thirty-two hours, times two seeds. Seventy runs, one
-       recipe: AdamW, warmup and cosine decay, thirty epoch-equivalents (capped at 150k steps,
-       which binds only at thirty-two hours), the best checkpoint by held-in validation loss. Nothing is tuned per cell, because a scaling study's conclusions
-       should survive a reader asking whether the small runs were simply tuned harder.</p>
+       recipe: AdamW, warmup and cosine decay, thirty epoch-equivalents capped at 150k steps, the
+       best checkpoint by held-in validation loss. The cap binds only at thirty-two hours, where it
+       allows 17.6 epochs. Nothing is tuned per cell, because a scaling study's conclusions should
+       survive a reader asking whether the small runs were simply tuned harder — and an earlier
+       draft of this grid failed exactly that test: a minimum-step floor had quietly given the
+       half-hour cells sixty epochs. Those cells were rerun.</p>
     <p>Policies are MLPs predicting eight-step action chunks from a 69-dimensional state. Both are
        deliberate. The observation is a single state vector, not a token sequence, so attention
-       would have nothing to attend over; and the phenomena under study — power-law loss curves,
-       capacity saturation, transfer — are properties of capacity against data, for which MLP
-       capacity is the cleanest possible axis. Seventy training runs on a CPU is the budget that
-       makes a sweep possible at all; a perception stack would spend it answering a different
-       question.</p>
+       would have nothing to attend over; and the phenomena under study — loss curves, capacity
+       saturation, transfer — are properties of capacity against data, for which MLP width is the
+       cleanest possible axis. Seventy training runs on a CPU is the budget that makes a sweep
+       possible at all; a perception stack would spend it answering a different question.</p>
   </div>
 
   <figure class="plate bleed">
     <img src="media/s8/fig2_val_scaling.png" alt="Log-log plot of validation error versus hours of pretraining data for five model sizes, with power-law fits">
-    <figcaption><b>Plate 3 · The law</b>Validation error on a common held-out set against hours of
-      data, one curve per size. Every size is close to a straight line in log-log space across
-      the full 64× range of data, <strong>R² between 0.97 and 0.99</strong>, and all five share
-      the same exponent, <strong>α ≈ 0.14–0.16</strong>: the exponent is a property of the data,
-      the constant a property of the model — the signature that language-model scaling made
-      familiar.</figcaption>
+    <figcaption><b>Plate 3 · The curves</b>Validation error on one common held-out set against hours
+      of data, one curve per size. Each is close to a straight line in log-log space across the
+      64× range of data: fitted exponents between <strong>0.13 and 0.18</strong>, R² between 0.96
+      and 0.99. Seven points per curve cannot prove a power law; what they show is curves that are
+      nearly straight and nearly parallel, the smaller models slightly steeper because they start
+      worse and converge toward the same floor. From half an hour to thirty-two, the smallest
+      model's error halves and the largest model's falls by 44%.</figcaption>
   </figure>
 
   <div class="col">
-    <p>The curves are not parallel forever. Over the final doubling, from sixteen to thirty-two
-       hours, the two smallest models improve by two to three percent; the three largest by six to
-       thirteen. The small models are not short of data. They are running out of room.</p>
+    <h3>What did not appear</h3>
+    <p>GEN-0 describes a threshold below which models ossify — stop converting data into loss
+       — while larger ones keep absorbing. This grid does not show it. Over the doubling from
+       eight to sixteen hours, where every cell trains the identical recipe, all five sizes
+       improved by almost the same fraction: between 8.7% and 11.9%. The small models' gains do
+       shrink in the final doubling — 2.4% for the two smallest against 12% for the two largest —
+       but that is the one doubling where the step cap binds, and the smallest models pick their
+       best checkpoint within the last few thousand steps of the budget, still improving when cut
+       off. Capacity saturation and training budget are confounded at exactly the point the claim
+       would rest on, so the claim is not made. A grid this size may simply be below the
+       threshold; it may also be that a 69-dimensional state does not contain enough to saturate
+       eleven thousand parameters in thirty-two hours. Either way, the honest report is that the
+       phenomenon was looked for and not found.</p>
   </div>
 
   <figure class="plate bleed">
     <img src="media/s8/fig3_capacity.png" alt="Two panels: error versus data per model size, and error versus parameters per data scale">
-    <figcaption><b>Plate 4 · Ossification</b>Left: the two smallest models' gains per doubling
-      dwindle while the three largest keep falling at the same rate. Right: the same grid cut the
-      other way. With eight hours of data or less, the best model has 160k parameters and anything
-      bigger is slightly <em>worse</em>; at thirty-two hours the optimum has moved to 580k and the
-      largest model has caught up. The right amount of capacity is a function of how much data
-      there is — returns to capacity grow with data, and returns to data grow with capacity.</figcaption>
+    <figcaption><b>Plate 4 · Capacity</b>The same grid cut the other way. At half an hour and one
+      hour the largest model is nominally best; from two to sixteen hours the 160k-parameter
+      model is best and the two larger ones are one to nine percent <em>worse</em>; at thirty-two
+      hours the three largest are within 3.5% of each other, inside their seed spread. Past 160k
+      parameters, capacity buys nothing measurable in this universe at any data scale tried. The
+      floor is set by the task and the demonstrators, not by the model.</figcaption>
   </figure>
 
   <div class="col">
@@ -314,28 +330,33 @@ footer a:hover{color:var(--amber)}
     <p>Every thousand steps, each model is also scored on demonstrations of <em>stack</em> — a
        family it never trains on. That is the Figure-1 measurement of the GEN-0 report, at this
        scale: zero-shot prediction error on a withheld downstream task, as a function of
-       pretraining.</p>
+       pretraining. The number reported is the error at eight epochs of training — a rule fixed
+       without looking at the withheld family. An earlier draft reported the minimum over
+       training, which is an oracle choice on the test family, and one whose bias grows with data
+       scale because longer runs are evaluated more often. It was replaced.</p>
   </div>
 
   <figure class="plate">
     <img src="media/s8/fig1_withheld_scaling.png" alt="Zero-shot prediction error on the withheld stack family versus pretraining hours, per model size">
-    <figcaption><b>Plate 5 · Zero-shot error on a family never trained on</b>More data helps, and
-      how much it helps depends on capacity: the smallest model's withheld error falls by a quarter
-      over the full data range (α = 0.08), the largest model's by more than forty percent
-      (α = 0.14). Extra data is only transferable structure if there is somewhere to put it.</figcaption>
+    <figcaption><b>Plate 5 · Zero-shot error on a family never trained on</b>Noisier than the held-in
+      curves (R² 0.80–0.88) but falling for every size: by 33% for the smallest model and 40% for
+      the largest across the data range. Capacity matters most when data is scarce — at half an
+      hour the smallest model's withheld error is 1.7 times the largest model's; at thirty-two
+      hours, 1.9 times.</figcaption>
   </figure>
 
   <figure class="plate">
     <img src="media/s8/fig7_specialisation.png" alt="Withheld-family error over training steps for the largest model at four data scales">
     <figcaption><b>Plate 6 · Specialisation, seen from inside</b>The largest model's withheld-family
       error <em>over training</em>, while its held-in validation loss falls monotonically the whole
-      time. With eight hours of data the withheld error bottoms out near 0.05 at about 25,000 steps
-      and then climbs to 0.090. With thirty-two hours it holds the same floor four times longer,
-      to about 90,000 steps, and then climbs too. Twenty-five thousand steps over eight hours and
-      ninety thousand over thirty-two are both roughly eleven epochs: specialisation is a function
-      of passes over the data, not of hours. More data does not prevent it; it postpones it.
-      Selecting the checkpoint by held-in loss — the standard rule, used here — selects a
-      specialised one.</figcaption>
+      time. With eight hours of data the withheld error bottoms out at 0.050 after 16,000 steps
+      (7.5 epochs), begins a sustained climb at about 30,000 (14 epochs), and ends its thirty
+      epochs at 0.122 — worse than it started. With thirty-two hours it bottoms out at 0.046 after
+      46,000 steps (5.4 epochs), holds until about 87,000 (10 epochs), and climbs to 0.077 by the
+      end of its budget. Four times the data bought 2.9 times the steps before specialisation;
+      in epochs the onsets are within a factor of 1.4. Specialisation is mostly, not purely, a
+      matter of passes over the data — and the checkpoint the standard rule selects, the one
+      with the best held-in loss, is a specialised one.</figcaption>
   </figure>
 
   <div class="col">
@@ -344,32 +365,39 @@ footer a:hover{color:var(--amber)}
        pretraining scale buys <em>downstream performance</em> once a model is post-trained on a
        little task-specific data. So each pretrained checkpoint is post-trained on ten, thirty, or
        one hundred stack demonstrations with one fixed recipe, and compared against the identical
-       recipe from scratch. The comparison is paired: every arm faces the same hundred sampled
-       stack instances, seed for seed, and what is reported is the interval on the per-episode
-       difference — not two marginal error bars eyeballed for overlap.</p>
+       recipe from scratch. The comparison is paired: every arm, both seeds, faces the same
+       hundred sampled stack instances, and what is reported is the seed-averaged per-instance
+       difference with a bootstrap interval over those hundred instances, alongside an exact
+       McNemar test on the discordant pairs. Twenty-one comparisons are made per model size, so
+       a Bonferroni threshold is reported too.</p>
   </div>
 
   <figure class="plate bleed">
     <img src="media/s8/fig4_transfer.png" alt="Closed-loop stack success versus pretraining hours for three demonstration budgets, against from-scratch baselines">
     <figcaption><b>Plate 7 · Transfer scaling</b>Closed-loop stack success for the 580k-parameter
-      policy. Zero-shot success is 0–4%: the family is genuinely new. With one hundred
+      policy. Zero-shot success is 0–3%: the family is genuinely new. With one hundred
       demonstrations, training from scratch reaches <strong>11%</strong>; the same recipe on top of
       thirty-two hours of pretraining reaches <strong>42%</strong>, a paired gain of
-      <strong>+32 points [+24, +40]</strong>, and the gain grows with pretraining hours at every
-      budget. With ten demonstrations the scratch policy never succeeds at all, and the pretrained
-      one succeeds one time in six. Every cell's paired interval excludes zero.</figcaption>
+      <strong>+32 points [+24, +40]</strong>. At the hundred-demonstration budget the gain rises
+      with every doubling of pretraining, from +10 at half an hour to +32; at ten and thirty
+      demonstrations it rises broadly but not monotonically. With ten demonstrations the scratch
+      policy never succeeds; the pretrained ones succeed up to one time in six.
+      Twenty of the twenty-one paired comparisons are significant at p&nbsp;&lt;&nbsp;0.05 and
+      eighteen survive Bonferroni correction.</figcaption>
   </figure>
 
   <div class="col">
-    <p>The largest model tells a sharper version of the same story. From scratch, its 3.3 million
-       parameters fit a hundred demonstrations well enough for 25% success on their own, and no
-       amount of pretraining adds significantly to that (+4 to +8 points, every interval spanning
-       zero) — while pretraining on <em>half an hour</em> of data makes it measurably worse, by ten
-       points [−18, −2]. The specialised initialisation of Plate 6 is a worse starting point than
-       random weights. Where the same model is starved — ten demonstrations — pretraining is worth
-       nine to fourteen points, and with thirty it lifts success from 4% to 27%. Pretraining pays
-       where data is scarce relative to capacity, and only when there is enough of it for the
-       capacity being pretrained.</p>
+    <p>The largest model tells a different story, and it is the one that makes the first
+       credible. From scratch, its 3.3 million parameters fit a hundred demonstrations well enough
+       for 25% success on their own, and pretraining does not significantly change that at any
+       scale: the paired differences run from −6 to +8 points and every interval spans zero. Where
+       the same model is starved — ten or thirty demonstrations — pretraining is worth two to
+       fourteen and five to twenty-four points respectively, and twelve of its twenty-one
+       comparisons are significant. Pretraining pays where data is scarce relative to capacity.
+       An earlier draft of this paragraph reported that half an hour of pretraining made the large
+       model significantly <em>worse</em>; that cell had been trained for sixty epochs by the
+       floor bug above, and after the rerun the effect is −6 points with an interval spanning zero.
+       It is reported here as what it is: not significant.</p>
   </div>
 
   <figure class="plate duo">
@@ -379,50 +407,57 @@ footer a:hover{color:var(--amber)}
   <div class="col">
     <p style="font-family:var(--sans);font-size:13px;color:var(--dim);margin-top:-28px">
       <b style="font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:6px">Plates 8 &amp; 9</b>
-      One policy, five tasks, closed loop. At thirty-two hours the largest model succeeds on
-      100% of reaches, 74% of pushes, 82% of lifts, 78% of placements and 100% of topples —
-      a mean of 87%, against 48% for the smallest model on half an hour. Right: the same policy,
-      and a post-trained 580k sibling on the withheld stacking task, driving the simulator.</p>
+      One policy, five tasks, closed loop, fifty episodes per family on the seed-0 checkpoints
+      (a Wilson half-width of roughly twelve points, so differences between adjacent data scales
+      are mostly inside it). At thirty-two hours the largest model succeeds on 100% of reaches,
+      74% of pushes, 82% of lifts, 78% of placements and 100% of topples — a mean of 87%, against
+      38% for the smallest model on half an hour. Right: the same policy, and a post-trained 580k
+      sibling on the withheld stacking task, driving the simulator.</p>
   </div>
 
   <div class="finding">
     <span class="tag">The validation set that moved</span>
     <h4>A metric that changes with the axis it is plotted against is not a metric</h4>
-    <p>The first pass of this grid showed validation error <em>rising</em> from sixteen to
-       thirty-two hours for four of the five sizes. Each cell had been validated on the held-out
-       episodes of its own data prefix — so every point on the hours axis was scored on a
-       different set of episodes, and the thirty-two-hour set happened to be harder.</p>
+    <p>Each cell of the grid validated, during training, on the held-out episodes of its own data
+       prefix — so every point on the hours axis was scored on a different set of episodes. On
+       the committed runs, that own-prefix error still <em>rises</em> from sixteen to thirty-two
+       hours for three of the five sizes; the thirty-two-hour episodes happen to be harder.</p>
     <p>Because episodes are assigned to train or validation by a hash of their seed, a validation
        episode is held out from <em>every</em> cell regardless of scale. The union of them is a
-       legitimate common test set for the whole grid. Re-scoring all seventy checkpoints on it
-       — no retraining, metrics as functions of what was saved — made every curve monotone and
-       turned an artefact into Plate 3.</p>
+       legitimate common test set for the whole grid. Re-scoring all seventy checkpoints on it —
+       no retraining, metrics as functions of what was saved — is what Plate 3 shows, and on it
+       every curve is monotone.</p>
   </div>
 
   <div class="finding">
     <span class="tag">Review before compute</span>
-    <h4>Four of the bugs below were found before the first training run</h4>
+    <h4>Three of the bugs below were found before the first training run</h4>
     <p>An adversarial review of the code ran before the sweep did, on the grounds that a silent
        bug found <em>after</em> seventy training runs costs seventy training runs. It found that
        resizing an object at reset left its collision bounding radius stale — tall pillars were
        settling embedded in the table with their contact flickering on one tick in five — that the
-       sampled friction coefficients were being masked by MuJoCo's max-combination rule, that
-       parked objects carried stale sizes from the previous episode, and that the early-stopping
-       rule gave different cells different effective recipes. All four were fixed, verified, and
-       the corpus regenerated, before any number existed to be attached to.</p>
+       sampled friction coefficients were being masked by MuJoCo's max-combination rule, and that
+       parked objects carried stale sizes from the previous episode. All three were fixed,
+       verified, and the corpus regenerated, before any number existed to be attached to. A second
+       review of the finished write-up found the step floor and the oracle metric above, and
+       softened more claims than this paragraph has room to list; the chapter is the version that
+       survived it.</p>
   </div>
 
   <div class="col">
     <h3>What this is and is not</h3>
     <p>This is a faithful miniature of a scaling-law study: nested data prefixes, a common
-       validation set, a genuinely withheld task family, paired closed-loop comparison, Wilson
-       intervals on success rates, and every number traceable to a committed run log. It is not a
-       claim about what a ten-billion-parameter model does. The observations are state-based
-       rather than pixels, the policies are MLPs, the demonstrators are scripted, and the largest
-       model here would be a rounding error in a foundation model's parameter count. What
-       transfers is the method — and the finding that, even in a universe this small, the same
-       shapes appear: a shared data exponent, capacity floors, specialisation under data scarcity,
-       and pretraining that pays off downstream only once there is enough of it.</p>
+       validation set, a genuinely withheld task family, paired closed-loop comparison with
+       corrected significance, Wilson intervals on success rates, and every number traceable to a
+       committed run log. It is not a claim about what a ten-billion-parameter model does. The
+       observations are state-based rather than pixels, the policies are MLPs, the demonstrators
+       are scripted, two seeds are not many, and the largest model here would be a rounding error
+       in a foundation model's parameter count. What appeared: near-straight loss curves with
+       similar exponents across a 290× range of model size, specialisation away from an unseen
+       task after roughly ten passes over the data, and pretraining that buys downstream success
+       where demonstrations are scarce relative to capacity. What did not: an ossification
+       threshold, or any return to capacity past 160k parameters. Both halves of that list are
+       the result.</p>
   </div>
 </div></article>
 
@@ -654,7 +689,7 @@ footer a:hover{color:var(--amber)}
 <article id="method"><div class="sheet">
   <div class="col">
     <p class="chapno">Chapter Six</p>
-    <h2>Twelve bugs, none of which raised an <i>exception</i></h2>
+    <h2>Thirteen bugs, none of which raised an <i>exception</i></h2>
     <p class="deck">Every result here was checked against something external. This is what that
        discipline caught.</p>
 
@@ -723,6 +758,13 @@ footer a:hover{color:var(--amber)}
          thirty-two hours. Re-scoring every checkpoint on one common held-out set made every
          curve monotone.</p></div></div>
     <div class="bug"><div>
+      <h5>A step floor that doubled one cell's epochs</h5>
+      <p>The training budget was "thirty epochs, clamped to at least 8,000 steps". At half an hour
+         of data the floor bound, and those cells trained sixty epochs — twice the recipe — at
+         exactly the scale where the largest model's pretraining appeared to <em>hurt</em>
+         transfer. Rerun at thirty epochs, the effect is not significant. The claim was
+         withdrawn.</p></div></div>
+    <div class="bug"><div>
       <h5>Confidence intervals of zero width</h5>
       <p>Bootstrap percentile intervals on success flags degenerate at 0% and 100%: a policy that
          fails every episode resamples to itself and reports certainty. Replaced with Wilson
@@ -756,7 +798,7 @@ python -m s6_brax_jax.train  --total-steps 8000000 --num-envs 512</code></pre>
 
   <div class="col"><h3>Where this stands</h3></div>
   <div class="status">
-    <div><span class="s done">Complete</span><span class="t">Scaling laws for behaviour cloning</span><span class="d">70-run grid, α ≈ 0.15, +32 pt paired transfer</span></div>
+    <div><span class="s done">Complete</span><span class="t">Scaling laws for behaviour cloning</span><span class="d">70-run grid, +32 pt paired transfer, ossification not found</span></div>
     <div><span class="s done">Complete</span><span class="t">Real-to-sim identification</span><span class="d">56.7% gap reduction, held out</span></div>
     <div><span class="s done">Complete</span><span class="t">Tendon characterisation</span><span class="d">Friction and bistability separated</span></div>
     <div><span class="s done">Complete</span><span class="t">PPO &amp; SAC from scratch</span><span class="d">9.41× efficiency gap measured</span></div>

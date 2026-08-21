@@ -1,37 +1,37 @@
 35 checkpoints x 5 families
-[   79s]  l/8.0 h mean success 0.80
 [   81s]  l/4.0 h mean success 0.78
-[   81s] xl/8.0 h mean success 0.78
-[   82s]  m/8.0 h mean success 0.79
 [   82s] xl/4.0 h mean success 0.78
 [   83s]  m/4.0 h mean success 0.76
 [   84s] xl/2.0 h mean success 0.73
-[   84s]  l/2.0 h mean success 0.78
-[   87s]  s/8.0 h mean success 0.76
+[   85s]  l/2.0 h mean success 0.78
+[   85s]  m/1.0 h mean success 0.68
 [   87s]  m/2.0 h mean success 0.75
 [   88s]  l/1.0 h mean success 0.69
-[   93s] xl/1.0 h mean success 0.72
-[   95s] xl/0.5 h mean success 0.66
-[  105s]  t/8.0 h mean success 0.58
-[  157s]  m/1.0 h mean success 0.68
-[  157s]  l/0.5 h mean success 0.67
-[  161s]  s/4.0 h mean success 0.72
-[  162s]  m/0.5 h mean success 0.67
-[  166s] xl/16.0h mean success 0.86
-[  167s]  l/16.0h mean success 0.85
-[  169s]  s/1.0 h mean success 0.54
-[  170s]  t/4.0 h mean success 0.58
-[  172s]  s/2.0 h mean success 0.60
-[  175s] xl/32.0h mean success 0.87
-[  176s]  s/0.5 h mean success 0.51
-[  183s]  t/2.0 h mean success 0.48
-[  183s]  t/1.0 h mean success 0.51
-[  186s]  t/0.5 h mean success 0.48
-[  226s]  l/32.0h mean success 0.85
-[  230s]  m/16.0h mean success 0.82
-[  232s]  m/32.0h mean success 0.83
-[  239s]  s/32.0h mean success 0.78
-[  239s]  s/16.0h mean success 0.74
-[  249s]  t/16.0h mean success 0.69
-[  253s]  t/32.0h mean success 0.68
+[   90s]  s/4.0 h mean success 0.72
+[   92s] xl/1.0 h mean success 0.72
+[   94s]  s/1.0 h mean success 0.54
+[   96s]  t/4.0 h mean success 0.58
+[   98s]  s/2.0 h mean success 0.60
+[  107s]  t/2.0 h mean success 0.48
+[  153s] xl/16.0h mean success 0.86
+[  154s] xl/32.0h mean success 0.87
+[  155s]  l/32.0h mean success 0.85
+[  156s]  l/16.0h mean success 0.85
+[  160s]  m/32.0h mean success 0.83
+[  160s]  m/16.0h mean success 0.82
+[  166s]  s/32.0h mean success 0.78
+[  167s]  s/16.0h mean success 0.74
+[  168s]  l/8.0 h mean success 0.83
+[  169s]  m/8.0 h mean success 0.80
+[  176s]  t/16.0h mean success 0.69
+[  178s]  t/1.0 h mean success 0.51
+[  181s] xl/8.0 h mean success 0.80
+[  182s]  t/32.0h mean success 0.68
+[  229s]  s/8.0 h mean success 0.73
+[  237s] xl/0.5 h mean success 0.68
+[  238s]  l/0.5 h mean success 0.66
+[  246s]  m/0.5 h mean success 0.54
+[  250s]  t/8.0 h mean success 0.59
+[  254s]  s/0.5 h mean success 0.44
+[  265s]  t/0.5 h mean success 0.38
 wrote s8_scaling\results\multitask.json

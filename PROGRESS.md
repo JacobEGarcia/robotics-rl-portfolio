@@ -2,7 +2,7 @@
 
 | # | Project | Status | Evidence |
 |---|---|---|---|
-| **S8** | Scaling laws for behaviour cloning | **Done, validated** (70-run grid, paired closed-loop transfer) | `s8_scaling/results/`, `s8_scaling/figures/`, `runs/*_s8_bc_*` |
+| **S8** | Scaling laws for behaviour cloning | **Done, validated** (70-run grid, paired closed-loop transfer, adversarially reviewed twice) | `s8_scaling/results/`, `s8_scaling/figures/`, `runs/*_s8_bc_*` |
 | **S7** | Three-way evaluation harness | **Done** (hardware backend is a deliberate stub) | `common/` |
 | **S1** | PPO from scratch | **Done, validated** | `media/s1/` |
 | **SAC** | SAC from scratch | **Done, validated** | `media/sac/` |
@@ -24,22 +24,25 @@ held-out data the optimiser never saw.
 
 A GEN-0-style scaling study on a Panda tabletop with six procedurally varied
 task families (stack withheld), 33.8 h of expert demonstrations, 5 model
-sizes × 7 data scales × 2 seeds, all on CPU.
+sizes × 7 data scales × 2 seeds, one recipe, all on CPU.
 
 | measurement | result |
 |---|---|
-| data-scaling exponent, common val set | α = 0.14–0.16 for every size, R² 0.97–0.99 |
-| capacity | best size 160k at ≤ 8 h, 582k at 32 h; small models' per-doubling gains 2–3% vs 6–13% |
-| withheld (stack) zero-shot error | t −25% (α 0.08), xl −44% (α 0.14) over 64× data |
-| specialisation | withheld error rises after ~10 epochs at every data scale |
-| transfer, 580k, 100 demos | scratch 11% → 42% at 32 h, paired **+32 pts [+24, +40]** |
-| transfer, 580k, 10 demos | scratch 0% → 16% |
-| multi-task closed loop, xl @ 32 h | reach 100 / push 74 / lift 82 / place 78 / topple 100 % |
+| data-scaling curves, common val set | near-straight in log-log, α 0.13–0.18, R² 0.96–0.99 (seven points per curve; no "law" claimed) |
+| 8→16 h doubling (uniform recipe) | every size gains 8.7–11.9% — **no ossification threshold found** |
+| capacity | past 160k params nothing measurable at any data scale; 32 h: three largest within 3.5% |
+| withheld (stack) zero-shot error at 8 epochs | t −33%, xl −40% over 64× data |
+| specialisation | xl withheld error rises after 7.5 (8 h) / 5.4 (32 h) epochs while held-in val falls |
+| transfer, 580k, 100 demos | scratch 11% → 42% at 32 h, paired **+32 pts [+24, +40]**; 20/21 cells p<0.05, 18 Bonferroni |
+| transfer, 3.26M, 100 demos | 25% scratch; pretraining −6 to +8, none significant; helps at 10/30 demos |
+| multi-task closed loop, xl @ 32 h, seed 0 | reach 100 / push 74 / lift 82 / place 78 / topple 100 % |
 
-Five silent bugs found (four by an adversarial review run *before* the sweep):
+Six silent bugs found (three by an adversarial review run *before* the sweep):
 stale `geom_rbound` on resized objects, friction masked by MuJoCo's
 max-combination rule, parked objects keeping stale sizes, a validation set that
-changed with the data scale, and bootstrap CIs of zero width at 0%/100%.
+changed with the data scale, bootstrap CIs of zero width at 0%/100%, and a
+step floor that doubled the 0.5 h cells' epochs (it had made a "pretraining
+hurts" claim look significant; rerun uniformly, it is not).
 
 ## S5 — Real-to-sim system identification
 
