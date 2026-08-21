@@ -2,6 +2,7 @@
 
 | # | Project | Status | Evidence |
 |---|---|---|---|
+| **S8** | Scaling laws for behaviour cloning | **Done, validated** (70-run grid, paired closed-loop transfer) | `s8_scaling/results/`, `s8_scaling/figures/`, `runs/*_s8_bc_*` |
 | **S7** | Three-way evaluation harness | **Done** (hardware backend is a deliberate stub) | `common/` |
 | **S1** | PPO from scratch | **Done, validated** | `media/s1/` |
 | **SAC** | SAC from scratch | **Done, validated** | `media/sac/` |
@@ -11,13 +12,34 @@
 | **S2** | In-hand reorientation | **Built, unit-validated, untrained** — needs GPU | `s2_inhand/`, see README |
 | **S3** | Domain randomization | **Randomization built and validated**; eval blocked on S2 | `s3_domain_rand/` |
 
-**Six of eight complete and validated. S2 and S3 are now written and unit-tested but untrained.** Site published at `docs/` (GitHub Pages ready).
+**Seven of nine complete and validated. S2 and S3 are now written and unit-tested but untrained.** Site published at `docs/` (GitHub Pages ready).
 
 Every completed project was validated against something external — a published
 baseline, an independent implementation, a physical consistency check, or
 held-out data the optimiser never saw.
 
 ---
+
+## S8 — Scaling laws for behaviour cloning (2026-08-21)
+
+A GEN-0-style scaling study on a Panda tabletop with six procedurally varied
+task families (stack withheld), 33.8 h of expert demonstrations, 5 model
+sizes × 7 data scales × 2 seeds, all on CPU.
+
+| measurement | result |
+|---|---|
+| data-scaling exponent, common val set | α = 0.14–0.16 for every size, R² 0.97–0.99 |
+| capacity | best size 160k at ≤ 8 h, 582k at 32 h; small models' per-doubling gains 2–3% vs 6–13% |
+| withheld (stack) zero-shot error | t −25% (α 0.08), xl −44% (α 0.14) over 64× data |
+| specialisation | withheld error rises after ~10 epochs at every data scale |
+| transfer, 580k, 100 demos | scratch 11% → 42% at 32 h, paired **+32 pts [+24, +40]** |
+| transfer, 580k, 10 demos | scratch 0% → 16% |
+| multi-task closed loop, xl @ 32 h | reach 100 / push 74 / lift 82 / place 78 / topple 100 % |
+
+Five silent bugs found (four by an adversarial review run *before* the sweep):
+stale `geom_rbound` on resized objects, friction masked by MuJoCo's
+max-combination rule, parked objects keeping stale sizes, a validation set that
+changed with the data scale, and bootstrap CIs of zero width at 0%/100%.
 
 ## S5 — Real-to-sim system identification
 

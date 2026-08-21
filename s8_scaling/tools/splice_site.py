@@ -55,8 +55,8 @@ def main(fragment_path: str) -> None:
     old_ledger_start = html.index('<div class="ledgergrid">')
     old_ledger_end = html.index('</div>', old_ledger_start) + len('</div>')
     ledger = '''<div class="ledgergrid">
-    <figure><span class="n amber">0.99</span><span class="l">R² of the power-law fit<br>over a 64× data range</span></figure>
-    <figure><span class="n sky">+25<span style="font-size:26px"> pts</span></span><span class="l">Paired transfer gain<br>from pretraining</span></figure>
+    <figure><span class="n amber">0.98</span><span class="l">R² of the power-law fit<br>over a 64× data range</span></figure>
+    <figure><span class="n sky">+32<span style="font-size:26px"> pts</span></span><span class="l">Paired transfer gain<br>from pretraining</span></figure>
     <figure><span class="n">56.7%</span><span class="l">Reality gap closed<br>on held-out data</span></figure>
     <figure><span class="n sage">28.3×</span><span class="l">JAX throughput<br>same CPU</span></figure>
     <figure><span class="n">70</span><span class="l">Training runs<br>in the scaling grid</span></figure>
@@ -119,7 +119,7 @@ def main(fragment_path: str) -> None:
         '  <div class="status">\n',
         '  <div class="status">\n'
         '    <div><span class="s done">Complete</span><span class="t">Scaling laws for behaviour cloning</span>'
-        '<span class="d">70-run grid, α ≈ 0.14, +25 pt paired transfer</span></div>\n')
+        '<span class="d">70-run grid, α ≈ 0.15, +32 pt paired transfer</span></div>\n')
 
     # --- footer link
     html = html.replace(

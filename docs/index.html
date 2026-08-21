@@ -180,6 +180,7 @@ footer a:hover{color:var(--amber)}
 <div class="masthead"><div class="sheet">
   <span class="logo">Jacob E. Garcia</span>
   <nav>
+    <a href="#scaling">Scaling</a>
     <a href="#gap">Reality Gap</a>
     <a href="#tendon">Tendons</a>
     <a href="#algorithms">Algorithms</a>
@@ -192,10 +193,10 @@ footer a:hover{color:var(--amber)}
 
 <!-- ============================================ TITLE ============================================ -->
 <section class="titlepage"><div class="sheet">
-  <p class="kicker">Robotics · Reinforcement Learning · Sim-to-Real</p>
+  <p class="kicker">Robotics · Scaling Laws · Reinforcement Learning · Sim-to-Real</p>
   <h1>Closing the <i>reality gap</i></h1>
-  <p class="standfirst">Six projects on the distance between a simulator and a physical robot —
-     and what it takes to measure that distance honestly.</p>
+  <p class="standfirst">Seven projects on what it takes to measure a robot-learning claim honestly —
+     from the scaling laws of imitation to the distance between a simulator and a physical arm.</p>
 
   <div class="colophon">
     <span>Author<b>Jacob E. Garcia</b></span>
@@ -208,18 +209,227 @@ footer a:hover{color:var(--amber)}
 <!-- ============================================ LEDGER ============================================ -->
 <section class="ledger"><div class="sheet">
   <div class="ledgergrid">
-    <figure><span class="n amber">56.7%</span><span class="l">Reality gap closed<br>on held-out data</span></figure>
-    <figure><span class="n sky">9.41×</span><span class="l">SAC sample<br>efficiency over PPO</span></figure>
+    <figure><span class="n amber">0.98</span><span class="l">R² of the power-law fit<br>over a 64× data range</span></figure>
+    <figure><span class="n sky">+32<span style="font-size:26px"> pts</span></span><span class="l">Paired transfer gain<br>from pretraining</span></figure>
+    <figure><span class="n">56.7%</span><span class="l">Reality gap closed<br>on held-out data</span></figure>
     <figure><span class="n sage">28.3×</span><span class="l">JAX throughput<br>same CPU</span></figure>
-    <figure><span class="n">632<span style="font-size:26px"> s</span></span><span class="l">Real Franka<br>trajectories fitted</span></figure>
-    <figure><span class="n">7</span><span class="l">Silent bugs found<br>none raised an exception</span></figure>
+    <figure><span class="n">70</span><span class="l">Training runs<br>in the scaling grid</span></figure>
+    <figure><span class="n">12</span><span class="l">Silent bugs found<br>none raised an exception</span></figure>
   </div>
 </div></section>
+
+<!-- ============================================ I — SCALING ============================================ -->
+<article id="scaling"><div class="sheet">
+  <div class="col">
+    <p class="chapno">Chapter One</p>
+    <h2>Scaling laws, at <i>tabletop</i> scale</h2>
+    <p class="deck">Robot foundation models are reported to follow power laws: more pretraining data,
+       predictably less error, and small models that stop absorbing while large ones keep going. Do
+       the same laws appear in a manipulation universe small enough to sweep end-to-end on one CPU?</p>
+
+    <p class="opening">Generalist's GEN-0 report measured its scaling claims on 270,000 hours of
+       real manipulation data and models past ten billion parameters. Those numbers are out of
+       reach here. The <em>experimental design</em> is not: a data engine, a pretraining grid over
+       model size and data scale, validation error on a task family the model never sees,
+       post-training on that family with small demonstration budgets, and closed-loop evaluation
+       with the statistics done properly. Every one of those pieces can be built honestly at small
+       scale. This chapter builds them.</p>
+
+    <p>The universe is a Franka Panda on a tabletop and six task families — reach, push, lift, place,
+       topple, and stack — with every episode procedurally resampled: object sizes, masses,
+       frictions, poses, and goals. The policy never sees the same tabletop twice. Five families
+       form the pretraining corpus. <strong>Stack is withheld entirely.</strong> It composes skills
+       the corpus contains — reach above, grasp, carry, release precisely — in a combination the
+       corpus never shows, which is exactly what a transfer target should be.</p>
+  </div>
+
+  <figure class="plate bleed">
+    <video src="media/s8/data_engine.mp4" autoplay loop muted playsinline></video>
+    <figcaption><b>Plate 1 · The data engine</b>Scripted <em>feedback</em> experts demonstrate every
+      family. They re-plan from live state each tick, recover from slips and re-grasp after
+      failures, so the demonstrations cover the states a learned policy will actually visit.
+      Only successes are kept; the acceptance rate per family is reported, not hidden.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p>Twenty-eight simulator processes collect the corpus at over a hundred times real time:
+       <strong>33.8 hours</strong> of demonstrated experience, 74,393 episodes, 2.4 million control
+       steps, in about ten minutes. It is stored so that cumulative hours per family stay balanced
+       at every prefix. That detail is the whole data-scaling axis: the 1-hour dataset is literally
+       the first hour of the 32-hour dataset, and seven nested prefixes are compared rather than
+       seven independently sampled datasets whose sampling luck would be confounded with scale.</p>
+  </div>
+
+  <figure class="plate">
+    <img src="media/s8/fig6_datacard.png" alt="Data card: hours per family and expert acceptance rate per family">
+    <figcaption><b>Plate 2 · The data card</b>Equal hours per family by construction. Acceptance
+      rates of 78–100%: the grasping and pushing families are the ones the experts sometimes fail,
+      which is also where the learned policies are weakest.</figcaption>
+  </figure>
+
+  <div class="col">
+    <h3>The grid</h3>
+    <p>Five policy sizes from 11 thousand to 3.3 million parameters — a 290× range — times seven
+       data scales from half an hour to thirty-two hours, times two seeds. Seventy runs, one
+       recipe: AdamW, warmup and cosine decay, thirty epoch-equivalents (capped at 150k steps,
+       which binds only at thirty-two hours), the best checkpoint by held-in validation loss. Nothing is tuned per cell, because a scaling study's conclusions
+       should survive a reader asking whether the small runs were simply tuned harder.</p>
+    <p>Policies are MLPs predicting eight-step action chunks from a 69-dimensional state. Both are
+       deliberate. The observation is a single state vector, not a token sequence, so attention
+       would have nothing to attend over; and the phenomena under study — power-law loss curves,
+       capacity saturation, transfer — are properties of capacity against data, for which MLP
+       capacity is the cleanest possible axis. Seventy training runs on a CPU is the budget that
+       makes a sweep possible at all; a perception stack would spend it answering a different
+       question.</p>
+  </div>
+
+  <figure class="plate bleed">
+    <img src="media/s8/fig2_val_scaling.png" alt="Log-log plot of validation error versus hours of pretraining data for five model sizes, with power-law fits">
+    <figcaption><b>Plate 3 · The law</b>Validation error on a common held-out set against hours of
+      data, one curve per size. Every size is close to a straight line in log-log space across
+      the full 64× range of data, <strong>R² between 0.97 and 0.99</strong>, and all five share
+      the same exponent, <strong>α ≈ 0.14–0.16</strong>: the exponent is a property of the data,
+      the constant a property of the model — the signature that language-model scaling made
+      familiar.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p>The curves are not parallel forever. Over the final doubling, from sixteen to thirty-two
+       hours, the two smallest models improve by two to three percent; the three largest by six to
+       thirteen. The small models are not short of data. They are running out of room.</p>
+  </div>
+
+  <figure class="plate bleed">
+    <img src="media/s8/fig3_capacity.png" alt="Two panels: error versus data per model size, and error versus parameters per data scale">
+    <figcaption><b>Plate 4 · Ossification</b>Left: the two smallest models' gains per doubling
+      dwindle while the three largest keep falling at the same rate. Right: the same grid cut the
+      other way. With eight hours of data or less, the best model has 160k parameters and anything
+      bigger is slightly <em>worse</em>; at thirty-two hours the optimum has moved to 580k and the
+      largest model has caught up. The right amount of capacity is a function of how much data
+      there is — returns to capacity grow with data, and returns to data grow with capacity.</figcaption>
+  </figure>
+
+  <div class="col">
+    <h3>What the withheld family sees</h3>
+    <p>Every thousand steps, each model is also scored on demonstrations of <em>stack</em> — a
+       family it never trains on. That is the Figure-1 measurement of the GEN-0 report, at this
+       scale: zero-shot prediction error on a withheld downstream task, as a function of
+       pretraining.</p>
+  </div>
+
+  <figure class="plate">
+    <img src="media/s8/fig1_withheld_scaling.png" alt="Zero-shot prediction error on the withheld stack family versus pretraining hours, per model size">
+    <figcaption><b>Plate 5 · Zero-shot error on a family never trained on</b>More data helps, and
+      how much it helps depends on capacity: the smallest model's withheld error falls by a quarter
+      over the full data range (α = 0.08), the largest model's by more than forty percent
+      (α = 0.14). Extra data is only transferable structure if there is somewhere to put it.</figcaption>
+  </figure>
+
+  <figure class="plate">
+    <img src="media/s8/fig7_specialisation.png" alt="Withheld-family error over training steps for the largest model at four data scales">
+    <figcaption><b>Plate 6 · Specialisation, seen from inside</b>The largest model's withheld-family
+      error <em>over training</em>, while its held-in validation loss falls monotonically the whole
+      time. With eight hours of data the withheld error bottoms out near 0.05 at about 25,000 steps
+      and then climbs to 0.090. With thirty-two hours it holds the same floor four times longer,
+      to about 90,000 steps, and then climbs too. Twenty-five thousand steps over eight hours and
+      ninety thousand over thirty-two are both roughly eleven epochs: specialisation is a function
+      of passes over the data, not of hours. More data does not prevent it; it postpones it.
+      Selecting the checkpoint by held-in loss — the standard rule, used here — selects a
+      specialised one.</figcaption>
+  </figure>
+
+  <div class="col">
+    <h3>Does pretraining buy downstream success?</h3>
+    <p>The thesis a scaling law exists to support is not about validation loss. It is that
+       pretraining scale buys <em>downstream performance</em> once a model is post-trained on a
+       little task-specific data. So each pretrained checkpoint is post-trained on ten, thirty, or
+       one hundred stack demonstrations with one fixed recipe, and compared against the identical
+       recipe from scratch. The comparison is paired: every arm faces the same hundred sampled
+       stack instances, seed for seed, and what is reported is the interval on the per-episode
+       difference — not two marginal error bars eyeballed for overlap.</p>
+  </div>
+
+  <figure class="plate bleed">
+    <img src="media/s8/fig4_transfer.png" alt="Closed-loop stack success versus pretraining hours for three demonstration budgets, against from-scratch baselines">
+    <figcaption><b>Plate 7 · Transfer scaling</b>Closed-loop stack success for the 580k-parameter
+      policy. Zero-shot success is 0–4%: the family is genuinely new. With one hundred
+      demonstrations, training from scratch reaches <strong>11%</strong>; the same recipe on top of
+      thirty-two hours of pretraining reaches <strong>42%</strong>, a paired gain of
+      <strong>+32 points [+24, +40]</strong>, and the gain grows with pretraining hours at every
+      budget. With ten demonstrations the scratch policy never succeeds at all, and the pretrained
+      one succeeds one time in six. Every cell's paired interval excludes zero.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p>The largest model tells a sharper version of the same story. From scratch, its 3.3 million
+       parameters fit a hundred demonstrations well enough for 25% success on their own, and no
+       amount of pretraining adds significantly to that (+4 to +8 points, every interval spanning
+       zero) — while pretraining on <em>half an hour</em> of data makes it measurably worse, by ten
+       points [−18, −2]. The specialised initialisation of Plate 6 is a worse starting point than
+       random weights. Where the same model is starved — ten demonstrations — pretraining is worth
+       nine to fourteen points, and with thirty it lifts success from 4% to 27%. Pretraining pays
+       where data is scarce relative to capacity, and only when there is enough of it for the
+       capacity being pretrained.</p>
+  </div>
+
+  <figure class="plate duo">
+    <span><img src="media/s8/fig5_multitask.png" alt="Closed-loop success per family versus pretraining hours for the largest policy"></span>
+    <span><video src="media/s8/policy.mp4" autoplay loop muted playsinline></video></span>
+  </figure>
+  <div class="col">
+    <p style="font-family:var(--sans);font-size:13px;color:var(--dim);margin-top:-28px">
+      <b style="font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:6px">Plates 8 &amp; 9</b>
+      One policy, five tasks, closed loop. At thirty-two hours the largest model succeeds on
+      100% of reaches, 74% of pushes, 82% of lifts, 78% of placements and 100% of topples —
+      a mean of 87%, against 48% for the smallest model on half an hour. Right: the same policy,
+      and a post-trained 580k sibling on the withheld stacking task, driving the simulator.</p>
+  </div>
+
+  <div class="finding">
+    <span class="tag">The validation set that moved</span>
+    <h4>A metric that changes with the axis it is plotted against is not a metric</h4>
+    <p>The first pass of this grid showed validation error <em>rising</em> from sixteen to
+       thirty-two hours for four of the five sizes. Each cell had been validated on the held-out
+       episodes of its own data prefix — so every point on the hours axis was scored on a
+       different set of episodes, and the thirty-two-hour set happened to be harder.</p>
+    <p>Because episodes are assigned to train or validation by a hash of their seed, a validation
+       episode is held out from <em>every</em> cell regardless of scale. The union of them is a
+       legitimate common test set for the whole grid. Re-scoring all seventy checkpoints on it
+       — no retraining, metrics as functions of what was saved — made every curve monotone and
+       turned an artefact into Plate 3.</p>
+  </div>
+
+  <div class="finding">
+    <span class="tag">Review before compute</span>
+    <h4>Four of the bugs below were found before the first training run</h4>
+    <p>An adversarial review of the code ran before the sweep did, on the grounds that a silent
+       bug found <em>after</em> seventy training runs costs seventy training runs. It found that
+       resizing an object at reset left its collision bounding radius stale — tall pillars were
+       settling embedded in the table with their contact flickering on one tick in five — that the
+       sampled friction coefficients were being masked by MuJoCo's max-combination rule, that
+       parked objects carried stale sizes from the previous episode, and that the early-stopping
+       rule gave different cells different effective recipes. All four were fixed, verified, and
+       the corpus regenerated, before any number existed to be attached to.</p>
+  </div>
+
+  <div class="col">
+    <h3>What this is and is not</h3>
+    <p>This is a faithful miniature of a scaling-law study: nested data prefixes, a common
+       validation set, a genuinely withheld task family, paired closed-loop comparison, Wilson
+       intervals on success rates, and every number traceable to a committed run log. It is not a
+       claim about what a ten-billion-parameter model does. The observations are state-based
+       rather than pixels, the policies are MLPs, the demonstrators are scripted, and the largest
+       model here would be a rounding error in a foundation model's parameter count. What
+       transfers is the method — and the finding that, even in a universe this small, the same
+       shapes appear: a shared data exponent, capacity floors, specialisation under data scarcity,
+       and pretraining that pays off downstream only once there is enough of it.</p>
+  </div>
+</div></article>
 
 <!-- ============================================ I — REALITY GAP ============================================ -->
 <article id="gap"><div class="sheet">
   <div class="col">
-    <p class="chapno">Chapter One</p>
+    <p class="chapno">Chapter Two</p>
     <h2>A simulator that has never been <i>wrong</i> is not a simulator</h2>
     <p class="deck">Fitting MuJoCo to 632 seconds of logged motion from a physical Franka Panda,
        and reporting the number that counts: error on episodes the optimiser never saw.</p>
@@ -239,7 +449,7 @@ footer a:hover{color:var(--amber)}
 
   <figure class="plate bleed">
     <img src="media/s5/panda_strip.png" alt="Four poses of a simulated Franka Panda reconstructed from real DROID joint angles">
-    <figcaption><b>Plate 1 · Replay</b>The MuJoCo Panda posed from real measured joint angles at four
+    <figcaption><b>Plate 10 · Replay</b>The MuJoCo Panda posed from real measured joint angles at four
       points in a single DROID episode. Every frame the simulator produces is compared against
       where the physical arm actually was.</figcaption>
   </figure>
@@ -257,7 +467,7 @@ footer a:hover{color:var(--amber)}
 
   <figure class="plate">
     <img src="media/s5/sysid_before_after.png" alt="Simulated versus real joint trajectory before and after system identification">
-    <figcaption><b>Plate 2 · Held-out episode</b>The worst-performing joint on an episode the
+    <figcaption><b>Plate 11 · Held-out episode</b>The worst-performing joint on an episode the
       optimiser never saw — chosen deliberately rather than the most flattering one. Black is the
       real robot.</figcaption>
   </figure>
@@ -270,7 +480,7 @@ footer a:hover{color:var(--amber)}
 
   <figure class="plate bleed">
     <img src="media/s5/fig_params.png" alt="Slope chart of five simulator parameters, default versus identified">
-    <figcaption><b>Plate 3 · Parameters</b>Latency lands at 3.30 steps — at 15 Hz, roughly
+    <figcaption><b>Plate 12 · Parameters</b>Latency lands at 3.30 steps — at 15 Hz, roughly
       <strong>220 ms</strong> between command and execution. Coulomb friction rises from nothing to
       3.07. Rotor inertia nearly quintuples, which is what a harmonic drive does: it multiplies
       reflected inertia by the square of the gear ratio.</figcaption>
@@ -282,7 +492,7 @@ footer a:hover{color:var(--amber)}
   </figure>
   <div class="col">
     <p style="font-family:var(--sans);font-size:13px;color:var(--dim);margin-top:-28px">
-      <b style="font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:6px">Plates 4 &amp; 5</b>
+      <b style="font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:6px">Plates 13 &amp; 14</b>
       Convergence over 45 CMA-ES generations, and the improvement broken out per joint — between
       46% and 74%, largest at the wrist where the light distal links make friction and delay
       dominate.</p>
@@ -306,7 +516,7 @@ footer a:hover{color:var(--amber)}
 <!-- ============================================ II — TENDONS ============================================ -->
 <article id="tendon"><div class="sheet">
   <div class="col">
-    <p class="chapno">Chapter Two</p>
+    <p class="chapno">Chapter Three</p>
     <h2>Tendons do not behave like <i>joints</i></h2>
     <p class="deck">A two-jointed finger pulled by an opposing pair of artificial muscles, and the
        two very different reasons it fails to go where you tell it.</p>
@@ -320,14 +530,14 @@ footer a:hover{color:var(--amber)}
 
   <figure class="plate bleed">
     <img src="media/s4/finger_strip.png" alt="Tendon-driven finger at four levels of flexor tension">
-    <figcaption><b>Plate 6 · Flexion</b>The same finger at four flexor tensions. Between the second
+    <figcaption><b>Plate 15 · Flexion</b>The same finger at four flexor tensions. Between the second
       and third frame it crosses a threshold and snaps — the jump is not proportional to the
       change in force.</figcaption>
   </figure>
 
   <figure class="plate">
     <video src="media/s4/finger_sweep.mp4" autoplay loop muted playsinline></video>
-    <figcaption><b>Plate 7 · Sweep</b>Flexor tension driven up and down through a full cycle at
+    <figcaption><b>Plate 16 · Sweep</b>Flexor tension driven up and down through a full cycle at
       frictionloss 0.5. The finger does not retrace its path on the way back.</figcaption>
   </figure>
 
@@ -339,7 +549,7 @@ footer a:hover{color:var(--amber)}
 
   <figure class="plate bleed">
     <img src="media/s4/fig_hysteresis.png" alt="Hysteresis loops widening with tendon friction, plus width and dead band trends">
-    <figcaption><b>Plate 8 · Hysteresis</b>Loop width and reversal dead band both rise monotonically
+    <figcaption><b>Plate 17 · Hysteresis</b>Loop width and reversal dead band both rise monotonically
       with tendon friction — the physical consistency check that says the model is behaving.</figcaption>
   </figure>
 
@@ -363,7 +573,7 @@ footer a:hover{color:var(--amber)}
 <!-- ============================================ III — ALGORITHMS ============================================ -->
 <article id="algorithms"><div class="sheet">
   <div class="col">
-    <p class="chapno">Chapter Three</p>
+    <p class="chapno">Chapter Four</p>
     <h2>Two algorithms, written by hand, on purpose</h2>
     <p class="deck">PPO and SAC from scratch — not because the libraries are bad, but because
        an answer you can defend has to be one you earned.</p>
@@ -377,7 +587,7 @@ footer a:hover{color:var(--amber)}
 
   <figure class="plate bleed">
     <img src="media/fig_learning.png" alt="PPO and SAC learning curves with the step count at which each crosses the solved threshold">
-    <figcaption><b>Plate 9 · Sample efficiency</b>SAC crosses the solved threshold at 8,799
+    <figcaption><b>Plate 18 · Sample efficiency</b>SAC crosses the solved threshold at 8,799
       environment steps; PPO needs 82,800. The horizontal distance between those two dots is the
       entire result.</figcaption>
   </figure>
@@ -395,7 +605,7 @@ footer a:hover{color:var(--amber)}
   </figure>
   <div class="col">
     <p style="font-family:var(--sans);font-size:13px;color:var(--dim);margin-top:-28px">
-      <b style="font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:6px">Plate 10 · Learned policies</b>
+      <b style="font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:6px">Plate 19 · Learned policies</b>
       PPO left, SAC right. Both swing up and hold. Watching the rollout is the cheapest check that
       a good return was earned honestly rather than by exploiting the simulator.</p>
   </div>
@@ -404,7 +614,7 @@ footer a:hover{color:var(--amber)}
 <!-- ============================================ IV — SPEED ============================================ -->
 <article id="speed"><div class="sheet">
   <div class="col">
-    <p class="chapno">Chapter Four</p>
+    <p class="chapno">Chapter Five</p>
     <h2>The same algorithm, <i>28× faster</i>, on the same processor</h2>
     <p class="deck">Rewriting PPO in JAX — and what the rewrite reveals about why reinforcement
        learning is slow.</p>
@@ -418,7 +628,7 @@ footer a:hover{color:var(--amber)}
 
   <figure class="plate">
     <img src="media/s6/fig_throughput.png" alt="Throughput comparison, PyTorch versus JAX, log scale">
-    <figcaption><b>Plate 11 · Throughput</b>1,934 versus 54,808 environment steps per second, both
+    <figcaption><b>Plate 20 · Throughput</b>1,934 versus 54,808 environment steps per second, both
       solving the task. No GPU is involved — this isolates the benefit of program shape from the
       benefit of hardware.</figcaption>
   </figure>
@@ -443,8 +653,8 @@ footer a:hover{color:var(--amber)}
 <!-- ============================================ V — METHOD ============================================ -->
 <article id="method"><div class="sheet">
   <div class="col">
-    <p class="chapno">Chapter Five</p>
-    <h2>Seven bugs, none of which raised an <i>exception</i></h2>
+    <p class="chapno">Chapter Six</p>
+    <h2>Twelve bugs, none of which raised an <i>exception</i></h2>
     <p class="deck">Every result here was checked against something external. This is what that
        discipline caught.</p>
 
@@ -487,6 +697,37 @@ footer a:hover{color:var(--amber)}
       <h5>A dataset containing no reality gap</h5>
       <p>Commanded and measured were the same signal, one step apart. Any fit would have been
          circular.</p></div></div>
+      <div class="bug"><div>
+      <h5>A resized geom with a stale bounding radius</h5>
+      <p>Writing <code>geom_size</code> at reset does not update the compiled collision bounds.
+         Pillars sampled taller than their XML size had their table contact culled by the
+         broadphase and settled a centimetre inside the table, contact flickering one tick in
+         five. Found by review before any training run; fixed by writing
+         <code>geom_rbound</code> and <code>geom_aabb</code> alongside the size.</p></div></div>
+    <div class="bug"><div>
+      <h5>Friction randomisation that was never applied</h5>
+      <p>MuJoCo combines the friction of two geoms by taking the maximum. Against a 0.8 table and
+         1.0 fingertip pads, most of the sampled [0.6, 1.2] range was inert. The data card would
+         have described a randomisation the physics never saw. Objects now carry contact
+         priority, so the sampled coefficient is the one that acts.</p></div></div>
+    <div class="bug"><div>
+      <h5>Parked objects remembering the previous episode</h5>
+      <p>Objects a task family does not use are parked out of the workspace — with whatever size
+         the previous family gave them. A 10 cm pillar parked at a 5 cm object's height sat
+         inside the table and bounced for the whole of the next episode. Episode physics depended
+         on what ran before it, and the documented seed-to-episode determinism was false.</p></div></div>
+    <div class="bug"><div>
+      <h5>A validation set that moved with the data scale</h5>
+      <p>Each grid cell validated on the held-out episodes of its own data prefix, so every point
+         on the hours axis was scored on a different set. Error appeared to rise from sixteen to
+         thirty-two hours. Re-scoring every checkpoint on one common held-out set made every
+         curve monotone.</p></div></div>
+    <div class="bug"><div>
+      <h5>Confidence intervals of zero width</h5>
+      <p>Bootstrap percentile intervals on success flags degenerate at 0% and 100%: a policy that
+         fails every episode resamples to itself and reports certainty. Replaced with Wilson
+         intervals, which have correct coverage at the extremes — where a reader most needs to
+         see uncertainty.</p></div></div>
   </div>
 
   <div class="col">
@@ -506,6 +747,7 @@ footer a:hover{color:var(--amber)}
   <pre><code>pip install "gymnasium[mujoco]" torch mujoco jax optax scipy matplotlib cma pandas
 bash scripts/fetch_assets.sh
 
+python -m s8_scaling.data_engine --hours 33   # then .sweep .reeval .transfer .eval_sweep
 python -m s5_sysid.fit       --iterations 45
 python -m s4_tendon.hysteresis
 python -m s1_ppo.train       --env Pendulum-v1 --total-steps 150000
@@ -514,6 +756,7 @@ python -m s6_brax_jax.train  --total-steps 8000000 --num-envs 512</code></pre>
 
   <div class="col"><h3>Where this stands</h3></div>
   <div class="status">
+    <div><span class="s done">Complete</span><span class="t">Scaling laws for behaviour cloning</span><span class="d">70-run grid, α ≈ 0.15, +32 pt paired transfer</span></div>
     <div><span class="s done">Complete</span><span class="t">Real-to-sim identification</span><span class="d">56.7% gap reduction, held out</span></div>
     <div><span class="s done">Complete</span><span class="t">Tendon characterisation</span><span class="d">Friction and bistability separated</span></div>
     <div><span class="s done">Complete</span><span class="t">PPO &amp; SAC from scratch</span><span class="d">9.41× efficiency gap measured</span></div>
@@ -527,6 +770,7 @@ python -m s6_brax_jax.train  --total-steps 8000000 --num-envs 512</code></pre>
   <span>Jacob E. Garcia · B.S. Cybersecurity, DePaul University</span>
   <span>
     <a href="https://github.com/JacobEGarcia/robotics-rl-portfolio">Source</a> ·
+    <a href="https://generalistai.com/blog/nov-04-2025-GEN-0">GEN-0</a> ·
     <a href="https://droid-dataset.github.io/">DROID</a> ·
     <a href="https://github.com/google-deepmind/mujoco_menagerie">Menagerie</a>
   </span>

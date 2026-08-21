@@ -1,0 +1,71 @@
+common val: 123909 timesteps (60000 scored); withheld 60000
+xl/8.0 h val_common 0.0112  withheld ckpt 0.0871  min 0.0511 @ 16000
+xl/8.0 h val_common 0.0113  withheld ckpt 0.1108  min 0.0476 @ 9000
+xl/4.0 h val_common 0.0119  withheld ckpt 0.0610  min 0.0541 @ 8000
+xl/4.0 h val_common 0.0119  withheld ckpt 0.0652  min 0.0558 @ 8000
+ l/8.0 h val_common 0.0109  withheld ckpt 0.0708  min 0.0615 @ 16000
+ l/8.0 h val_common 0.0109  withheld ckpt 0.0759  min 0.0606 @ 7000
+xl/2.0 h val_common 0.0131  withheld ckpt 0.0638  min 0.0584 @ 6000
+xl/2.0 h val_common 0.0132  withheld ckpt 0.0612  min 0.0586 @ 8000
+ l/4.0 h val_common 0.0118  withheld ckpt 0.0733  min 0.0676 @ 8000
+ l/4.0 h val_common 0.0117  withheld ckpt 0.0704  min 0.0630 @ 8000
+xl/1.0 h val_common 0.0140  withheld ckpt 0.0733  min 0.0695 @ 4000
+xl/1.0 h val_common 0.0140  withheld ckpt 0.0739  min 0.0695 @ 4000
+ m/8.0 h val_common 0.0106  withheld ckpt 0.0673  min 0.0621 @ 12000
+ m/8.0 h val_common 0.0106  withheld ckpt 0.0683  min 0.0648 @ 15000
+ l/2.0 h val_common 0.0128  withheld ckpt 0.0754  min 0.0680 @ 6000
+ l/2.0 h val_common 0.0131  withheld ckpt 0.0712  min 0.0675 @ 4000
+xl/0.5 h val_common 0.0163  withheld ckpt 0.0791  min 0.0772 @ 2000
+xl/0.5 h val_common 0.0167  withheld ckpt 0.0885  min 0.0849 @ 4000
+ m/4.0 h val_common 0.0116  withheld ckpt 0.0751  min 0.0685 @ 8000
+ m/4.0 h val_common 0.0116  withheld ckpt 0.0687  min 0.0666 @ 15000
+ s/8.0 h val_common 0.0127  withheld ckpt 0.0897  min 0.0864 @ 20000
+ s/8.0 h val_common 0.0125  withheld ckpt 0.0900  min 0.0868 @ 26000
+ l/1.0 h val_common 0.0140  withheld ckpt 0.0770  min 0.0727 @ 3000
+ l/1.0 h val_common 0.0140  withheld ckpt 0.0745  min 0.0708 @ 4000
+ m/2.0 h val_common 0.0128  withheld ckpt 0.0743  min 0.0719 @ 6000
+ m/2.0 h val_common 0.0128  withheld ckpt 0.0745  min 0.0738 @ 8000
+ t/8.0 h val_common 0.0150  withheld ckpt 0.0877  min 0.0827 @ 26000
+ t/8.0 h val_common 0.0152  withheld ckpt 0.0925  min 0.0920 @ 46000
+ s/4.0 h val_common 0.0141  withheld ckpt 0.0906  min 0.0900 @ 28000
+ s/4.0 h val_common 0.0139  withheld ckpt 0.0955  min 0.0943 @ 24000
+ l/0.5 h val_common 0.0169  withheld ckpt 0.0800  min 0.0778 @ 2000
+ l/0.5 h val_common 0.0167  withheld ckpt 0.0795  min 0.0795 @ 3000
+ m/1.0 h val_common 0.0146  withheld ckpt 0.0806  min 0.0806 @ 8000
+ m/1.0 h val_common 0.0147  withheld ckpt 0.0822  min 0.0786 @ 4000
+ t/4.0 h val_common 0.0167  withheld ckpt 0.0996  min 0.0987 @ 28000
+ t/4.0 h val_common 0.0169  withheld ckpt 0.0983  min 0.0975 @ 24000
+ s/2.0 h val_common 0.0164  withheld ckpt 0.0939  min 0.0933 @ 12000
+ s/2.0 h val_common 0.0165  withheld ckpt 0.1060  min 0.1047 @ 9000
+ m/0.5 h val_common 0.0167  withheld ckpt 0.0887  min 0.0853 @ 4000
+ m/0.5 h val_common 0.0169  withheld ckpt 0.0902  min 0.0888 @ 4000
+ t/2.0 h val_common 0.0195  withheld ckpt 0.1120  min 0.1101 @ 7000
+ s/1.0 h val_common 0.0196  withheld ckpt 0.1079  min 0.1072 @ 5000
+ t/2.0 h val_common 0.0195  withheld ckpt 0.1061  min 0.1058 @ 13000
+ s/1.0 h val_common 0.0195  withheld ckpt 0.1197  min 0.1158 @ 4000
+ t/1.0 h val_common 0.0225  withheld ckpt 0.1142  min 0.1142 @ 8000
+ t/1.0 h val_common 0.0225  withheld ckpt 0.1172  min 0.1160 @ 6000
+ s/0.5 h val_common 0.0204  withheld ckpt 0.1068  min 0.1065 @ 7000
+ s/0.5 h val_common 0.0202  withheld ckpt 0.1259  min 0.1250 @ 6000
+ t/0.5 h val_common 0.0230  withheld ckpt 0.1210  min 0.1210 @ 8000
+ t/0.5 h val_common 0.0230  withheld ckpt 0.1228  min 0.1213 @ 6000
+ l/16.0h val_common 0.0100  withheld ckpt 0.0734  min 0.0584 @ 31000
+xl/16.0h val_common 0.0102  withheld ckpt 0.0851  min 0.0466 @ 31000
+xl/32.0h val_common 0.0091  withheld ckpt 0.0751  min 0.0461 @ 46000
+ l/16.0h val_common 0.0099  withheld ckpt 0.0841  min 0.0602 @ 11000
+xl/16.0h val_common 0.0102  withheld ckpt 0.0707  min 0.0461 @ 15000
+xl/32.0h val_common 0.0088  withheld ckpt 0.2286  min 0.0446 @ 28000
+ l/32.0h val_common 0.0088  withheld ckpt 0.0724  min 0.0557 @ 45000
+ l/32.0h val_common 0.0087  withheld ckpt 0.0866  min 0.0585 @ 10000
+ m/16.0h val_common 0.0097  withheld ckpt 0.0736  min 0.0633 @ 18000
+ m/16.0h val_common 0.0097  withheld ckpt 0.0665  min 0.0624 @ 68000
+ m/32.0h val_common 0.0091  withheld ckpt 0.0636  min 0.0589 @ 65000
+ m/32.0h val_common 0.0091  withheld ckpt 0.0643  min 0.0601 @ 45000
+ s/16.0h val_common 0.0114  withheld ckpt 0.0900  min 0.0821 @ 39000
+ s/16.0h val_common 0.0115  withheld ckpt 0.0838  min 0.0836 @ 109000
+ s/32.0h val_common 0.0111  withheld ckpt 0.0972  min 0.0852 @ 20000
+ s/32.0h val_common 0.0111  withheld ckpt 0.0866  min 0.0833 @ 70000
+ t/16.0h val_common 0.0134  withheld ckpt 0.0920  min 0.0864 @ 33000
+ t/16.0h val_common 0.0137  withheld ckpt 0.0995  min 0.0977 @ 68000
+ t/32.0h val_common 0.0131  withheld ckpt 0.0979  min 0.0868 @ 44000
+ t/32.0h val_common 0.0133  withheld ckpt 0.0995  min 0.0959 @ 72000

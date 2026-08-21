@@ -1,0 +1,12 @@
+{
+  "size": "m",
+  "hours": 32.0,
+  "seed": 1,
+  "n_params": 159784,
+  "train_samples": 2187202,
+  "best_val": 0.009047057794531186,
+  "best_withheld": 0.06433282936016718,
+  "best_step": 146000,
+  "steps_trained": 150000,
+  "wall_seconds": 1020.1
+}

@@ -1,0 +1,12 @@
+{
+  "size": "xl",
+  "hours": 8.0,
+  "seed": 1,
+  "n_params": 3261480,
+  "train_samples": 545473,
+  "best_val": 0.010412607833875806,
+  "best_withheld": 0.11079899377028148,
+  "best_step": 46000,
+  "steps_trained": 60000,
+  "wall_seconds": 3617.1
+}

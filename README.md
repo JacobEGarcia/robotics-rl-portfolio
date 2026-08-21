@@ -37,7 +37,7 @@ an independent implementation, a physical consistency check, or held-out data
 the optimiser never saw. A learning curve that rises proves only that a number
 went up.
 
-That discipline found **seven bugs, none of which raised an exception**:
+That discipline found **twelve bugs, none of which raised an exception**:
 
 1. **Missing reward scaling** (PyTorch PPO) — value loss of ~10⁶ against a
    policy loss of ~10⁻² meant `clip_grad_norm_` sent nearly the entire gradient
@@ -59,6 +59,19 @@ That discipline found **seven bugs, none of which raised an exception**:
 7. **A dataset with no reality gap** — `lerobot/nyu_franka_play_dataset` has
    `action == state[t+1] − state[t]` exactly (correlation 1.0000). Fitting a
    simulator to it would have produced a perfect, meaningless result.
+8. **A resized geom with a stale bounding radius** (S8) — writing `geom_size`
+   at reset leaves `geom_rbound`/`geom_aabb` compiled for the old size; tall
+   pillars settled a centimetre inside the table with flickering contact.
+9. **Friction randomisation that was never applied** (S8) — MuJoCo combines
+   friction by elementwise max, so a 0.8 table and 1.0 fingertip pads masked
+   most of the sampled range. Objects now carry contact `priority`.
+10. **Parked objects remembering the previous episode** (S8) — unused objects
+    kept the previous family's sizes, so physics depended on episode order.
+11. **A validation set that moved with the data scale** (S8) — each grid cell
+    validated on its own prefix's held-out episodes; error appeared to rise
+    from 16 h to 32 h. Re-scored on one common set, every curve is monotone.
+12. **Confidence intervals of zero width** (S8) — percentile bootstrap on
+    success flags collapses at 0% and 100%. Replaced with Wilson intervals.
 
 ---
 

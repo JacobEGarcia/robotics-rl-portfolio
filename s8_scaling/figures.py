@@ -202,7 +202,7 @@ def fig_transfer(transfer_json: Path, out: Path) -> None:
                 label="zero-shot (0 demos)")
 
     ax.set_xscale("log")
-    ax.set_ylim(-0.02, 1.0)
+    ax.set_ylim(-0.02, 0.62)
     ax.set_xlabel("pretraining data (hours), stack never included")
     ax.set_ylabel("stack success rate (100 paired episodes)")
     ax.set_title("transfer scaling: pretraining hours buy downstream success")
@@ -252,7 +252,7 @@ def fig_specialisation(runs_root: Path, out: Path, size: str = "xl") -> None:
         ax.plot(steps / 1000, loss, color=PALETTE[i], lw=1.7, label=f"{h:g} h of data")
     ax.set_xlabel("training steps (thousands)")
     ax.set_ylabel("withheld-family (stack) MSE")
-    ax.set_title(f"{size}: zero-shot error over training - specialisation sets in with few hours")
+    ax.set_title(f"{size}: zero-shot error over training - specialisation sets in after ~10 epochs")
     ax.legend(fontsize=8.5)
     fig.savefig(out)
     plt.close(fig)

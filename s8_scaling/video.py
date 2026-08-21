@@ -105,7 +105,7 @@ def main() -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     env = TabletopEnv()
     writer = imageio.get_writer(
-        str(out), fps=FPS, codec="libx264", quality=8, macro_block_size=1
+        str(out), fps=FPS, codec="libx264", quality=6, macro_block_size=1
     )
 
     if args.mode == "expert":

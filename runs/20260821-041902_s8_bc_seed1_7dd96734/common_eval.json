@@ -1,0 +1,8 @@
+{
+  "val_common": 0.014715138814349969,
+  "withheld_at_checkpoint": 0.08223614309628804,
+  "withheld_min": 0.0785527858932813,
+  "withheld_min_step": 4000,
+  "withheld_final": 0.08223614919980367,
+  "common_val_timesteps": 60000
+}
