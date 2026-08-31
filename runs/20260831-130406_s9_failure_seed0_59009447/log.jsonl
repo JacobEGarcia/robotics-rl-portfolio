@@ -1,0 +1,17 @@
+{"type": "manifest", "run_id": "20260831-130406_s9_failure_seed0_59009447", "project": "s9_failure", "seed": 0, "config": {"n_directions": 400, "failure_counts": [0, 1, 2, 3, 5, 8, 12, 16, 20, 25, 30], "trials": 24, "n_tasks": 60}, "environment": {"python_version": "3.11.9", "platform": "Windows-10-10.0.26200-SP0", "numpy_version": "2.4.6", "torch_version": "2.13.0+cpu", "mujoco_version": "3.11.0", "torch_device": "cpu", "git_sha": "ef29d9580ced037ff621ac592e1485e4442e0174", "git_dirty": true}, "started_at": "2026-08-31T13:04:06", "model_hash": "677cd288e2abea83"}
+{"type": "warning", "t": 0.096, "message": "Working tree is dirty; git_sha does not fully describe this run."}
+{"type": "affine_check", "t": 0.104, "affine_max_err_N": 0.0, "qfrc_identity_max_err_Nm": 1.8189894035458565e-12}
+{"type": "support_check", "t": 38.306, "n_directions": 24, "n_random_activations": 4000, "max_sample_exceeding_bound": 0.0, "max_vertex_gap": 1.1368683772161603e-13, "bound_is_valid": true, "bound_is_tight": true}
+{"type": "monotone_check", "t": 38.306, "max_width_increase_from_removal": 0.0, "removal_never_enlarges": true}
+{"type": "failures", "t": 38.306, "k": 0, "mean_width_fraction": 1.0, "mean_width_std": 0.0, "tasks_feasible_fraction": 1.0, "tasks_feasible_std": 0.0}
+{"type": "failures", "t": 38.306, "k": 1, "mean_width_fraction": 0.9801, "mean_width_std": 0.0237, "tasks_feasible_fraction": 0.9896, "tasks_feasible_std": 0.0125}
+{"type": "failures", "t": 38.306, "k": 2, "mean_width_fraction": 0.9601, "mean_width_std": 0.0343, "tasks_feasible_fraction": 0.9866, "tasks_feasible_std": 0.0129}
+{"type": "failures", "t": 38.306, "k": 3, "mean_width_fraction": 0.9396, "mean_width_std": 0.0425, "tasks_feasible_fraction": 0.9799, "tasks_feasible_std": 0.013}
+{"type": "failures", "t": 38.306, "k": 5, "mean_width_fraction": 0.9086, "mean_width_std": 0.043, "tasks_feasible_fraction": 0.9479, "tasks_feasible_std": 0.0464}
+{"type": "failures", "t": 38.306, "k": 8, "mean_width_fraction": 0.8492, "mean_width_std": 0.0574, "tasks_feasible_fraction": 0.9301, "tasks_feasible_std": 0.0574}
+{"type": "failures", "t": 38.306, "k": 12, "mean_width_fraction": 0.7732, "mean_width_std": 0.0783, "tasks_feasible_fraction": 0.8884, "tasks_feasible_std": 0.0784}
+{"type": "failures", "t": 38.306, "k": 16, "mean_width_fraction": 0.6913, "mean_width_std": 0.0793, "tasks_feasible_fraction": 0.84, "tasks_feasible_std": 0.1044}
+{"type": "failures", "t": 38.306, "k": 20, "mean_width_fraction": 0.6115, "mean_width_std": 0.0841, "tasks_feasible_fraction": 0.7388, "tasks_feasible_std": 0.1427}
+{"type": "failures", "t": 38.306, "k": 25, "mean_width_fraction": 0.5158, "mean_width_std": 0.0898, "tasks_feasible_fraction": 0.5618, "tasks_feasible_std": 0.187}
+{"type": "failures", "t": 38.306, "k": 30, "mean_width_fraction": 0.4008, "mean_width_std": 0.0896, "tasks_feasible_fraction": 0.3043, "tasks_feasible_std": 0.1896}
+{"type": "run_end", "wall_seconds": 38.829, "failed": false, "error": null}

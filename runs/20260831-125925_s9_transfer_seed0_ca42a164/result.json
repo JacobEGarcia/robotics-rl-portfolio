@@ -1,0 +1,109 @@
+{
+  "plant_check": {
+    "max_abs_err_Nm": 1.4210854715202004e-14,
+    "samples": 6,
+    "plant_matches_simulator": true
+  },
+  "naive_error_grows_with_speed": true,
+  "naive_error_at_slowest": 0.0302,
+  "naive_error_at_fastest": 0.28058,
+  "compensated_error_at_fastest": 0.133347,
+  "improvement_at_1hz": 5.4,
+  "per_frequency": [
+    {
+      "freq_hz": 0.25,
+      "max_equality_residual": 1.1102230246251565e-16,
+      "naive": {
+        "rms_torque_error_Nm": 2.5092558461269925,
+        "relative_torque_error": 0.030203717276488965,
+        "max_abs_torque_error_Nm": 4.669002245882519,
+        "rms_activation_error": 0.0034444078960198686,
+        "command_saturated_fraction": 0.0
+      },
+      "compensated": {
+        "rms_torque_error_Nm": 0.3308768652570794,
+        "relative_torque_error": 0.0024168660978078614,
+        "max_abs_torque_error_Nm": 1.2910407485350213,
+        "rms_activation_error": 0.0007726627727671915,
+        "command_saturated_fraction": 0.2125
+      },
+      "improvement": 12.5
+    },
+    {
+      "freq_hz": 0.5,
+      "max_equality_residual": 1.1102230246251565e-16,
+      "naive": {
+        "rms_torque_error_Nm": 4.736444906869995,
+        "relative_torque_error": 0.05791788580156398,
+        "max_abs_torque_error_Nm": 8.049922277293707,
+        "rms_activation_error": 0.006112642077053185,
+        "command_saturated_fraction": 0.0
+      },
+      "compensated": {
+        "rms_torque_error_Nm": 0.8744921354693159,
+        "relative_torque_error": 0.0068313680018140845,
+        "max_abs_torque_error_Nm": 3.0569604139676887,
+        "rms_activation_error": 0.0017554440785930553,
+        "command_saturated_fraction": 0.268
+      },
+      "improvement": 8.5
+    },
+    {
+      "freq_hz": 1.0,
+      "max_equality_residual": 1.1102230246251565e-16,
+      "naive": {
+        "rms_torque_error_Nm": 8.516648571075345,
+        "relative_torque_error": 0.10638711413125795,
+        "max_abs_torque_error_Nm": 13.380516119653876,
+        "rms_activation_error": 0.010340500395640733,
+        "command_saturated_fraction": 0.0
+      },
+      "compensated": {
+        "rms_torque_error_Nm": 2.078442787293148,
+        "relative_torque_error": 0.01967229513297449,
+        "max_abs_torque_error_Nm": 6.265650567903973,
+        "rms_activation_error": 0.003915272477167423,
+        "command_saturated_fraction": 0.342
+      },
+      "improvement": 5.4
+    },
+    {
+      "freq_hz": 2.0,
+      "max_equality_residual": 1.1102230246251565e-16,
+      "naive": {
+        "rms_torque_error_Nm": 14.241615626961332,
+        "relative_torque_error": 0.18132352306564953,
+        "max_abs_torque_error_Nm": 20.421022945414222,
+        "rms_activation_error": 0.016630156159016626,
+        "command_saturated_fraction": 0.0
+      },
+      "compensated": {
+        "rms_torque_error_Nm": 4.624805045068135,
+        "relative_torque_error": 0.055271757936456445,
+        "max_abs_torque_error_Nm": 10.952988109801192,
+        "rms_activation_error": 0.007989993078829657,
+        "command_saturated_fraction": 0.672
+      },
+      "improvement": 3.3
+    },
+    {
+      "freq_hz": 4.0,
+      "max_equality_residual": 1.1102230246251565e-16,
+      "naive": {
+        "rms_torque_error_Nm": 21.722925926801775,
+        "relative_torque_error": 0.2805849408504176,
+        "max_abs_torque_error_Nm": 30.312699883361176,
+        "rms_activation_error": 0.025053209686480688,
+        "command_saturated_fraction": 0.0
+      },
+      "compensated": {
+        "rms_torque_error_Nm": 9.869247319323051,
+        "relative_torque_error": 0.13334684636142974,
+        "max_abs_torque_error_Nm": 15.404270515368653,
+        "rms_activation_error": 0.014500137147465252,
+        "command_saturated_fraction": 0.816
+      },
+      "improvement": 2.1
+    }
+  ]
+}

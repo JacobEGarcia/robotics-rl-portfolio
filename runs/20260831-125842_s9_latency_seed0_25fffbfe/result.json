@@ -1,0 +1,120 @@
+{
+  "inverse_max_abs_rate_error": 2.842170943040401e-14,
+  "saturation_frequency_hz": 3.5,
+  "compensated_rms_below_saturation_max": 0.00023303,
+  "compensated_rms_above_saturation_max": 0.129674,
+  "no_saturation_below_predicted": true,
+  "saturation_above_predicted": true,
+  "error_reduction": {
+    "0.5 Hz": 504.2,
+    "1 Hz": 486.6,
+    "2 Hz": 451.0,
+    "3 Hz": 417.8,
+    "5 Hz": 13.2,
+    "8 Hz": 4.6,
+    "12 Hz": 2.8,
+    "20 Hz": 1.8
+  },
+  "per_frequency": {
+    "naive": [
+      {
+        "freq_hz": 0.5,
+        "rms_error": 0.019580104228945662,
+        "max_abs_error": 0.036546675287584984,
+        "saturated_fraction": 0.0
+      },
+      {
+        "freq_hz": 1.0,
+        "rms_error": 0.03779888190231724,
+        "max_abs_error": 0.06911724289055177,
+        "saturated_fraction": 0.0
+      },
+      {
+        "freq_hz": 2.0,
+        "rms_error": 0.07006197910406599,
+        "max_abs_error": 0.12479456052445359,
+        "saturated_fraction": 0.0
+      },
+      {
+        "freq_hz": 3.0,
+        "rms_error": 0.09734888843224701,
+        "max_abs_error": 0.17061071180089205,
+        "saturated_fraction": 0.0
+      },
+      {
+        "freq_hz": 5.0,
+        "rms_error": 0.13985479915125404,
+        "max_abs_error": 0.24033665994158476,
+        "saturated_fraction": 0.0
+      },
+      {
+        "freq_hz": 8.0,
+        "rms_error": 0.18166114445790896,
+        "max_abs_error": 0.3074922350247442,
+        "saturated_fraction": 0.0
+      },
+      {
+        "freq_hz": 12.0,
+        "rms_error": 0.21272064015413106,
+        "max_abs_error": 0.35686959591292255,
+        "saturated_fraction": 0.0
+      },
+      {
+        "freq_hz": 20.0,
+        "rms_error": 0.238908216034487,
+        "max_abs_error": 0.3980241411391797,
+        "saturated_fraction": 0.0
+      }
+    ],
+    "compensated": [
+      {
+        "freq_hz": 0.5,
+        "rms_error": 3.883718895425811e-05,
+        "max_abs_error": 5.4948082366446105e-05,
+        "saturated_fraction": 0.0
+      },
+      {
+        "freq_hz": 1.0,
+        "rms_error": 7.767293737844795e-05,
+        "max_abs_error": 0.0001098940572704099,
+        "saturated_fraction": 0.0
+      },
+      {
+        "freq_hz": 2.0,
+        "rms_error": 0.00015534045144689217,
+        "max_abs_error": 0.00021978065505551259,
+        "saturated_fraction": 0.0
+      },
+      {
+        "freq_hz": 3.0,
+        "rms_error": 0.0002330264398203763,
+        "max_abs_error": 0.00032966105824705494,
+        "saturated_fraction": 0.0
+      },
+      {
+        "freq_hz": 5.0,
+        "rms_error": 0.010606094380031135,
+        "max_abs_error": 0.030228281654329253,
+        "saturated_fraction": 0.152
+      },
+      {
+        "freq_hz": 8.0,
+        "rms_error": 0.03959174806249569,
+        "max_abs_error": 0.0942770002868546,
+        "saturated_fraction": 0.2408
+      },
+      {
+        "freq_hz": 12.0,
+        "rms_error": 0.07619457836436432,
+        "max_abs_error": 0.16296829417510128,
+        "saturated_fraction": 0.4206
+      },
+      {
+        "freq_hz": 20.0,
+        "rms_error": 0.12967357434157534,
+        "max_abs_error": 0.24898036437141413,
+        "saturated_fraction": 0.598
+      }
+    ]
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "n_muscles": 50,
+  "n_dofs": 5,
+  "n_tasks": 56,
+  "full_mean_width_Nm": 755.44,
+  "support_check": {
+    "n_directions": 24,
+    "n_random_activations": 4000,
+    "max_sample_exceeding_bound": 0.0,
+    "max_vertex_gap": 1.1368683772161603e-13,
+    "bound_is_valid": true,
+    "bound_is_tight": true
+  },
+  "monotone_check": {
+    "max_width_increase_from_removal": 0.0,
+    "removal_never_enlarges": true
+  },
+  "geometric": [
+    {
+      "k": 0,
+      "mean_width_fraction": 1.0,
+      "std": 0.0
+    },
+    {
+      "k": 1,
+      "mean_width_fraction": 0.9801,
+      "std": 0.0237
+    },
+    {
+      "k": 2,
+      "mean_width_fraction": 0.9601,
+      "std": 0.0343
+    },
+    {
+      "k": 3,
+      "mean_width_fraction": 0.9396,
+      "std": 0.0425
+    },
+    {
+      "k": 5,
+      "mean_width_fraction": 0.9086,
+      "std": 0.043
+    },
+    {
+      "k": 8,
+      "mean_width_fraction": 0.8492,
+      "std": 0.0574
+    },
+    {
+      "k": 12,
+      "mean_width_fraction": 0.7732,
+      "std": 0.0783
+    },
+    {
+      "k": 16,
+      "mean_width_fraction": 0.6913,
+      "std": 0.0793
+    },
+    {
+      "k": 20,
+      "mean_width_fraction": 0.6115,
+      "std": 0.0841
+    },
+    {
+      "k": 25,
+      "mean_width_fraction": 0.5158,
+      "std": 0.0898
+    },
+    {
+      "k": 30,
+      "mean_width_fraction": 0.4008,
+      "std": 0.0896
+    }
+  ],
+  "functional": [
+    {
+      "k": 0,
+      "tasks_feasible_fraction": 1.0,
+      "std": 0.0
+    },
+    {
+      "k": 1,
+      "tasks_feasible_fraction": 0.9896,
+      "std": 0.0125
+    },
+    {
+      "k": 2,
+      "tasks_feasible_fraction": 0.9866,
+      "std": 0.0129
+    },
+    {
+      "k": 3,
+      "tasks_feasible_fraction": 0.9799,
+      "std": 0.013
+    },
+    {
+      "k": 5,
+      "tasks_feasible_fraction": 0.9479,
+      "std": 0.0464
+    },
+    {
+      "k": 8,
+      "tasks_feasible_fraction": 0.9301,
+      "std": 0.0574
+    },
+    {
+      "k": 12,
+      "tasks_feasible_fraction": 0.8884,
+      "std": 0.0784
+    },
+    {
+      "k": 16,
+      "tasks_feasible_fraction": 0.84,
+      "std": 0.1044
+    },
+    {
+      "k": 20,
+      "tasks_feasible_fraction": 0.7388,
+      "std": 0.1427
+    },
+    {
+      "k": 25,
+      "tasks_feasible_fraction": 0.5618,
+      "std": 0.187
+    },
+    {
+      "k": 30,
+      "tasks_feasible_fraction": 0.3043,
+      "std": 0.1896
+    }
+  ],
+  "criticality_top": [
+    {
+      "muscle": "soleus_r",
+      "width_loss_pct": 11.605
+    },
+    {
+      "muscle": "vaslat_r",
+      "width_loss_pct": 10.831
+    },
+    {
+      "muscle": "recfem_r",
+      "width_loss_pct": 6.494
+    },
+    {
+      "muscle": "gasmed_r",
+      "width_loss_pct": 6.334
+    },
+    {
+      "muscle": "vasmed_r",
+      "width_loss_pct": 5.461
+    },
+    {
+      "muscle": "semimem_r",
+      "width_loss_pct": 4.994
+    },
+    {
+      "muscle": "vasint_r",
+      "width_loss_pct": 3.6
+    },
+    {
+      "muscle": "glmax2_r",
+      "width_loss_pct": 3.518
+    },
+    {
+      "muscle": "bflh_r",
+      "width_loss_pct": 3.401
+    },
+    {
+      "muscle": "addlong_r",
+      "width_loss_pct": 3.306
+    }
+  ],
+  "per_trial_monotone": {
+    "geometric": true,
+    "functional": true,
+    "trials": 24
+  },
+  "geometric_monotone_mean": true,
+  "functional_monotone_mean": true,
+  "width_at_k5": 0.9086,
+  "feasible_at_k5": 0.9479,
+  "width_at_k12": 0.7732,
+  "feasible_at_k12": 0.8884,
+  "crossover_k": 30,
+  "single_muscle_worst_loss_pct": 11.605
+}
