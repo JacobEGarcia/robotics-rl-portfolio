@@ -99,6 +99,12 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--ckpt-dir", type=str, default=None)
     p.add_argument("--ckpt-mirror", type=str, default=None)
     p.add_argument("--keep-last", type=int, default=3)
+    p.add_argument("--ckpt-every-min", type=float, default=10.0,
+                   help="also checkpoint at least this often in wall-clock "
+                        "minutes. Step-based spacing alone cannot bound "
+                        "preemption loss, because throughput is unknown until "
+                        "the run is going; this bounds it to N minutes "
+                        "whatever the throughput turns out to be.")
     p.add_argument("--max-hours", type=float, default=None)
     p.add_argument("--resume", action="store_true")
     p.add_argument("--curr-start", type=float, default=0.4)
@@ -177,6 +183,7 @@ def main() -> None:
     steps_per_iter = args.num_envs * args.rollout_steps
     step_count = start_step
     next_ckpt = start_step + args.ckpt_every
+    last_ckpt_wall = time.time()
     iters = 0
     t0 = time.time()
 
@@ -278,7 +285,16 @@ def main() -> None:
         out_of_time = (args.max_hours is not None
                        and (time.time() - t0) > args.max_hours * 3600.0)
 
-        if step_count >= next_ckpt or out_of_time:
+        # Wall clock as well as steps. A session reclaimed 1.9e6 steps
+        # after the last checkpoint throws all of it away, and step
+        # spacing cannot bound that because the throughput is not known
+        # until the run is going. This bounds the loss to ckpt_every_min
+        # whatever the throughput turns out to be.
+        due_by_time = (args.ckpt_every_min is not None
+                       and (time.time() - last_ckpt_wall)
+                       > args.ckpt_every_min * 60.0)
+
+        if step_count >= next_ckpt or due_by_time or out_of_time:
             save_ckpt(ckpt_dir / f"ckpt_{step_count:012d}.pkl", {
                 "params": params, "opt_state": opt_state, "step": step_count,
                 "curriculum": curriculum, "key": key, "args": vars(args),
@@ -296,7 +312,14 @@ def main() -> None:
                     # the progress file is the least important thing on it.
                     pass
             print(f"  checkpoint @ {step_count:,}", flush=True)
-            next_ckpt += args.ckpt_every
+            last_ckpt_wall = time.time()
+            # Re-base on the current step, not `next_ckpt += every`.
+            # Both triggers then mean the same thing, 'at least this
+            # long since the last checkpoint', measured in steps and in
+            # minutes. Incrementing instead makes a time-triggered save
+            # at 1.2e6 leave the step target at 2e6, so the next step
+            # save lands 0.8e6 later rather than a full period later.
+            next_ckpt = step_count + args.ckpt_every
 
         if out_of_time:
             print(f"reached --max-hours at step {step_count:,}; exiting cleanly",

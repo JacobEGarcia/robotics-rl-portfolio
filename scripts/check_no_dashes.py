@@ -57,13 +57,30 @@ def files(roots: list[str] | None = None) -> list[Path]:
 
 
 def fix(text: str) -> str:
+    """
+    Replace by context. The right substitute is not always a comma.
+
+    A comma is correct for a mid-sentence parenthetical and wrong for the two
+    places a dash most often appears in this repository: after a heading's
+    subject, and after a bold label opening a list item. "# S2, In-Hand Cube
+    Reorientation" and "- **opt_state**, Adam's moments" both read as comma
+    splices, which is the opposite of what the rule is for. A colon is the
+    natural replacement in both, so those cases are handled first and the
+    comma is the fallback.
+    """
+    dash = f"[{EM}{EN}]"
+
     # A dash between two digits is a range: "0.7-1.3", "5-7 frames".
-    text = re.sub(rf"(?<=\d)\s*[{EM}{EN}]\s*(?=\d)", " to ", text)
-    # A spaced dash is a parenthetical break; a comma carries it.
-    text = re.sub(rf"\s+[{EM}{EN}]\s+", ", ", text)
-    # Anything left (unspaced, mid-word, start of line) becomes a plain comma
-    # or a hyphen depending on whether it is glued to a word.
-    text = re.sub(rf"(?<=\w)[{EM}{EN}](?=\w)", "-", text)
+    text = re.sub(rf"(?<=\d)\s*{dash}\s*(?=\d)", " to ", text)
+    # Markdown heading: the dash separates a name from its description.
+    text = re.sub(rf"(?m)^(#{{1,6}} [^\n]*?)\s+{dash}\s+", r"\1: ", text)
+    # A bold or code label opening a line or list item.
+    text = re.sub(rf"(?m)^(\s*(?:[-*+]\s+)?(?:\*\*[^*\n]+\*\*|`[^`\n]+`))\s+{dash}\s+",
+                  r"\1: ", text)
+    # Everything else mid-sentence: a comma carries the break.
+    text = re.sub(rf"\s+{dash}\s+", ", ", text)
+    # Unspaced and glued to words on both sides is a hyphen, not a break.
+    text = re.sub(rf"(?<=\w){dash}(?=\w)", "-", text)
     return text.replace(EM, ",").replace(EN, ",")
 
 

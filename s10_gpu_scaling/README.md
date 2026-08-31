@@ -1,4 +1,4 @@
-# S10, What a GPU buys a physics simulator, and what it costs
+# S10: What a GPU buys a physics simulator, and what it costs
 
 **Status: built and CPU-validated. Throughput and solver cost need a GPU
 session (`colab/S10_gpu_scaling.ipynb`). The fidelity result below is complete

@@ -1,17 +1,57 @@
 # Running this portfolio on a free Colab T4
 
-Three notebooks. Run them in this order.
+**Open [`Autopilot.ipynb`](Autopilot.ipynb) every session.** It reads what is
+already in Drive, works out the next most valuable job, and runs it until the
+session budget is spent. The plan is recomputed from Drive each time, so it is
+correct after a preemption, after a manual run, and after a session that got
+halfway through a job.
 
 | | notebook | needs GPU for | one session? |
 |---|---|---|---|
+| | [`Autopilot.ipynb`](Autopilot.ipynb) | whatever is next | runs until the budget is spent |
 | 1 | [`S10_gpu_scaling.ipynb`](S10_gpu_scaling.ipynb) | measurement only, no training | **yes**, ~1 h |
-| 2 | [`S2_inhand.ipynb`](S2_inhand.ipynb) | PPO, ~10⁸ steps | no, several |
-| 3 | [`S3_domain_rand.ipynb`](S3_domain_rand.ipynb) | PPO ×2 arms, ~3×10⁷ each | no, several |
+| 2 | [`S2_inhand.ipynb`](S2_inhand.ipynb) | PPO, ~10^8 steps | no, several |
+| 3 | [`S3_domain_rand.ipynb`](S3_domain_rand.ipynb) | PPO x2 arms, ~3x10^7 each | no, several |
+
+The numbered three are for driving one project by hand, or for reading what a
+stage actually does. Autopilot runs the same commands with the ordering already
+decided:
 
 **S10 first.** It finishes inside one session, it produces a result whether or
-not the quota holds out that afternoon, and section 3 of it measures the batch
-size S2 should be configured with. Starting with the multi-day training run and
+not the quota holds out that afternoon, and it measures the batch size S2
+should be configured with. Starting with the multi-day training run and
 discovering afterwards that the batch size was wrong is the expensive ordering.
+
+**S3's control arm before its DR arm.** Neither arm is worth anything alone. If
+the budget runs out after one, an orphaned baseline is at least a usable no-DR
+number for S2's task, whereas an orphaned DR arm answers no question at all.
+
+## Getting the most out of a lease
+
+The free tier charges wall-clock GPU time, not useful work, so three things
+decide how much science a fixed quota buys, and none of them is the learning
+rate.
+
+**Compilation is paid once per session, not once per project.** MJX compiles
+the LEAP scene through XLA in minutes, and a run preempted four times pays it
+four times. Every notebook points JAX's persistent compilation cache at Drive,
+as environment variables so that subprocesses inherit it and so the directory
+is known before the first compile. Measured on this codebase, two processes
+sharing a cache: **6.45 s cold, 0.95 s warm.** The saving scales with compile
+cost, so on MJX it is worth far more than that.
+
+**Checkpoint spacing is a bet on how long the lease lasts.** Checkpointing
+every 2e6 steps means a session killed 1.9e6 steps later throws away 1.9e6
+steps, and step spacing alone cannot bound that because the throughput is not
+known until the run is going. `--ckpt-every-min` (default 10) bounds the loss
+to ten minutes whatever the throughput turns out to be. Verified against a
+simulated 2,000 steps/s run: worst gap 10.1 minutes, and on a fast run the
+time trigger never fires and step spacing is unchanged.
+
+**Batch size should be the knee, not the ceiling.** S10's throughput sweep
+reports the smallest batch within 10% of the best. Past it, each extra
+environment buys under 10% while costing proportional memory and a longer
+compile, and on a preemptible lease a longer compile is a direct loss.
 
 ## What free Colab actually gives you
 

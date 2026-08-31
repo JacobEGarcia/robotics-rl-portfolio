@@ -7,17 +7,22 @@ Generate the Colab notebooks from this file.
 the notebooks are generated rather than edited. Same reason the manga guide's
 `index.html` is generated from `parts/`: edit the source, never the artifact.
 
-Three notebooks, in the order they should be run:
+Four notebooks:
 
+    Autopilot.ipynb         open this one every session; it picks the next job
     S10_gpu_scaling.ipynb   one session, no training, produces numbers
     S2_inhand.ipynb         the flagship: PPO on the LEAP hand, many sessions
     S3_domain_rand.ipynb    two training arms plus the held-out evaluation
 
-S10 is first on purpose. It finishes inside a single free session, it measures
-the throughput that decides how S2 should be configured, and it produces a
-result even if the GPU quota runs out that afternoon. Starting with the
-multi-day training run and discovering the batch size was wrong is the
-expensive ordering.
+Autopilot is the one to use day to day. The other three exist for when you
+want to drive a single project by hand, or to read what a stage actually does;
+Autopilot runs the same commands with the ordering already decided.
+
+That ordering puts S10 first on purpose. It finishes inside a single free
+session, it measures the throughput that decides how S2 should be configured,
+and it produces a result even if the quota dies that afternoon. Starting with
+the multi-day training run and discovering afterwards that the batch size was
+wrong is the expensive ordering.
 """
 
 from __future__ import annotations
@@ -131,6 +136,7 @@ print('GPU OK')
 
 CELL_DRIVE = '''
 # --- Drive, for anything that must outlive this runtime ---
+import os
 from pathlib import Path
 from google.colab import drive
 
@@ -139,8 +145,21 @@ drive.mount('/content/drive')
 DRIVE = Path('/content/drive/MyDrive/robotics-rl-portfolio')
 DRIVE.mkdir(parents=True, exist_ok=True)
 WORK = Path('/content/work'); WORK.mkdir(exist_ok=True)
+
+# One XLA compilation cache on Drive, shared by this process and every
+# subprocess it starts. MJX compiles the LEAP scene in minutes and a
+# preempted run re-pays that every session; cached, it is seconds. Set as
+# environment variables rather than jax.config so child processes inherit it,
+# and because the directory has to be known before the first compile.
+os.environ['JAX_COMPILATION_CACHE_DIR'] = str(DRIVE / 'jax_cache')
+os.environ['JAX_PERSISTENT_CACHE_MIN_COMPILE_TIME_SECS'] = '0.5'
+os.environ['JAX_COMPILATION_CACHE_MAX_SIZE'] = str(2_000_000_000)
+(DRIVE / 'jax_cache').mkdir(parents=True, exist_ok=True)
+
+_n = len([p for p in (DRIVE / 'jax_cache').rglob('*') if p.is_file()])
 print('drive :', DRIVE)
 print('local :', WORK)
+print('cache :', _n, 'entries', '(empty: this session pays full compile cost)' if not _n else '')
 '''
 
 
@@ -709,18 +728,123 @@ print('An interval that straddles zero is a null result. Report it as one.')
 
 # ==========================================================================
 
+AUTOPILOT_BLURB = """
+**Open this one every session.** It works out what to run from what is already
+in Drive, then runs it until the session budget is spent.
+
+A free-tier lease is short and ends without warning, so the expensive mistake
+is not the learning rate, it is spending a session on work already done or
+leaving a lease idle while you decide. The plan is recomputed from Drive every
+time, so it is correct after a preemption, after a manual run, and after a
+session that got halfway through a job.
+
+Order is cheapest-informative-first: S10 (one session, and it sets the batch
+size for everything after it), then S2, then S3's **control arm before its DR
+arm** (an orphaned baseline is still a usable no-DR number; an orphaned DR arm
+answers no question at all), then the evaluation.
+
+Every child process shares one XLA compilation cache on Drive, which is why
+this is worth using even for a single job: measured on this codebase, a cold
+compile of 6.45 s came back at 0.95 s from cache, and MJX's LEAP compile is
+minutes rather than seconds.
+"""
+
+AUTOPILOT_CELLS = [
+    md("""
+## 2. What should this session do?
+
+Dry run first. Nothing is started, nothing is charged against the quota.
+"""),
+    code('''
+import os, subprocess, sys
+os.chdir(SRC)
+subprocess.run([sys.executable, 'colab/autopilot.py',
+                '--drive', str(DRIVE), '--plan'],
+               env=dict(os.environ, PYTHONPATH=str(SRC)))
+'''),
+    md("""
+## 3. Run it
+
+`SESSION_HOURS` is the budget for this whole notebook; `MAX_HOURS` is the
+budget for any single training job, and should sit below where the free tier
+tends to cut you off. A job that hits its budget writes a final checkpoint and
+exits 0, so the next session resumes rather than restarts.
+
+`NUM_ENVS` should be the knee that S10's throughput sweep measured, not the
+largest batch that fits. Past the knee each extra environment buys under 10%
+throughput while costing proportional memory and a longer compile, and on a
+preemptible lease a longer compile is a direct loss.
+
+Interrupting this cell is safe. The newest checkpoint is already in Drive.
+"""),
+    code('''
+SESSION_HOURS = 3.0
+MAX_HOURS     = 2.5
+NUM_ENVS      = 2048     # use S10's measured knee
+
+p = subprocess.Popen(
+    [sys.executable, '-u', 'colab/autopilot.py',
+     '--drive', str(DRIVE),
+     '--session-hours', str(SESSION_HOURS),
+     '--max-hours', str(MAX_HOURS),
+     '--num-envs', str(NUM_ENVS)],
+    cwd=str(SRC), env=dict(os.environ, PYTHONPATH=str(SRC)),
+    stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
+try:
+    for line in p.stdout:
+        print(line, end='', flush=True)
+except KeyboardInterrupt:
+    p.terminate()
+    print('\\ninterrupted; the newest checkpoint is in Drive')
+p.wait()
+'''),
+    md("""
+## 4. Where everything stands
+"""),
+    code('''
+import json
+from pathlib import Path
+
+def latest(d):
+    cks = sorted(Path(d).glob('ckpt_*.pkl')) if Path(d).exists() else []
+    return int(cks[-1].stem.split('_')[1]) if cks else 0
+
+print(f"{'job':<16}{'steps':>14}{'target':>14}")
+for name, d, target in (
+        ('S2',          DRIVE / 's2_checkpoints', 100_000_000),
+        ('S3 baseline', DRIVE / 's3_checkpoints' / 'baseline', 30_000_000),
+        ('S3 dr',       DRIVE / 's3_checkpoints' / 'dr', 30_000_000)):
+    print(f'{name:<16}{latest(d):>14,}{target:>14,}')
+
+s10 = DRIVE / 's10_results' / 'results'
+print()
+print('S10 results :', sorted(p.name for p in s10.glob('*.json')) if s10.exists() else 'none yet')
+print('S3 eval     :', 'done' if (DRIVE / 's3_eval.json').exists() else 'pending')
+
+cache = DRIVE / 'jax_cache'
+n = len([p for p in cache.rglob('*') if p.is_file()]) if cache.exists() else 0
+mb = sum(p.stat().st_size for p in cache.rglob('*') if p.is_file()) / 1e6 if n else 0
+print(f'xla cache   : {n} entries, {mb:.0f} MB (saved compile time next session)')
+'''),
+]
+
+
 def main() -> None:
     HERE.mkdir(parents=True, exist_ok=True)
     specs = [
+        ("Autopilot.ipynb",
+         bootstrap("colab/autopilot.py",
+                   "Autopilot: run the next most valuable job", AUTOPILOT_BLURB)
+         + AUTOPILOT_CELLS),
         ("S10_gpu_scaling.ipynb",
          bootstrap("s10_gpu_scaling/run.py",
-                   "S10, What a GPU buys a physics simulator", S10_BLURB) + S10_CELLS),
+                   "S10: What a GPU buys a physics simulator", S10_BLURB) + S10_CELLS),
         ("S2_inhand.ipynb",
          bootstrap("s2_inhand/train.py",
-                   "S2, In-hand cube reorientation (LEAP hand, MJX)", S2_BLURB) + S2_CELLS),
+                   "S2: In-hand cube reorientation (LEAP hand, MJX)", S2_BLURB) + S2_CELLS),
         ("S3_domain_rand.ipynb",
          bootstrap("s3_domain_rand/train.py",
-                   "S3, Domain randomization, two arms, held-out physics", S3_BLURB) + S3_CELLS),
+                   "S3: Domain randomization, two arms, held-out physics", S3_BLURB) + S3_CELLS),
     ]
     for name, cells in specs:
         p = HERE / name

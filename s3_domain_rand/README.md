@@ -1,4 +1,4 @@
-# S3, Domain Randomization and Zero-Shot Transfer
+# S3: Domain Randomization and Zero-Shot Transfer
 
 **Status: complete and unit-validated on CPU, randomization, per-environment
 batched physics, both training arms, and the held-out evaluation. Untrained:
