@@ -1,0 +1,570 @@
+{
+  "continuous": {
+    "carrier_hz": 1.0,
+    "min_on_ms": 0.0,
+    "period_over_tau": 2824.859,
+    "mean_pressure_frac": 0.5,
+    "ripple_pp_frac": 0.0,
+    "steps_per_period": 2000000,
+    "rms_error_frac": 1.35077e-14,
+    "switches_per_second": 0.0
+  },
+  "ripple_slope_vs_log_f": -3.087,
+  "bang_bang_ripple_is_full_scale": true,
+  "ripple_collapse_factor_across_transition": 2564.9,
+  "all_runs_resolved": true,
+  "best_switching_error": 0.00011792,
+  "continuous_to_switching_floor_ratio": 8730000000.0,
+  "fill_tau_ms": 0.354,
+  "actuator_bandwidth_hz": 449.6,
+  "carriers_that_average": [
+    3000.0,
+    5000.0,
+    20000.0
+  ],
+  "carriers_that_bang_bang": [
+    50.0,
+    100.0,
+    200.0,
+    500.0,
+    1000.0,
+    2000.0
+  ],
+  "worst_bang_bang_ripple_frac": 1.0,
+  "ripple_at_100hz_frac": 1.0,
+  "ideal_valve_error_at_5khz": 0.000185812,
+  "continuous_error": 1.35077e-14,
+  "duty_grid": {
+    "max_relative_spacing_error": 2.13e-14,
+    "spacing_matches_closed_form": true
+  },
+  "best_carrier_by_min_on_time": {
+    "0": {
+      "carrier_hz": 10000.0,
+      "rms_error_frac": 0.00011792,
+      "switches_per_second": 216.7
+    },
+    "0.1": {
+      "carrier_hz": 5000.0,
+      "rms_error_frac": 0.0522536,
+      "switches_per_second": 50.0
+    },
+    "0.2": {
+      "carrier_hz": 3000.0,
+      "rms_error_frac": 0.0996393,
+      "switches_per_second": 16.7
+    },
+    "0.5": {
+      "carrier_hz": 3000.0,
+      "rms_error_frac": 0.0996393,
+      "switches_per_second": 16.7
+    },
+    "1": {
+      "carrier_hz": 3000.0,
+      "rms_error_frac": 0.0996393,
+      "switches_per_second": 16.7
+    }
+  },
+  "table": [
+    {
+      "carrier_hz": 50.0,
+      "min_on_ms": 0.0,
+      "period_over_tau": 56.497,
+      "mean_pressure_frac": 0.19183,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 40000,
+      "rms_error_frac": 0.489824,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 50.0,
+      "min_on_ms": 0.1,
+      "period_over_tau": 56.497,
+      "mean_pressure_frac": 0.19183,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 40000,
+      "rms_error_frac": 0.489824,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 50.0,
+      "min_on_ms": 0.2,
+      "period_over_tau": 56.497,
+      "mean_pressure_frac": 0.19183,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 40000,
+      "rms_error_frac": 0.489824,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 50.0,
+      "min_on_ms": 0.5,
+      "period_over_tau": 56.497,
+      "mean_pressure_frac": 0.19183,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 40000,
+      "rms_error_frac": 0.489824,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 50.0,
+      "min_on_ms": 1.0,
+      "period_over_tau": 56.497,
+      "mean_pressure_frac": 0.19183,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 40000,
+      "rms_error_frac": 0.489824,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 100.0,
+      "min_on_ms": 0.0,
+      "period_over_tau": 28.249,
+      "mean_pressure_frac": 0.80817,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 20000,
+      "rms_error_frac": 0.489824,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 100.0,
+      "min_on_ms": 0.1,
+      "period_over_tau": 28.249,
+      "mean_pressure_frac": 0.80817,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 20000,
+      "rms_error_frac": 0.489824,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 100.0,
+      "min_on_ms": 0.2,
+      "period_over_tau": 28.249,
+      "mean_pressure_frac": 0.80817,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 20000,
+      "rms_error_frac": 0.489824,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 100.0,
+      "min_on_ms": 0.5,
+      "period_over_tau": 28.249,
+      "mean_pressure_frac": 0.80817,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 20000,
+      "rms_error_frac": 0.489824,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 100.0,
+      "min_on_ms": 1.0,
+      "period_over_tau": 28.249,
+      "mean_pressure_frac": 0.80817,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 20000,
+      "rms_error_frac": 0.489824,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 200.0,
+      "min_on_ms": 0.0,
+      "period_over_tau": 14.124,
+      "mean_pressure_frac": 0.41667,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 10000,
+      "rms_error_frac": 0.479431,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 200.0,
+      "min_on_ms": 0.1,
+      "period_over_tau": 14.124,
+      "mean_pressure_frac": 0.41667,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 10000,
+      "rms_error_frac": 0.479431,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 200.0,
+      "min_on_ms": 0.2,
+      "period_over_tau": 14.124,
+      "mean_pressure_frac": 0.41667,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 10000,
+      "rms_error_frac": 0.479431,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 200.0,
+      "min_on_ms": 0.5,
+      "period_over_tau": 14.124,
+      "mean_pressure_frac": 0.41667,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 10000,
+      "rms_error_frac": 0.479431,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 200.0,
+      "min_on_ms": 1.0,
+      "period_over_tau": 14.124,
+      "mean_pressure_frac": 0.41667,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 10000,
+      "rms_error_frac": 0.479431,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 500.0,
+      "min_on_ms": 0.0,
+      "period_over_tau": 5.65,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 4000,
+      "rms_error_frac": 0.435388,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 500.0,
+      "min_on_ms": 0.1,
+      "period_over_tau": 5.65,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 4000,
+      "rms_error_frac": 0.435388,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 500.0,
+      "min_on_ms": 0.2,
+      "period_over_tau": 5.65,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 4000,
+      "rms_error_frac": 0.435388,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 500.0,
+      "min_on_ms": 0.5,
+      "period_over_tau": 5.65,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 4000,
+      "rms_error_frac": 0.435388,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 500.0,
+      "min_on_ms": 1.0,
+      "period_over_tau": 5.65,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 4000,
+      "rms_error_frac": 0.435388,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 1000.0,
+      "min_on_ms": 0.0,
+      "period_over_tau": 2.825,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 2000,
+      "rms_error_frac": 0.35934,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 1000.0,
+      "min_on_ms": 0.1,
+      "period_over_tau": 2.825,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 2000,
+      "rms_error_frac": 0.35934,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 1000.0,
+      "min_on_ms": 0.2,
+      "period_over_tau": 2.825,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 2000,
+      "rms_error_frac": 0.35934,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 1000.0,
+      "min_on_ms": 0.5,
+      "period_over_tau": 2.825,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 2000,
+      "rms_error_frac": 0.35934,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 1000.0,
+      "min_on_ms": 1.0,
+      "period_over_tau": 2.825,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 1.0,
+      "steps_per_period": 2000,
+      "rms_error_frac": 0.35934,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 2000.0,
+      "min_on_ms": 0.0,
+      "period_over_tau": 1.412,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 0.71819,
+      "steps_per_period": 1000,
+      "rms_error_frac": 0.214626,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 2000.0,
+      "min_on_ms": 0.1,
+      "period_over_tau": 1.412,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 0.71819,
+      "steps_per_period": 1000,
+      "rms_error_frac": 0.214626,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 2000.0,
+      "min_on_ms": 0.2,
+      "period_over_tau": 1.412,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 0.71819,
+      "steps_per_period": 1000,
+      "rms_error_frac": 0.214626,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 2000.0,
+      "min_on_ms": 0.5,
+      "period_over_tau": 1.412,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 0.71819,
+      "steps_per_period": 1000,
+      "rms_error_frac": 0.214626,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 2000.0,
+      "min_on_ms": 1.0,
+      "period_over_tau": 1.412,
+      "mean_pressure_frac": 0.5,
+      "ripple_pp_frac": 0.71819,
+      "steps_per_period": 1000,
+      "rms_error_frac": 0.214626,
+      "switches_per_second": 0.0
+    },
+    {
+      "carrier_hz": 3000.0,
+      "min_on_ms": 0.0,
+      "period_over_tau": 0.942,
+      "mean_pressure_frac": 0.49979,
+      "ripple_pp_frac": 0.501597,
+      "steps_per_period": 667,
+      "rms_error_frac": 0.146947,
+      "switches_per_second": 1000.0
+    },
+    {
+      "carrier_hz": 3000.0,
+      "min_on_ms": 0.1,
+      "period_over_tau": 0.942,
+      "mean_pressure_frac": 0.49976,
+      "ripple_pp_frac": 0.156994,
+      "steps_per_period": 667,
+      "rms_error_frac": 0.069574,
+      "switches_per_second": 2983.3
+    },
+    {
+      "carrier_hz": 3000.0,
+      "min_on_ms": 0.2,
+      "period_over_tau": 0.942,
+      "mean_pressure_frac": 0.59964,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 667,
+      "rms_error_frac": 0.0996393,
+      "switches_per_second": 16.7
+    },
+    {
+      "carrier_hz": 3000.0,
+      "min_on_ms": 0.5,
+      "period_over_tau": 0.942,
+      "mean_pressure_frac": 0.59964,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 667,
+      "rms_error_frac": 0.0996393,
+      "switches_per_second": 16.7
+    },
+    {
+      "carrier_hz": 3000.0,
+      "min_on_ms": 1.0,
+      "period_over_tau": 0.942,
+      "mean_pressure_frac": 0.59964,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 667,
+      "rms_error_frac": 0.0996393,
+      "switches_per_second": 16.7
+    },
+    {
+      "carrier_hz": 5000.0,
+      "min_on_ms": 0.0,
+      "period_over_tau": 0.565,
+      "mean_pressure_frac": 0.50054,
+      "ripple_pp_frac": 0.000779761,
+      "steps_per_period": 400,
+      "rms_error_frac": 0.000552092,
+      "switches_per_second": 183.3
+    },
+    {
+      "carrier_hz": 5000.0,
+      "min_on_ms": 0.1,
+      "period_over_tau": 0.565,
+      "mean_pressure_frac": 0.55225,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 400,
+      "rms_error_frac": 0.0522536,
+      "switches_per_second": 50.0
+    },
+    {
+      "carrier_hz": 5000.0,
+      "min_on_ms": 0.2,
+      "period_over_tau": 0.565,
+      "mean_pressure_frac": 0.39249,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 400,
+      "rms_error_frac": 0.107512,
+      "switches_per_second": 16.7
+    },
+    {
+      "carrier_hz": 5000.0,
+      "min_on_ms": 0.5,
+      "period_over_tau": 0.565,
+      "mean_pressure_frac": 0.39249,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 400,
+      "rms_error_frac": 0.107512,
+      "switches_per_second": 16.7
+    },
+    {
+      "carrier_hz": 5000.0,
+      "min_on_ms": 1.0,
+      "period_over_tau": 0.565,
+      "mean_pressure_frac": 0.39249,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 400,
+      "rms_error_frac": 0.107512,
+      "switches_per_second": 16.7
+    },
+    {
+      "carrier_hz": 10000.0,
+      "min_on_ms": 0.0,
+      "period_over_tau": 0.282,
+      "mean_pressure_frac": 0.49988,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 200,
+      "rms_error_frac": 0.00011792,
+      "switches_per_second": 216.7
+    },
+    {
+      "carrier_hz": 10000.0,
+      "min_on_ms": 0.1,
+      "period_over_tau": 0.282,
+      "mean_pressure_frac": 0.39249,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 200,
+      "rms_error_frac": 0.107512,
+      "switches_per_second": 16.7
+    },
+    {
+      "carrier_hz": 10000.0,
+      "min_on_ms": 0.2,
+      "period_over_tau": 0.282,
+      "mean_pressure_frac": 0.39249,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 200,
+      "rms_error_frac": 0.107512,
+      "switches_per_second": 16.7
+    },
+    {
+      "carrier_hz": 10000.0,
+      "min_on_ms": 0.5,
+      "period_over_tau": 0.282,
+      "mean_pressure_frac": 0.39249,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 200,
+      "rms_error_frac": 0.107512,
+      "switches_per_second": 16.7
+    },
+    {
+      "carrier_hz": 10000.0,
+      "min_on_ms": 1.0,
+      "period_over_tau": 0.282,
+      "mean_pressure_frac": 0.39249,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 200,
+      "rms_error_frac": 0.107512,
+      "switches_per_second": 16.7
+    },
+    {
+      "carrier_hz": 20000.0,
+      "min_on_ms": 0.0,
+      "period_over_tau": 0.141,
+      "mean_pressure_frac": 0.49982,
+      "ripple_pp_frac": 0.000389873,
+      "steps_per_period": 200,
+      "rms_error_frac": 0.000185812,
+      "switches_per_second": 716.7
+    },
+    {
+      "carrier_hz": 20000.0,
+      "min_on_ms": 0.1,
+      "period_over_tau": 0.141,
+      "mean_pressure_frac": 0.39243,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 200,
+      "rms_error_frac": 0.107566,
+      "switches_per_second": 16.7
+    },
+    {
+      "carrier_hz": 20000.0,
+      "min_on_ms": 0.2,
+      "period_over_tau": 0.141,
+      "mean_pressure_frac": 0.39243,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 200,
+      "rms_error_frac": 0.107566,
+      "switches_per_second": 16.7
+    },
+    {
+      "carrier_hz": 20000.0,
+      "min_on_ms": 0.5,
+      "period_over_tau": 0.141,
+      "mean_pressure_frac": 0.39243,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 200,
+      "rms_error_frac": 0.107566,
+      "switches_per_second": 16.7
+    },
+    {
+      "carrier_hz": 20000.0,
+      "min_on_ms": 1.0,
+      "period_over_tau": 0.141,
+      "mean_pressure_frac": 0.39243,
+      "ripple_pp_frac": 0.0,
+      "steps_per_period": 200,
+      "rms_error_frac": 0.107566,
+      "switches_per_second": 16.7
+    }
+  ]
+}

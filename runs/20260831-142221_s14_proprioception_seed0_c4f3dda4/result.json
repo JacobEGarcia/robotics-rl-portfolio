@@ -1,0 +1,230 @@
+{
+  "stiffness": [
+    {
+      "eps": 0.02,
+      "open_k_N_per_m": 764.18,
+      "closed_k_N_per_m": 187857.36,
+      "lock_ratio": 245.8,
+      "stiffer_than_series_element": true
+    },
+    {
+      "eps": 0.05,
+      "open_k_N_per_m": 740.79,
+      "closed_k_N_per_m": 148199.24,
+      "lock_ratio": 200.1,
+      "stiffer_than_series_element": true
+    },
+    {
+      "eps": 0.1,
+      "open_k_N_per_m": 701.8,
+      "closed_k_N_per_m": 94617.92,
+      "lock_ratio": 134.8,
+      "stiffer_than_series_element": true
+    },
+    {
+      "eps": 0.15,
+      "open_k_N_per_m": 662.81,
+      "closed_k_N_per_m": 54999.92,
+      "lock_ratio": 83.0,
+      "stiffer_than_series_element": false
+    },
+    {
+      "eps": 0.2,
+      "open_k_N_per_m": 623.82,
+      "closed_k_N_per_m": 27500.38,
+      "lock_ratio": 44.1,
+      "stiffer_than_series_element": false
+    },
+    {
+      "eps": 0.25,
+      "open_k_N_per_m": 584.83,
+      "closed_k_N_per_m": 10379.87,
+      "lock_ratio": 17.7,
+      "stiffer_than_series_element": false
+    },
+    {
+      "eps": 0.3,
+      "open_k_N_per_m": 545.85,
+      "closed_k_N_per_m": 2004.38,
+      "lock_ratio": 3.7,
+      "stiffer_than_series_element": false
+    }
+  ],
+  "lock_ratio_range": [
+    3.7,
+    245.8
+  ],
+  "sensing": [
+    {
+      "eps": 0.02,
+      "dP_deps_Pa": 320600000.0,
+      "full_scale_travel_mm": 0.215,
+      "fraction_of_stroke": 0.00645,
+      "resolution_um": 0.0525,
+      "bits": 12
+    },
+    {
+      "eps": 0.05,
+      "dP_deps_Pa": 284600000.0,
+      "full_scale_travel_mm": 0.2422,
+      "fraction_of_stroke": 0.00727,
+      "resolution_um": 0.0591,
+      "bits": 12
+    },
+    {
+      "eps": 0.1,
+      "dP_deps_Pa": 227200000.0,
+      "full_scale_travel_mm": 0.3035,
+      "fraction_of_stroke": 0.00911,
+      "resolution_um": 0.0741,
+      "bits": 12
+    },
+    {
+      "eps": 0.15,
+      "dP_deps_Pa": 172800000.0,
+      "full_scale_travel_mm": 0.399,
+      "fraction_of_stroke": 0.01197,
+      "resolution_um": 0.0974,
+      "bits": 12
+    },
+    {
+      "eps": 0.2,
+      "dP_deps_Pa": 121500000.0,
+      "full_scale_travel_mm": 0.5674,
+      "fraction_of_stroke": 0.01702,
+      "resolution_um": 0.1385,
+      "bits": 12
+    },
+    {
+      "eps": 0.25,
+      "dP_deps_Pa": 73360000.0,
+      "full_scale_travel_mm": 0.9398,
+      "fraction_of_stroke": 0.0282,
+      "resolution_um": 0.2295,
+      "bits": 12
+    },
+    {
+      "eps": 0.3,
+      "dP_deps_Pa": 28310000.0,
+      "full_scale_travel_mm": 2.4355,
+      "fraction_of_stroke": 0.07307,
+      "resolution_um": 0.5946,
+      "bits": 12
+    }
+  ],
+  "full_scale_travel_mm_range": [
+    0.215,
+    2.4355
+  ],
+  "max_fraction_of_stroke": 0.07307,
+  "observability": {
+    "n_pressures": 50,
+    "n_dofs": 5,
+    "rank_moment_arms": 5,
+    "rank_pressure_jacobian": 5,
+    "rank_preserved_by_row_scaling": true,
+    "pose_fully_observable": true,
+    "condition_number_moment_arms": 3.82,
+    "condition_number_pressure": 6.35,
+    "singular_values_pressure": [
+      20700000000.0,
+      15760000000.0,
+      12420000000.0,
+      9793000000.0,
+      3260000000.0
+    ]
+  },
+  "estimator": {
+    "per_sensor": [
+      {
+        "bits": 8,
+        "sensor_sigma_Pa": 2693.0,
+        "rms_angle_error_rad": 8.226e-07,
+        "rms_angle_error_mdeg": 0.0471
+      },
+      {
+        "bits": 10,
+        "sensor_sigma_Pa": 673.3,
+        "rms_angle_error_rad": 1.936e-07,
+        "rms_angle_error_mdeg": 0.0111
+      },
+      {
+        "bits": 12,
+        "sensor_sigma_Pa": 168.3,
+        "rms_angle_error_rad": 5.448e-08,
+        "rms_angle_error_mdeg": 0.0031
+      },
+      {
+        "bits": 14,
+        "sensor_sigma_Pa": 42.08,
+        "rms_angle_error_rad": 1.275e-08,
+        "rms_angle_error_mdeg": 0.0007
+      },
+      {
+        "bits": 16,
+        "sensor_sigma_Pa": 10.52,
+        "rms_angle_error_rad": 3.414e-09,
+        "rms_angle_error_mdeg": 0.0002
+      }
+    ],
+    "noise_free_error_rad": 1.29e-19,
+    "estimator_exact_without_noise": true,
+    "condition_number": 6.35
+  },
+  "drift": [
+    {
+      "seconds": 1.0,
+      "flow_error_pct": 1.0,
+      "fluid_moved_mL": 1.955,
+      "accumulated_volume_error_mL": 0.0195,
+      "eps_error": 0.00473,
+      "length_error_mm": 0.473,
+      "as_fraction_of_stroke": 0.0142
+    },
+    {
+      "seconds": 2.0,
+      "flow_error_pct": 1.0,
+      "fluid_moved_mL": 3.91,
+      "accumulated_volume_error_mL": 0.0391,
+      "eps_error": 0.00946,
+      "length_error_mm": 0.946,
+      "as_fraction_of_stroke": 0.0284
+    },
+    {
+      "seconds": 5.0,
+      "flow_error_pct": 1.0,
+      "fluid_moved_mL": 9.774,
+      "accumulated_volume_error_mL": 0.0977,
+      "eps_error": 0.02364,
+      "length_error_mm": 2.364,
+      "as_fraction_of_stroke": 0.0709
+    },
+    {
+      "seconds": 10.0,
+      "flow_error_pct": 1.0,
+      "fluid_moved_mL": 19.548,
+      "accumulated_volume_error_mL": 0.1955,
+      "eps_error": 0.04728,
+      "length_error_mm": 4.728,
+      "as_fraction_of_stroke": 0.1418
+    },
+    {
+      "seconds": 20.0,
+      "flow_error_pct": 1.0,
+      "fluid_moved_mL": 39.095,
+      "accumulated_volume_error_mL": 0.391,
+      "eps_error": 0.09456,
+      "length_error_mm": 9.456,
+      "as_fraction_of_stroke": 0.2837
+    },
+    {
+      "seconds": 60.0,
+      "flow_error_pct": 1.0,
+      "fluid_moved_mL": 117.286,
+      "accumulated_volume_error_mL": 1.1729,
+      "eps_error": 0.28369,
+      "length_error_mm": 28.369,
+      "as_fraction_of_stroke": 0.8511
+    }
+  ]
+}

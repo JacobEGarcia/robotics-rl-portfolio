@@ -1,0 +1,276 @@
+{
+  "peak_demand_lpm": 59.95,
+  "mean_demand_lpm": 25.51,
+  "burstiness_peak_over_mean": 2.35,
+  "unlimited_error_by_policy": {
+    "uniform": 0.0,
+    "equal_share": 0.0,
+    "by_demand": 0.0,
+    "by_torque": 0.0
+  },
+  "monotone_in_capacity": {
+    "uniform": true,
+    "equal_share": true,
+    "by_demand": true,
+    "by_torque": true
+  },
+  "capacity_respected": true,
+  "at_published_pump": {
+    "uniform": {
+      "relative_torque_error": 0.41697,
+      "peak_relative_error": 0.910198,
+      "mean_served_lpm": 22.0209,
+      "fraction_of_cycle_flow_limited": 0.266,
+      "capacity_never_exceeded": true
+    },
+    "equal_share": {
+      "relative_torque_error": 0.138977,
+      "peak_relative_error": 0.676619,
+      "mean_served_lpm": 22.0209,
+      "fraction_of_cycle_flow_limited": 0.266,
+      "capacity_never_exceeded": true
+    },
+    "by_demand": {
+      "relative_torque_error": 0.41697,
+      "peak_relative_error": 0.910198,
+      "mean_served_lpm": 22.0209,
+      "fraction_of_cycle_flow_limited": 0.266,
+      "capacity_never_exceeded": true
+    },
+    "by_torque": {
+      "relative_torque_error": 0.17627,
+      "peak_relative_error": 0.829893,
+      "mean_served_lpm": 22.0209,
+      "fraction_of_cycle_flow_limited": 0.266,
+      "capacity_never_exceeded": true
+    }
+  },
+  "best_policy_at_published_pump": "equal_share",
+  "uniform_over_best_at_published": 3.0,
+  "table": {
+    "uniform@5": {
+      "relative_torque_error": 0.742644,
+      "peak_relative_error": 0.999557,
+      "mean_served_lpm": 4.729,
+      "fraction_of_cycle_flow_limited": 0.894,
+      "capacity_never_exceeded": true
+    },
+    "uniform@10": {
+      "relative_torque_error": 0.724086,
+      "peak_relative_error": 0.999557,
+      "mean_served_lpm": 8.9219,
+      "fraction_of_cycle_flow_limited": 0.784,
+      "capacity_never_exceeded": true
+    },
+    "uniform@20": {
+      "relative_torque_error": 0.653754,
+      "peak_relative_error": 0.986585,
+      "mean_served_lpm": 15.3801,
+      "fraction_of_cycle_flow_limited": 0.462,
+      "capacity_never_exceeded": true
+    },
+    "uniform@40": {
+      "relative_torque_error": 0.41697,
+      "peak_relative_error": 0.910198,
+      "mean_served_lpm": 22.0209,
+      "fraction_of_cycle_flow_limited": 0.266,
+      "capacity_never_exceeded": true
+    },
+    "uniform@80": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "uniform@160": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "uniform@320": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "uniform@1e+06": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "equal_share@5": {
+      "relative_torque_error": 0.726389,
+      "peak_relative_error": 1.000972,
+      "mean_served_lpm": 4.729,
+      "fraction_of_cycle_flow_limited": 0.894,
+      "capacity_never_exceeded": true
+    },
+    "equal_share@10": {
+      "relative_torque_error": 0.696571,
+      "peak_relative_error": 0.993969,
+      "mean_served_lpm": 8.9219,
+      "fraction_of_cycle_flow_limited": 0.784,
+      "capacity_never_exceeded": true
+    },
+    "equal_share@20": {
+      "relative_torque_error": 0.56429,
+      "peak_relative_error": 0.924043,
+      "mean_served_lpm": 15.3801,
+      "fraction_of_cycle_flow_limited": 0.462,
+      "capacity_never_exceeded": true
+    },
+    "equal_share@40": {
+      "relative_torque_error": 0.138977,
+      "peak_relative_error": 0.676619,
+      "mean_served_lpm": 22.0209,
+      "fraction_of_cycle_flow_limited": 0.266,
+      "capacity_never_exceeded": true
+    },
+    "equal_share@80": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "equal_share@160": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "equal_share@320": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "equal_share@1e+06": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "by_demand@5": {
+      "relative_torque_error": 0.742644,
+      "peak_relative_error": 0.999557,
+      "mean_served_lpm": 4.729,
+      "fraction_of_cycle_flow_limited": 0.894,
+      "capacity_never_exceeded": true
+    },
+    "by_demand@10": {
+      "relative_torque_error": 0.724086,
+      "peak_relative_error": 0.999557,
+      "mean_served_lpm": 8.9219,
+      "fraction_of_cycle_flow_limited": 0.784,
+      "capacity_never_exceeded": true
+    },
+    "by_demand@20": {
+      "relative_torque_error": 0.653754,
+      "peak_relative_error": 0.986585,
+      "mean_served_lpm": 15.3801,
+      "fraction_of_cycle_flow_limited": 0.462,
+      "capacity_never_exceeded": true
+    },
+    "by_demand@40": {
+      "relative_torque_error": 0.41697,
+      "peak_relative_error": 0.910198,
+      "mean_served_lpm": 22.0209,
+      "fraction_of_cycle_flow_limited": 0.266,
+      "capacity_never_exceeded": true
+    },
+    "by_demand@80": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "by_demand@160": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "by_demand@320": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "by_demand@1e+06": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "by_torque@5": {
+      "relative_torque_error": 0.724655,
+      "peak_relative_error": 1.015977,
+      "mean_served_lpm": 4.729,
+      "fraction_of_cycle_flow_limited": 0.894,
+      "capacity_never_exceeded": true
+    },
+    "by_torque@10": {
+      "relative_torque_error": 0.69275,
+      "peak_relative_error": 1.00409,
+      "mean_served_lpm": 8.9219,
+      "fraction_of_cycle_flow_limited": 0.784,
+      "capacity_never_exceeded": true
+    },
+    "by_torque@20": {
+      "relative_torque_error": 0.255473,
+      "peak_relative_error": 0.913705,
+      "mean_served_lpm": 15.3801,
+      "fraction_of_cycle_flow_limited": 0.462,
+      "capacity_never_exceeded": true
+    },
+    "by_torque@40": {
+      "relative_torque_error": 0.17627,
+      "peak_relative_error": 0.829893,
+      "mean_served_lpm": 22.0209,
+      "fraction_of_cycle_flow_limited": 0.266,
+      "capacity_never_exceeded": true
+    },
+    "by_torque@80": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "by_torque@160": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "by_torque@320": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    },
+    "by_torque@1e+06": {
+      "relative_torque_error": 0.0,
+      "peak_relative_error": 0.0,
+      "mean_served_lpm": 25.5072,
+      "fraction_of_cycle_flow_limited": 0.0,
+      "capacity_never_exceeded": true
+    }
+  }
+}
