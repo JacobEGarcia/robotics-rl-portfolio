@@ -21,6 +21,15 @@ under a quasi-static protocol.
 | 0.5 | 0.582 | 2.77 | 0.799 |
 | 1.0 | 0.680 | 2.87 | 0.791 |
 
+> **Correction (S16).** The widths in this table are **not converged with
+> respect to the settling cap.** Holding each level longer than the 4 s used
+> here shrinks them monotonically: the zero-friction width falls 0.207 → 0.117
+> → 0.055 → 0.032 rad at caps of 4, 10, 30 and 80 s, and is still falling. The
+> qualitative result (hysteresis rises monotonically with tendon friction)
+> holds at every cap tested. The absolute figures, and the attribution of
+> 0.207 rad specifically to snap-through bistability, do not. See
+> [S16](../s16_myofiber_finger/README.md) for the convergence sweep.
+
 Both hysteresis width and dead band increase monotonically with tendon
 friction, which is the expected physical behaviour and the check that the
 model is sound.

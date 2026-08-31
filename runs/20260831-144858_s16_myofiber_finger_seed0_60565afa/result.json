@@ -1,0 +1,171 @@
+{
+  "excursion": {
+    "flexor": {
+      "required_excursion": 0.2654,
+      "fits_without_transmission": true
+    },
+    "extensor": {
+      "required_excursion": 0.2133,
+      "fits_without_transmission": true
+    },
+    "braid_eps_max": 0.3333,
+    "both_fit": true
+  },
+  "settle_convergence": {
+    "rows": [
+      {
+        "cap_seconds": 2.0,
+        "width_friction_0": 0.3126,
+        "width_friction_1": 0.6872,
+        "unsettled_friction_0": 40
+      },
+      {
+        "cap_seconds": 4.0,
+        "width_friction_0": 0.2066,
+        "width_friction_1": 0.6798,
+        "unsettled_friction_0": 23
+      },
+      {
+        "cap_seconds": 10.0,
+        "width_friction_0": 0.1173,
+        "width_friction_1": 0.5115,
+        "unsettled_friction_0": 10
+      },
+      {
+        "cap_seconds": 30.0,
+        "width_friction_0": 0.055,
+        "width_friction_1": 0.3536,
+        "unsettled_friction_0": 6
+      },
+      {
+        "cap_seconds": 80.0,
+        "width_friction_0": 0.0315,
+        "width_friction_1": 0.1522,
+        "unsettled_friction_0": 3
+      }
+    ],
+    "monotone_decreasing_in_cap": true,
+    "still_falling_at_longest_cap": true,
+    "s4_published_width_at_zero_friction": 0.207,
+    "width_at_s4_cap": 0.2066,
+    "width_at_longest_cap": 0.0315,
+    "shrink_factor": 6.6,
+    "converged": false
+  },
+  "hysteresis_ideal": {
+    "0.0": 0.055,
+    "0.2": 0.2167,
+    "0.5": 0.3303,
+    "1.0": 0.3536
+  },
+  "hysteresis_myofiber": {
+    "0.0": 0.0082,
+    "0.2": 0.1108,
+    "0.5": 0.1079,
+    "1.0": 0.1074
+  },
+  "actuator_excess_rad": {
+    "0.0": -0.0468,
+    "0.2": -0.1059,
+    "0.5": -0.2224,
+    "1.0": -0.2462
+  },
+  "dead_band_ideal": {
+    "0.0": 2.4615,
+    "0.2": 2.5641,
+    "0.5": 2.5641,
+    "1.0": 2.5641
+  },
+  "dead_band_myofiber": {
+    "0.0": 0.8205,
+    "0.2": 1.0256,
+    "0.5": 1.0256,
+    "1.0": 1.0256
+  },
+  "monotone_in_friction_ideal": true,
+  "monotone_in_friction_myofiber": false,
+  "total_unsettled": 276,
+  "actuator_r0_mm": 0.6077,
+  "table": [
+    {
+      "frictionloss": 0.0,
+      "ideal_actuator": true,
+      "hysteresis_width_rad": 0.055,
+      "dead_band_N": 2.4615,
+      "max_flexion_rad": 0.8049,
+      "n_unsettled": 6,
+      "actuator_r0_mm": 0.6077,
+      "actuator_L0_mm": 88.135
+    },
+    {
+      "frictionloss": 0.0,
+      "ideal_actuator": false,
+      "hysteresis_width_rad": 0.0082,
+      "dead_band_N": 0.8205,
+      "max_flexion_rad": 0.7907,
+      "n_unsettled": 23,
+      "actuator_r0_mm": 0.6077,
+      "actuator_L0_mm": 88.135
+    },
+    {
+      "frictionloss": 0.2,
+      "ideal_actuator": true,
+      "hysteresis_width_rad": 0.2167,
+      "dead_band_N": 2.5641,
+      "max_flexion_rad": 0.8022,
+      "n_unsettled": 26,
+      "actuator_r0_mm": 0.6077,
+      "actuator_L0_mm": 88.135
+    },
+    {
+      "frictionloss": 0.2,
+      "ideal_actuator": false,
+      "hysteresis_width_rad": 0.1108,
+      "dead_band_N": 1.0256,
+      "max_flexion_rad": 0.7889,
+      "n_unsettled": 51,
+      "actuator_r0_mm": 0.6077,
+      "actuator_L0_mm": 88.135
+    },
+    {
+      "frictionloss": 0.5,
+      "ideal_actuator": true,
+      "hysteresis_width_rad": 0.3303,
+      "dead_band_N": 2.5641,
+      "max_flexion_rad": 0.7972,
+      "n_unsettled": 29,
+      "actuator_r0_mm": 0.6077,
+      "actuator_L0_mm": 88.135
+    },
+    {
+      "frictionloss": 0.5,
+      "ideal_actuator": false,
+      "hysteresis_width_rad": 0.1079,
+      "dead_band_N": 1.0256,
+      "max_flexion_rad": 0.7894,
+      "n_unsettled": 54,
+      "actuator_r0_mm": 0.6077,
+      "actuator_L0_mm": 88.135
+    },
+    {
+      "frictionloss": 1.0,
+      "ideal_actuator": true,
+      "hysteresis_width_rad": 0.3536,
+      "dead_band_N": 2.5641,
+      "max_flexion_rad": 0.791,
+      "n_unsettled": 31,
+      "actuator_r0_mm": 0.6077,
+      "actuator_L0_mm": 88.135
+    },
+    {
+      "frictionloss": 1.0,
+      "ideal_actuator": false,
+      "hysteresis_width_rad": 0.1074,
+      "dead_band_N": 1.0256,
+      "max_flexion_rad": 0.7891,
+      "n_unsettled": 56,
+      "actuator_r0_mm": 0.6077,
+      "actuator_L0_mm": 88.135
+    }
+  ]
+}

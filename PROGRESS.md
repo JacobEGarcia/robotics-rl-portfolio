@@ -3,6 +3,11 @@
 | # | Project | Status | Evidence |
 |---|---|---|---|
 | **S10** | GPU simulation: fidelity, throughput, solver cost | **Built, CPU-validated; GPU numbers pending** | `s10_gpu_scaling/README.md`, `colab/S10_gpu_scaling.ipynb` |
+| **S16** | S4's finger with a braid behind it | **Done**; S4 correction validated, Myofiber values are upper bounds | `media/s16/`, `s16_myofiber_finger/README.md` |
+| **S15** | Switching-valve cost against a continuous one | **Done, validated** | `media/s15/`, `s15_valve/README.md` |
+| **S14** | Pressure proprioception | **Done, validated** | `media/s14/`, `s14_proprioception/README.md` |
+| **S13** | Flow-limited control of a hydraulic limb | **Done, validated** | `media/s13/`, `s13_flow_control/README.md` |
+| **S12** | Braid vs muscle: excursion, force and pump budgets | **Done, validated** | `media/s12/`, `s12_myofiber_leg/README.md` |
 | **S11** | Myofiber-class hydraulic actuator | **Done, validated** (20/20 published claims reproduced from the run log) | `media/s11/`, `s11_myofiber/README.md`, `runs/*_s11_myofiber_*` |
 | **S9** | Muscle actuation (MS-Human-700), plant + six control studies | **Done, validated** (every number backed by a committed run log) + six films | `media/s9/`, `media/s9/s9_muscle.mp4`, `s9_muscle/README.md`, `runs/*_s9_*` |
 | **S8** | Scaling laws for behaviour cloning | **Done, validated** (70-run grid, paired closed-loop transfer, adversarially reviewed twice) | `s8_scaling/results/`, `s8_scaling/figures/`, `runs/*_s8_bc_*` |
@@ -15,11 +20,82 @@
 | **S2** | In-hand reorientation | **Built, unit-validated, untrained**, GPU trainer ready (`colab/S2_inhand.ipynb`) | `s2_inhand/`, see README |
 | **S3** | Domain randomization | **Complete and unit-validated, untrained**, both arms + held-out eval (`colab/S3_domain_rand.ipynb`) | `s3_domain_rand/` |
 
-**Nine of twelve complete and validated.** S2, S3 and S10 are written and unit-tested; each needs GPU time, and each ships a Colab notebook that checkpoints through a preempted session (see `colab/README.md`). Site published at `docs/` (GitHub Pages ready).
+**Fourteen of seventeen complete and validated.** S2, S3 and S10 are written and unit-tested; each needs GPU time, and each ships a Colab notebook that checkpoints through a preempted session (see `colab/README.md`). Site published at `docs/` (GitHub Pages ready).
 
 Every completed project was validated against something external: a published
 baseline, an independent implementation, a physical consistency check, or
 held-out data the optimiser never saw.
+
+---
+
+## S14 / S15 / S16: sensing, valves, and a correction to S4 (2026-08-31)
+
+**S14 — pressure proprioception.** Closing a valve traps near-incompressible
+fluid, which makes the actuator **18x to 246x** stiffer than at constant
+pressure: a closed valve is a lock a joint can hold at zero power. The same
+stiffness makes pressure a superb sensor over a useless range, the full 0-100
+psi span covering **0.215 to 2.44 mm** of travel, under 8% of stroke, at
+sub-micron resolution. Pose is fully observable from the pressure vector (rank
+5 of 5, condition number 6.35 against the moment-arm matrix's 3.82), and the
+open-valve alternative of integrating flow drifts **85% of stroke in 60 s** at
+1% flow error.
+
+**S15 — switching valves.** The actuator's own fill time constant is 0.354 ms,
+so PWM only averages above about 3 kHz. Below it every cycle fully charges and
+discharges: ripple is **full scale** at 50 Hz through 1 kHz, and collapses by
+**2565x** across the transition. A cliff, not a 1/f rolloff. A 0.1 ms minimum
+on-time, fast for a solenoid, costs **440x** against an ideal valve, because
+raising the carrier to fix ripple directly worsens duty resolution. The cheap
+fix, adding hydraulic compliance, directly undoes S14's lock.
+
+**S16 — S4's finger with a braid.** The ideal-actuator arm reproduces S4's
+table to three decimals (0.2066 / 0.4048 / 0.5822 / 0.6798). Then it finds that
+**S4's numbers are not converged in the settling cap**: the zero-friction width
+falls 0.207 → 0.117 → 0.055 → 0.032 rad at 4, 10, 30 and 80 s, still falling.
+S4's qualitative claim survives; the absolute table and the attribution of
+0.207 rad to snap-through bistability do not. Separately, the braid cuts
+hysteresis **49-85%** against an ideal force source, because a compliant
+actuator cannot hold its command through a snap.
+
+---
+
+## S12 / S13: braided actuators in a body, and the pump that feeds them (2026-08-31)
+
+**S12 — can a braid replace a human muscle?** A braided sleeve's maximum
+contraction has a closed-form ceiling of `1 - 1/sqrt(3) = 42.26%` as the braid
+angle goes to zero, verified against a 4000-point sweep. MS-Human-700's leg
+muscles need a median excursion of 37.3%, and **17 of 50 exceed the ceiling**,
+so no braid at any braid angle can match them. They are the glutei, adductors,
+sartorius, gracilis and psoas: the long-throw hip muscles. The fix is a
+stroke-amplifying transmission (median 1.12, max 1.72), paid for linearly in
+fluid volume.
+
+Sizing target matters more than any of it. Peak isometric force for one leg is
+50,137 N; the force actually used in 277 stance problems is 18,684 N, **37.3%**.
+That is 5.69 L against 2.19 L of working fluid, and 5,111 published fibres
+against 1,905, for the same limb doing the same job.
+
+**S13 — flow-limited control.** Tracking the S9 stance cycle with those
+actuators demands a mean 25.5 L/min and a peak of 60.0, so the published
+40 L/min pump is flow-limited **26.6% of every cycle**. Four allocation
+policies, scored on joint torque error: **equal-share water-filling wins at
+0.139, 3.0x better than uniform scaling at 0.417**.
+
+Two results that were not the hypothesis. The informed policy (`by_torque`,
+weighting by how much each actuator moves the tracked joints) *loses*, at
+0.176: at the worst instant equal-share fully satisfies 23 of 27 requests and
+concentrates the shortfall on four, while uniform serves none of them fully and
+puts everyone at 66.7%. Torque error is a norm, so many small correct
+contributions beat everything being slightly wrong. And `by_demand` produces
+allocations *identical to uniform* at every timestep, because serving in
+proportion to request size is uniform scaling restated: it sounds like a policy
+and is not one.
+
+16. **A constraint that silently stopped existing.** S13's first version
+    tracked only the bladder compliance volume and missed the braid's geometric
+    volume, four orders of magnitude larger. Mean demand read 0.003 L/min,
+    nothing was rationed, and all four policies tied at exactly zero. Every
+    check passed, because a constraint that never binds is trivially respected.
 
 ---
 
