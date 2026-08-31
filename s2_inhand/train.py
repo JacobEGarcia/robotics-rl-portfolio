@@ -34,6 +34,7 @@ from __future__ import annotations
 import argparse
 import json
 import pickle
+import shutil
 import time
 from pathlib import Path
 
@@ -134,7 +135,8 @@ class RewardScaler:
 # Checkpointing
 # --------------------------------------------------------------------------
 
-def save_ckpt(path: Path, payload: dict) -> None:
+def save_ckpt(path: Path, payload: dict, *, mirror: Path | None = None,
+              keep_last: int = 3) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     # write-then-rename: a session killed mid-write must not leave a truncated
     # checkpoint that the next session then tries to resume from
@@ -143,15 +145,86 @@ def save_ckpt(path: Path, payload: dict) -> None:
         pickle.dump(payload, f)
     tmp.replace(path)
 
+    # Mirror to a second directory, for Colab, where the only storage that
+    # survives the runtime being reclaimed is Google Drive. Writing the
+    # checkpoint straight to Drive would be the obvious thing and is the wrong
+    # thing: the Drive FUSE mount is slow and occasionally returns an error
+    # mid-write, so the atomic-rename guarantee above would be protecting the
+    # copy that does not matter. Write locally, then copy.
+    if mirror is not None:
+        try:
+            mirror.mkdir(parents=True, exist_ok=True)
+            mtmp = mirror / (path.name + ".part")
+            shutil.copyfile(path, mtmp)
+            mtmp.replace(mirror / path.name)
+            _prune(mirror, keep_last)
+        except OSError as exc:
+            # A Drive hiccup must not kill a run that is otherwise fine. The
+            # local checkpoint is already on disk; say so and carry on.
+            print(f"  WARNING: mirror to {mirror} failed ({exc}); "
+                  f"local checkpoint is intact", flush=True)
 
-def load_latest(ckpt_dir: Path):
-    if not ckpt_dir.exists():
-        return None
-    cands = sorted(ckpt_dir.glob("ckpt_*.pkl"))
-    if not cands:
-        return None
-    with open(cands[-1], "rb") as f:
-        return pickle.load(f)
+    _prune(path.parent, keep_last)
+
+
+def _prune(directory: Path, keep_last: int) -> None:
+    """
+    Keep only the newest `keep_last` checkpoints.
+
+    Colab's Drive quota is 15 GB shared with everything else the account
+    stores, and a 1e8-step run at one checkpoint per 2e6 steps writes fifty of
+    them. Keeping three is enough: the newest to resume from, and two behind
+    it in case the newest was written by a session that was already going
+    wrong. Never keep one, a corrupt newest checkpoint with no fallback
+    means the run restarts from zero.
+    """
+    if keep_last <= 0:
+        return
+    cks = sorted(directory.glob("ckpt_*.pkl"))
+    for old in cks[:-keep_last]:
+        try:
+            old.unlink()
+        except OSError:
+            pass
+
+
+def load_latest(ckpt_dir: Path, *, mirror: Path | None = None):
+    """
+    Newest checkpoint across the local directory and the mirror.
+
+    Both are searched because on Colab they diverge in the ordinary case: the
+    runtime is reclaimed, `/content` is destroyed, and the only surviving
+    checkpoint is the Drive copy. Searching only the local directory turns
+    every resume into a silent fresh start, which does not error and shows up
+    hours later as a learning curve that begins at zero again.
+
+    Falls back down the list on a corrupt file rather than dying. A session
+    killed while Drive was mid-copy can leave one unreadable checkpoint, and
+    losing the whole run to that when a good one sits behind it would be
+    absurd.
+    """
+    cands: list[tuple[str, int, Path]] = []
+    for rank, d in ((1, mirror), (0, ckpt_dir)):
+        if d is not None and d.exists():
+            cands += [(p.name, rank, p) for p in d.glob("ckpt_*.pkl")]
+    # Sort by the step number in the filename, not by mtime: a Drive copy is
+    # written after the local file it came from, so mtime ordering can prefer
+    # an older step that happened to be mirrored last. On a tie the local copy
+    # wins, because reading a checkpoint back over the Drive FUSE mount is
+    # markedly slower than reading the identical bytes from local disk.
+    cands.sort()
+    ordered = [p for _, _, p in cands]
+
+    for p in reversed(ordered):
+        try:
+            with open(p, "rb") as f:
+                ck = pickle.load(f)
+            ck["_from"] = str(p)
+            return ck
+        except Exception as exc:                   # noqa: BLE001
+            print(f"  checkpoint {p.name} unreadable ({exc}); trying the one "
+                  f"before it", flush=True)
+    return None
 
 
 # --------------------------------------------------------------------------
@@ -173,6 +246,18 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--ckpt-every", type=int, default=2_000_000)
     p.add_argument("--ckpt-dir", type=str, default=str(CKPT_DIR))
+    p.add_argument("--ckpt-mirror", type=str, default=None,
+                   help="second directory each checkpoint is copied to, and "
+                        "which --resume also searches. On Colab point this at "
+                        "Google Drive; /content does not survive the runtime "
+                        "being reclaimed.")
+    p.add_argument("--keep-last", type=int, default=3,
+                   help="checkpoints to retain in each directory")
+    p.add_argument("--max-hours", type=float, default=None,
+                   help="stop cleanly after this much wall clock, writing a "
+                        "final checkpoint first. Set it below the platform's "
+                        "session cap: being killed between checkpoints throws "
+                        "away everything since the last one.")
     p.add_argument("--resume", action="store_true")
     p.add_argument("--smoke", action="store_true",
                    help="minimal run proving the loop closes, including a "
@@ -211,8 +296,10 @@ def main() -> None:
     start_step = 0
     curriculum = args.curr_start
 
+    mirror = Path(args.ckpt_mirror) if args.ckpt_mirror else None
+
     if args.resume:
-        ck = load_latest(ckpt_dir)
+        ck = load_latest(ckpt_dir, mirror=mirror)
         if ck is None:
             print("no checkpoint found, starting fresh", flush=True)
         else:
@@ -221,7 +308,8 @@ def main() -> None:
             start_step = ck["step"]
             curriculum = ck["curriculum"]
             key = ck["key"]
-            print(f"resumed from step {start_step:,} curriculum {curriculum:.2f}", flush=True)
+            print(f"resumed from step {start_step:,} curriculum {curriculum:.2f} "
+                  f"({ck.get('_from', '?')})", flush=True)
 
     reset_v = jax.jit(jax.vmap(env.reset, in_axes=(0, None)))
     step_v = jax.jit(jax.vmap(env.step))
@@ -352,23 +440,44 @@ def main() -> None:
                   f"success {succ_rate:5.2%}  curr {curriculum:4.2f}  "
                   f"{sps:,.0f} steps/s", flush=True)
 
-        if step_count >= next_ckpt:
+        out_of_time = (args.max_hours is not None
+                       and (time.time() - t0) > args.max_hours * 3600.0)
+
+        if step_count >= next_ckpt or out_of_time:
             save_ckpt(ckpt_dir / f"ckpt_{step_count:012d}.pkl", {
                 "params": params, "opt_state": opt_state, "step": step_count,
                 "curriculum": curriculum, "key": key,
                 "args": vars(args),
-            })
-            (ckpt_dir / "latest.json").write_text(json.dumps({
+            }, mirror=mirror, keep_last=args.keep_last)
+            meta = json.dumps({
                 "step": step_count, "curriculum": curriculum,
                 "success": succ_rate, "wall_s": time.time() - t0,
-            }, indent=2))
+            }, indent=2)
+            (ckpt_dir / "latest.json").write_text(meta)
+            if mirror is not None:
+                try:
+                    mirror.mkdir(parents=True, exist_ok=True)
+                    (mirror / "latest.json").write_text(meta)
+                except OSError:
+                    # save_ckpt already warned if the mirror is unreachable;
+                    # the progress file is the least important thing on it.
+                    pass
             print(f"  checkpoint @ {step_count:,}", flush=True)
             next_ckpt += args.ckpt_every
+
+        if out_of_time:
+            # Exit code 0. Running out of the session budget is the expected
+            # end of a Colab session, not a failure, and a nonzero exit here
+            # would make every chained session look like a crash.
+            print(f"reached --max-hours ({args.max_hours}) at step "
+                  f"{step_count:,}; checkpoint written, exiting cleanly. "
+                  f"Re-run the same command to continue.", flush=True)
+            return
 
     save_ckpt(ckpt_dir / f"ckpt_{step_count:012d}.pkl", {
         "params": params, "opt_state": opt_state, "step": step_count,
         "curriculum": curriculum, "key": key, "args": vars(args),
-    })
+    }, mirror=mirror, keep_last=args.keep_last)
     print(f"done at {step_count:,} steps in {time.time() - t0:.1f}s", flush=True)
 
 

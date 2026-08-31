@@ -1,0 +1,88 @@
+# Running this portfolio on a free Colab T4
+
+Three notebooks. Run them in this order.
+
+| | notebook | needs GPU for | one session? |
+|---|---|---|---|
+| 1 | [`S10_gpu_scaling.ipynb`](S10_gpu_scaling.ipynb) | measurement only, no training | **yes**, ~1 h |
+| 2 | [`S2_inhand.ipynb`](S2_inhand.ipynb) | PPO, ~10⁸ steps | no, several |
+| 3 | [`S3_domain_rand.ipynb`](S3_domain_rand.ipynb) | PPO ×2 arms, ~3×10⁷ each | no, several |
+
+**S10 first.** It finishes inside one session, it produces a result whether or
+not the quota holds out that afternoon, and section 3 of it measures the batch
+size S2 should be configured with. Starting with the multi-day training run and
+discovering afterwards that the batch size was wrong is the expensive ordering.
+
+## What free Colab actually gives you
+
+Worth being concrete, because the plan depends on it:
+
+- **A T4, usually.** 16 GB, compute capability 7.5. What the runtime menu says
+  and what the driver reports are not always the same thing, the notebooks
+  print `nvidia-smi` and the JAX-reported device kind, and every result records
+  the reported string. Quote it as "what the driver said", never as the
+  hardware. A Kaggle session advertised as `T4 x2` reported a P100.
+- **An unpublished, varying quota**, consumed by wall-clock GPU time whether or
+  not you are computing. A few hours a day is the realistic planning number.
+- **A ~90 minute idle disconnect** and a session cap well below the 12 hours
+  Kaggle allows. Keep the tab visible.
+- **`/content` does not survive the runtime being reclaimed.** Neither does the
+  pip environment. Drive does.
+
+## How the notebooks survive that
+
+Three mechanisms, all in `s2_inhand/train.py` and `s3_domain_rand/train.py`:
+
+- **`--ckpt-mirror`** copies each checkpoint to a second directory after
+  writing it locally. Point it at Drive. Writing straight to Drive would be
+  the obvious thing and is the wrong thing: the Drive FUSE mount is slow and
+  occasionally errors mid-write, so the write-then-rename that protects
+  against a truncated checkpoint would be protecting the copy that does not
+  matter.
+- **`--resume` searches both directories**, newest-step-first, and falls back
+  down the list if the newest file is unreadable. On Colab the two diverge in
+  the ordinary case: the runtime is reclaimed, `/content` is destroyed, and the
+  Drive copy is the only one left. A resume that searched only local disk would
+  silently start from scratch, which does not error and shows up hours later as
+  a learning curve that begins at zero again.
+- **`--max-hours`** exits cleanly with a final checkpoint before the platform
+  is likely to cut the session off. Exit code 0, running out of session budget
+  is the expected end of a Colab session, not a failure, and a nonzero exit
+  would make every chained session look like a crash.
+
+`--keep-last 3` bounds what accumulates in Drive. Three, not one: the newest to
+resume from, and two behind it in case the newest was written by a session that
+was already going wrong.
+
+## The one thing you have to do first
+
+The notebooks `git clone` the public portfolio repo. Anything committed locally
+but not pushed is not in that clone, and the setup cell will stop and say so.
+
+```bash
+cd ~/Downloads/hermestes/robotics-rl-portfolio && git push origin main
+```
+
+If you would rather not push, tar the repo and drop it in
+`MyDrive/robotics-rl-portfolio/portfolio.tgz`; the setup cell unpacks it over
+the clone.
+
+```bash
+tar czf portfolio.tgz --exclude=assets --exclude=runs --exclude=.git .
+```
+
+`assets/menagerie` is excluded from both paths on purpose, it is 2.3 GB of
+third-party models and is itself a git repository. The notebooks fetch the
+seven directories they need with a sparse checkout, in seconds.
+
+## Editing these notebooks
+
+Don't. They are generated:
+
+```bash
+python colab/build.py
+```
+
+`.ipynb` is JSON with source split into lines, which does not diff and does not
+review. Edit `colab/build.py` and regenerate, the same rule the manga guide's
+`index.html` follows.

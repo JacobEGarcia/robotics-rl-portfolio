@@ -1,0 +1,120 @@
+{
+  "dynamixel_2r": {
+    "shipped": "mjINT_EULER",
+    "n_steps": 40,
+    "rows": [
+      {
+        "integrator": "mjINT_EULER",
+        "shipped": true,
+        "float32_floor_m": 0.0010242762430356506,
+        "unstable": false,
+        "mjx_vs_mjc_m": 1.3938745504523151e-08,
+        "ratio_to_floor": 1.3608385041922722e-05
+      },
+      {
+        "integrator": "mjINT_IMPLICITFAST",
+        "shipped": false,
+        "float32_floor_m": 0.0010207201941735138,
+        "unstable": false,
+        "mjx_vs_mjc_m": 1.9685695517832766e-08,
+        "ratio_to_floor": 1.9286084110222244e-05
+      },
+      {
+        "integrator": "mjINT_RK4",
+        "shipped": false,
+        "float32_floor_m": 1.94707096045992e-07,
+        "unstable": false,
+        "mjx_vs_mjc_m": 7.828659183972573e-08,
+        "ratio_to_floor": 0.4020736451291614
+      },
+      {
+        "integrator": "mjINT_IMPLICIT",
+        "shipped": false,
+        "float32_floor_m": 0.0010171971765765733,
+        "unstable": false,
+        "unsupported": "mjtIntegrator.mjINT_IMPLICIT"
+      }
+    ],
+    "model": {
+      "file": "menagerie\\dynamixel_2r\\dynamixel_2r.xml",
+      "nq": 2,
+      "nv": 2,
+      "nu": 2,
+      "nbody": 4,
+      "ngeom": 80,
+      "ntendon": 0,
+      "n_mesh_geom": 80,
+      "timestep": 0.002,
+      "integrator": 0,
+      "solver": 2,
+      "iterations": 100,
+      "ls_iterations": 50
+    },
+    "device": {
+      "platform": "cpu",
+      "device_kind_reported": "cpu",
+      "n_devices": 1,
+      "jax": "0.10.2",
+      "x64": false
+    }
+  },
+  "franka_emika_panda": {
+    "shipped": "mjINT_IMPLICITFAST",
+    "n_steps": 40,
+    "rows": [
+      {
+        "integrator": "mjINT_EULER",
+        "shipped": false,
+        "float32_floor_m": 0.006826387749842623,
+        "unstable": false,
+        "mjx_vs_mjc_m": 1.196574074524082e-07,
+        "ratio_to_floor": 1.7528656712353736e-05
+      },
+      {
+        "integrator": "mjINT_IMPLICITFAST",
+        "shipped": true,
+        "float32_floor_m": 0.006855860829575398,
+        "unstable": false,
+        "mjx_vs_mjc_m": 0.049893463465889576,
+        "ratio_to_floor": 7.277490705566089
+      },
+      {
+        "integrator": "mjINT_RK4",
+        "shipped": false,
+        "float32_floor_m": 3.4613402752553796e-05,
+        "unstable": false,
+        "mjx_vs_mjc_m": 2.0166532482595356e-07,
+        "ratio_to_floor": 0.005826220735003425
+      },
+      {
+        "integrator": "mjINT_IMPLICIT",
+        "shipped": false,
+        "float32_floor_m": 0.006852074940312727,
+        "unstable": false,
+        "unsupported": "mjtIntegrator.mjINT_IMPLICIT"
+      }
+    ],
+    "model": {
+      "file": "menagerie\\franka_emika_panda\\panda.xml",
+      "nq": 9,
+      "nv": 9,
+      "nu": 8,
+      "nbody": 12,
+      "ngeom": 81,
+      "ntendon": 1,
+      "n_mesh_geom": 71,
+      "timestep": 0.002,
+      "integrator": 3,
+      "solver": 2,
+      "iterations": 100,
+      "ls_iterations": 50
+    },
+    "device": {
+      "platform": "cpu",
+      "device_kind_reported": "cpu",
+      "n_devices": 1,
+      "jax": "0.10.2",
+      "x64": false
+    }
+  }
+}

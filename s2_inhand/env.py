@@ -224,12 +224,19 @@ class InHandEnv:
             state.prev_action,
         ])
 
-    def reset(self, key: jax.Array, target_angle_max: jax.Array) -> InHandState:
+    def reset(self, key: jax.Array, target_angle_max: jax.Array,
+              model=None) -> InHandState:
+        # `model` overrides the instance's own compiled model. It exists for
+        # s3_domain_rand, which needs a *different* model per environment and
+        # therefore has to pass one in through vmap's in_axes rather than
+        # closing over a single shared one. Defaulting to None keeps every S2
+        # call site and every S2 test unchanged.
+        model = self.model if model is None else model
         key, k_target = jax.random.split(key)
 
-        data = mjx.make_data(self.model)
+        data = mjx.make_data(model)
         data = data.replace(qpos=self.qpos_init, ctrl=self.ctrl_init)
-        data = mjx.forward(self.model, data)
+        data = mjx.forward(model, data)
 
         cube_q = self._cube_quat(data)
         target = random_quat_within(k_target, cube_q, target_angle_max)
@@ -246,7 +253,9 @@ class InHandEnv:
             success=jnp.float32(0.0),
         )
 
-    def step(self, state: InHandState, action: jax.Array) -> InHandState:
+    def step(self, state: InHandState, action: jax.Array,
+             model=None) -> InHandState:
+        model = self.model if model is None else model
         cfg = self.cfg
         action = jnp.clip(action, -1.0, 1.0)
 
@@ -258,7 +267,7 @@ class InHandEnv:
         ctrl = jnp.clip(ctrl, self.ctrl_lo, self.ctrl_hi)
 
         def one(d, _):
-            return mjx.step(self.model, d.replace(ctrl=ctrl)), None
+            return mjx.step(model, d.replace(ctrl=ctrl)), None
 
         data, _ = jax.lax.scan(one, state.data, None, length=cfg.n_substeps)
 

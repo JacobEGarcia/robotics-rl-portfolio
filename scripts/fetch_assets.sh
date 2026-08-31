@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Fetch the third-party assets this repository depends on but does not vendor.
 #
-#   MuJoCo Menagerie  ~2.3 GB  robot models (Franka Panda, LEAP/Shadow hands)
+#   MuJoCo Menagerie  ~2.3 GB  robot models (Franka Panda, LEAP/Shadow hands,
+#                               MS-Human-700 musculoskeletal body)
 #   DROID episodes    ~3.9 MB  32 real Franka trajectories, 632 s at 15 Hz
 #
 # Run from the repository root:

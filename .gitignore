@@ -29,3 +29,14 @@ s8_scaling/tools/*.png
 s8_scaling/tools/*.mp4
 runs/*_s8_bc_*/policy.pt
 runs/*_s8_transfer_*/policy.pt
+
+# MuJoCo drops this next to the working directory when a sim goes unstable.
+# The instability itself is recorded in the run JSON (parity.Trajectory.extra).
+MUJOCO_LOG.TXT
+s10_gpu_scaling/results/*smoke*.json
+
+# Training checkpoints are regenerable and per-session. Shipping one is worse
+# than useless: the Colab notebooks run --resume, which would find a committed
+# smoke checkpoint and silently continue a 32-step run.
+s2_inhand/checkpoints/
+s3_domain_rand/checkpoints/

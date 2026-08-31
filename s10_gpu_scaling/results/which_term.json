@@ -1,0 +1,59 @@
+{
+  "franka_emika_panda": {
+    "steps": 40,
+    "seed": 0,
+    "rows": [
+      {
+        "variant": "as_shipped",
+        "mjx_vs_mjc_m": 0.049893463465889576,
+        "float32_floor_m": 0.006855860829575398,
+        "ratio_to_floor": 7.277490705566089,
+        "max_dof_damping": 1.0,
+        "max_actuator_kv": 450.0,
+        "unstable": false
+      },
+      {
+        "variant": "no_joint_damping",
+        "mjx_vs_mjc_m": 0.053999833442648505,
+        "float32_floor_m": 0.007127239288144121,
+        "ratio_to_floor": 7.576542790204207,
+        "max_dof_damping": 0.0,
+        "max_actuator_kv": 450.0,
+        "unstable": false
+      },
+      {
+        "variant": "no_actuator_kv",
+        "mjx_vs_mjc_m": 2.1773876128950725e-07,
+        "float32_floor_m": 0.0064182842934358015,
+        "ratio_to_floor": 3.392476109420646e-05,
+        "max_dof_damping": 1.0,
+        "max_actuator_kv": 0.0,
+        "unstable": false
+      },
+      {
+        "variant": "neither",
+        "mjx_vs_mjc_m": 3.027162297316112e-07,
+        "float32_floor_m": 0.00675579321568162,
+        "ratio_to_floor": 4.4808391859736474e-05,
+        "max_dof_damping": 0.0,
+        "max_actuator_kv": 0.0,
+        "unstable": false
+      }
+    ],
+    "model": {
+      "file": "menagerie\\franka_emika_panda\\panda.xml",
+      "nq": 9,
+      "nv": 9,
+      "nu": 8,
+      "nbody": 12,
+      "ngeom": 81,
+      "ntendon": 1,
+      "n_mesh_geom": 71,
+      "timestep": 0.002,
+      "integrator": 3,
+      "solver": 2,
+      "iterations": 100,
+      "ls_iterations": 50
+    }
+  }
+}

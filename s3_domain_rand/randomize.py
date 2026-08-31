@@ -103,17 +103,31 @@ class DomainRandConfig:
         }
 
 
-def apply_to_model(mjx_model, params: dict, nominal: dict):
+def randomized_fields(params: dict, nominal: dict) -> dict:
     """
-    Return a copy of the MJX model with randomized physics parameters.
+    Just the four model arrays the randomizer touches, as a plain dict.
 
-    Takes `nominal` explicitly rather than reading the current model values, so
-    that repeated application does not compound multipliers. Randomizing a
-    model that was already randomized is a subtle and very easy mistake: the
+    Separated from `apply_to_model` so it can be `vmap`ped on its own. That
+    separation is not stylistic, it is the difference between a batch that
+    fits on a T4 and one that does not.
+
+    `jax.vmap` adds a leading axis to *every* leaf of whatever its function
+    returns. Vmapping a function that returns the whole model therefore
+    replicates the entire model per environment: mesh vertices, convex hulls,
+    body trees, everything. On the LEAP scene that is a few megabytes times
+    `n_envs`, and at the batch sizes MJX is worth using at, it is an
+    out-of-memory error whose message says nothing about domain
+    randomization. Vmapping *this* function and folding the four results back
+    into one shared model keeps the per-environment cost at four small
+    arrays.
+
+    Takes `nominal` explicitly rather than reading the current model values,
+    so repeated application does not compound multipliers. Randomizing a model
+    that was already randomized is a subtle and very easy mistake: the
     distribution silently drifts wider every episode and the "held-out" set
     stops being held out.
     """
-    return mjx_model.tree_replace({
+    return {
         "body_mass": nominal["body_mass"].at[nominal["cube_body"]].set(
             nominal["cube_mass"] * params["cube_mass"]),
         "geom_friction": nominal["geom_friction"].at[nominal["cube_geom"], 0].set(
@@ -122,7 +136,12 @@ def apply_to_model(mjx_model, params: dict, nominal: dict):
             nominal["gain0"] * params["actuator_gain"]),
         "dof_damping": nominal["dof_damping"].at[:16].set(
             nominal["damping16"] * params["joint_damping"]),
-    })
+    }
+
+
+def apply_to_model(mjx_model, params: dict, nominal: dict):
+    """One randomized model, for single-environment use (tests, debugging)."""
+    return mjx_model.tree_replace(randomized_fields(params, nominal))
 
 
 def add_obs_noise(key: jax.Array, obs: jax.Array, cfg: DomainRandConfig) -> jax.Array:
