@@ -12,6 +12,12 @@ runs it until the session budget is spent.
 
 The ordering is not arbitrary. It is cheapest-informative-first:
 
+0.  **A smoke gate**, once, before anything is charged against the quota. Four
+    environments, two iterations, a checkpoint written to Drive and then
+    resumed from Drive with the local copy deleted. That last step is the
+    whole preemption story and it is the one that fails silently: a resume
+    that finds nothing does not raise, it starts from zero, and it surfaces
+    days later as a learning curve that begins again.
 1.  **S10** if it has no results. One session, no training, and it produces a
     publishable number even if the quota dies that afternoon. It also measures
     the batch size everything else should use, so running it first makes every
@@ -89,6 +95,22 @@ def _s10_done(drive: Path) -> bool:
 
 def plan(drive: Path, max_hours: float, num_envs: int) -> list[Job]:
     jobs: list[Job] = []
+
+    # Before anything is charged against the quota, prove the preemption story
+    # works on this machine. `--smoke --resume` with a mirror runs four
+    # environments for two iterations, writes a checkpoint to Drive, and then
+    # resumes from it. A resume that silently finds nothing is the failure this
+    # whole setup exists to prevent, and it does not raise: it starts from
+    # zero and shows up days later as a curve that begins again.
+    #
+    # Runs once. The marker is in Drive, so it survives the runtime but is
+    # re-run if the checkpoint format ever changes and the marker is deleted.
+    if not (drive / ".smoke_ok").exists():
+        jobs.append(Job(
+            "smoke", "checkpoint/resume has not been proven on this machine yet",
+            [sys.executable, "-u", "-m", "s2_inhand.train", "--smoke",
+             "--ckpt-dir", "/content/work/smoke",
+             "--ckpt-mirror", str(drive / "smoke_mirror"), "--resume"]))
 
     if not _s10_done(drive):
         jobs.append(Job(
@@ -214,6 +236,24 @@ def main() -> None:
                   f"Start a new session and run this cell again.", flush=True)
             return
         code = run(j, drive)
+
+        if j.name == "smoke" and code == 0:
+            # Only mark it after the run actually succeeded, and verify the
+            # resume happened rather than trusting the exit code: the trainer
+            # exits 0 whether it resumed or started fresh, so the exit code
+            # alone does not distinguish "resume works" from the exact failure
+            # this gate exists to catch.
+            mirror = drive / "smoke_mirror"
+            if list(mirror.glob("ckpt_*.pkl")):
+                (drive / ".smoke_ok").write_text("ok")
+                print("[autopilot] smoke gate passed; checkpoint/resume "
+                      "verified against Drive", flush=True)
+            else:
+                print("[autopilot] smoke run exited 0 but nothing reached "
+                      "the Drive mirror. Stopping: every preempted session "
+                      "would silently restart from zero.", flush=True)
+                return
+
         if code != 0:
             # Stop rather than fall through to the next job. A failure here is
             # usually environmental (OOM at this batch size, Drive unmounted),

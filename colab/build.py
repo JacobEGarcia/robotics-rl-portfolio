@@ -455,33 +455,71 @@ assert drift < 0.03, 'grasp is not holding; do not train against this'
 print('scene OK')
 '''),
 
-    md("### Smoke gate, do not skip\n\n"
-       "Four environments, two iterations, one checkpoint written and reloaded. "
-       "It proves the rollout, the GAE, the PPO update and the checkpoint path "
-       "close end to end **on this machine**.\n\n"
-       "It must print at least one `step ...` line and one `checkpoint @ ...` "
-       "line. Two minutes here against an afternoon of a run that was never "
-       "going to work."),
+    md("""
+### Smoke gate, do not skip
+
+Two runs of four environments each, and it is the only place the whole
+preemption story is ever tested end to end.
+
+**Run one** proves the rollout, the GAE, the PPO update and the checkpoint
+path close, and that the checkpoint reaches Drive rather than only local
+disk.
+
+**Run two deletes the local checkpoint directory first**, which is exactly
+what happens when a free session is reclaimed, and requires the trainer to
+resume from Drive alone. This is the behaviour most likely to fail silently:
+a resume that finds nothing does not raise, it starts from zero, and you
+discover it hours later as a learning curve that begins again.
+
+None of this could be tested on the machine that wrote it. A single
+`mjx.step` of this scene costs about 4 seconds on CPU and the compile runs
+past fifty minutes, so the loop has never closed anywhere. Two minutes here
+against an afternoon of a run that was never going to work.
+"""),
     code('''
-import os, subprocess, sys, time
+import os, shutil, subprocess, sys, time
 os.chdir(SRC)
-SMOKE = WORK / 'smoke_ckpt'
+SMOKE  = WORK / 'smoke_ckpt'
+MIRROR = DRIVE / 'smoke_mirror'
+shutil.rmtree(SMOKE, ignore_errors=True)
+shutil.rmtree(MIRROR, ignore_errors=True)
 
-t0 = time.time()
-r = subprocess.run([sys.executable, '-u', '-m', 's2_inhand.train', '--smoke',
-                    '--ckpt-dir', str(SMOKE)],
-                   env=dict(os.environ, PYTHONPATH=str(SRC)),
-                   capture_output=True, text=True)
-print(r.stdout[-4000:])
-if r.stderr.strip():
-    print('--- stderr ---'); print(r.stderr[-3000:])
-print(f'\\nexit={r.returncode} in {time.time()-t0:.0f}s')
+def smoke(tag):
+    t0 = time.time()
+    r = subprocess.run(
+        [sys.executable, '-u', '-m', 's2_inhand.train', '--smoke',
+         '--ckpt-dir', str(SMOKE), '--ckpt-mirror', str(MIRROR), '--resume'],
+        env=dict(os.environ, PYTHONPATH=str(SRC)),
+        capture_output=True, text=True)
+    print('--- ' + tag + ' (exit %d, %.0fs) ---' % (r.returncode, time.time() - t0))
+    print(r.stdout[-3000:])
+    if r.stderr.strip():
+        print('--- stderr ---'); print(r.stderr[-2000:])
+    return r
 
-wrote = list(SMOKE.glob('ckpt_*.pkl'))
+# 1. does the loop close, and does the checkpoint reach Drive?
+r = smoke('first run')
 assert r.returncode == 0, 'smoke run failed, see stderr'
-assert wrote, 'smoke run wrote no checkpoint'
 assert 'step ' in r.stdout, 'smoke run never closed an iteration'
-print('SMOKE GATE PASSED ->', [p.name for p in wrote])
+assert list(SMOKE.glob('ckpt_*.pkl')), 'nothing written locally'
+assert list(MIRROR.glob('ckpt_*.pkl')), 'nothing reached the Drive mirror'
+
+# 2. simulate the way a free session actually ends: /content is destroyed
+#    and only Drive survives. This is the most important behaviour in the
+#    whole setup and the one most likely to fail silently, because a resume
+#    that finds nothing does not error. It starts from zero and shows up
+#    hours later as a learning curve that begins again.
+shutil.rmtree(SMOKE, ignore_errors=True)
+r = smoke('after simulated preemption')
+assert r.returncode == 0, 'resume failed'
+assert 'resumed from step' in r.stdout, (
+    'RESUME DID NOT FIND THE DRIVE CHECKPOINT. Every preempted session would '
+    'silently restart from zero. Do not start a real run.')
+
+print()
+print('SMOKE GATE PASSED: loop closes, checkpoint reaches Drive, and a run '
+      'resumes from Drive alone.')
+shutil.rmtree(MIRROR, ignore_errors=True)
 '''),
 
     md("## 3. Size the batch by measurement, not by guess\n\n"
