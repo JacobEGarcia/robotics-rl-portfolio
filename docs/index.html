@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Closing the Reality Gap — Jacob E. Garcia</title>
-<meta name="description" content="Reinforcement learning written from scratch, muscle and hydraulic actuator modeling in MuJoCo, and a simulator fitted to a physical Franka Panda. Sixteen projects, twenty-two silent bugs.">
+<meta name="description" content="Reinforcement learning written from scratch, muscle and hydraulic actuator modeling in MuJoCo, and a simulator fitted to a physical Franka Panda. Eighteen projects, twenty-four silent bugs.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -192,6 +192,7 @@ footer a:hover{color:var(--amber)}
     <a href="#muscle">Muscle</a>
     <a href="#hydraulic">Water</a>
     <a href="#instruments">Instruments</a>
+    <a href="#choice">Choice</a>
     <a href="#method">Method</a>
     <a href="kare.html">1-Bit Edition</a>
     <a href="https://github.com/JacobEGarcia/robotics-rl-portfolio">Source ↗</a>
@@ -202,7 +203,7 @@ footer a:hover{color:var(--amber)}
 <section class="titlepage"><div class="sheet">
   <p class="kicker">Robotics · Scaling Laws · Reinforcement Learning · Sim-to-Real</p>
   <h1>Closing the <i>reality gap</i></h1>
-  <p class="standfirst">Sixteen projects on what it takes to measure a robot-learning claim honestly,
+  <p class="standfirst">Eighteen projects on what it takes to measure a robot-learning claim honestly,
      from the scaling laws of imitation to the fluid budget of a body that runs on water.</p>
 
   <div class="colophon">
@@ -964,11 +965,101 @@ footer a:hover{color:var(--amber)}
   </div>
 </div></article>
 
+<!-- ============================================ IX — CHOICE ============================================ -->
+<article id="choice"><div class="sheet">
+  <div class="col">
+    <p class="chapno">Chapter Nine</p>
+    <h2>What the mechanics choose, and what a rig could <i>measure</i></h2>
+    <p class="deck">Two closing studies. One asks what motion a muscle-driven leg would pick if
+       effort were the only thing that mattered, and gets the shape right and the answer wrong.
+       The other asks what you could learn about fifty actuators from five torque sensors.</p>
+
+    <p>Everything up to here took the task as given and asked what the actuators have to do. The
+       first of these turns it around. Metabolic cost per unit distance is U-shaped in step
+       length, and people settle near the bottom of that curve. If a purely mechanical effort
+       model, with no metabolism in it anywhere, reproduced both the shape and the location, that
+       would say the preference is a consequence of the mechanics rather than of physiology.</p>
+  </div>
+
+  <figure class="plate bleed">
+    <img src="media/s17/gait_economy.png" alt="Effort per metre against step length, under load, and at three cost exponents">
+    <figcaption><b>Plate 31 · Economy</b>Effort per metre against step length, with the knee and
+      ankle profiles optimised at every length rather than assumed. The shaded band is where
+      humans actually walk.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p>The shape arrives. There is a genuine interior minimum: halving the optimal step costs
+       <strong>1.85x</strong>, doubling it <strong>5.6x</strong>, and past 0.94 m the leg cannot
+       produce the required torque at all. Short steps pay a per-step overhead many times over,
+       long ones need large torques at bad postures, and both sides of the textbook argument fall
+       out of mechanics alone.</p>
+
+    <p>The location does not. The model picks <strong>0.46 m</strong> against a human 0.65 to
+       0.75, roughly thirty per cent short, and the answer slides two grid cells when the effort
+       exponent is changed from two to five. A prediction that moves with a modelling choice
+       nobody has settled is a weak prediction, and saying so matters more than the central
+       value.</p>
+  </div>
+
+  <div class="pull">The cheapest way to walk, if effort is all that counts, is not to bend your
+    knees.
+    <cite>What the optimiser found, and why the answer is short</cite></div>
+
+  <div class="col">
+    <p>The diagnosis is in the postures the optimiser chose. At every step length it drives the
+       knee to its lower bound and holds it there. That is correct, and it is exactly why a
+       quasi-static model is the wrong instrument for this question: a straight leg is cheap to
+       hold and useless at absorbing a landing, clearing a swing foot, or returning elastic
+       energy, and none of those costs exist in a model without dynamics. Bending the knee is
+       what makes long steps affordable, and this model has no reason to do it.</p>
+
+    <p>So the honest reading is narrow. Quasi-static mechanical effort explains the shape of the
+       cost curve and not the position of its minimum, and the missing ingredients are the ones
+       the gait literature already names.</p>
+  </div>
+
+  <div class="col">
+    <p>The second study is a question you would want answered before building anything. A
+       musculoskeletal limb has fifty actuators and, realistically, five joint torque sensors. Is
+       calibrating it even possible?</p>
+
+    <p>It is a rank question, and answerable on paper. Because joint torque is exactly affine in
+       activation, scaling one actuator's peak force scales one column of the plant, so torque is
+       <em>linear</em> in the unknown scale factors. One pose gives five equations for fifty
+       unknowns; stacking poses builds a system whose rank and conditioning are the whole
+       answer.</p>
+  </div>
+
+  <figure class="plate bleed">
+    <img src="media/s18/identifiability.png" alt="Rank and condition number against experiment count, and per-muscle recovery error">
+    <figcaption><b>Plate 32 · What a rig can see</b>Rank climbs by exactly five per pose, the
+      number of joints being measured, until it saturates. The condition number does something
+      less convenient.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p>Sixteen poses make the system solvable. But the condition number is at its <em>worst</em>,
+       around 2,500, at almost exactly the point rank becomes full, and it keeps improving for
+       another three doublings of effort after rank has stopped changing. Rank answers "can you".
+       Conditioning answers "how well". A rig that stopped collecting the moment the problem
+       became solvable would amplify its sensor noise about four times more than one that kept
+       going.</p>
+
+    <p>The practical answer is encouraging. At a tenth of a newton-metre of torque noise, which is
+       comfortably inside a good dynamometer, <strong>all fifty actuators are recovered to better
+       than 3.2%</strong>. At a full newton-metre it degrades to thirty-nine of fifty, and the
+       eleven that drop out share a property: almost no leverage about any joint the rig is
+       watching. They are the psoas group and a small peroneal. That is not a fact about those
+       muscles. It is a specification for where to put the next sensor.</p>
+  </div>
+</div></article>
+
 <!-- ============================================ V — METHOD ============================================ -->
 <article id="method"><div class="sheet">
   <div class="col">
-    <p class="chapno">Chapter Nine</p>
-    <h2>Twenty-two bugs, none of which raised an <i>exception</i></h2>
+    <p class="chapno">Chapter Ten</p>
+    <h2>Twenty-four bugs, none of which raised an <i>exception</i></h2>
     <p class="deck">Every result here was checked against something external. This is what that
        discipline caught.</p>
 
@@ -1103,6 +1194,19 @@ footer a:hover{color:var(--amber)}
          was being compared against measures the <em>mean</em> gap over a trimmed grid. It reported
          0.863 rad against 0.207 for the identical case and looked like a finding. Both metrics are
          defensible; using one of each and subtracting is not.</p></div></div>
+    <div class="bug"><div>
+      <h5>Infeasible samples averaged away</h5>
+      <p>Cost was the mean over the <em>solvable</em> samples in a step, scaled back up. Long
+         steps then came out cheaper than the optimum, because at the longest reach only six of
+         nine samples could be solved at all and the three impossible ones simply vanished from
+         the average. A step is now feasible only if every sample in it is.</p></div></div>
+    <div class="bug"><div>
+      <h5>An objective that returned infinity</h5>
+      <p>With unreachable postures scored as infinite, the simplex optimiser's convergence test
+         computes infinity minus infinity, which is not a number, and the search wanders while
+         the library warns. Replaced with a large finite penalty that grows with how badly the
+         torque was missed — after which the optimiser immediately found postures six times
+         cheaper than the profile it had started from.</p></div></div>
   </div>
 
   <div class="col">
