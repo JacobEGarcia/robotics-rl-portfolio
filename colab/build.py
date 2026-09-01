@@ -538,11 +538,23 @@ best = max((p for p in pts if p.steps_per_s), key=lambda p: p.steps_per_s, defau
 
 NUM_ENVS = k.n_envs if k else 1024
 print()
-print(f'chosen --num-envs {NUM_ENVS}')
+print('chosen --num-envs ' + str(NUM_ENVS))
 if best:
-    print(f'best {best.steps_per_s:,.0f} steps/s at n={best.n_envs:,}')
-    print(f'1e8 steps at the knee ~ {1e8/k.steps_per_s/3600:.1f} GPU-hours')
-    print(f'  = {1e8/k.steps_per_s/3600/2.5:.1f} sessions at 2.5 h each')
+    print('best %,.0f steps/s at n=%,d'.replace('%,', '%') % (best.steps_per_s, best.n_envs))
+    print('1e8 steps at the knee ~ %.1f GPU-hours' % (1e8 / k.steps_per_s / 3600))
+    print('  = %.1f sessions at 2.5 h each' % (1e8 / k.steps_per_s / 3600 / 2.5))
+
+# Persist it. This is a measurement, and a measurement that lives only in a
+# notebook variable dies with the runtime: every later session would either
+# re-measure it (minutes of lease) or guess. Section 4 and the autopilot both
+# read this file, so the knee is measured once and used forever.
+import json
+(DRIVE / 's2_num_envs.json').write_text(json.dumps({
+    'num_envs': int(NUM_ENVS),
+    'steps_per_s': float(k.steps_per_s) if k else None,
+    'device_kind_reported': getattr(jax.devices()[0], 'device_kind', '?'),
+}, indent=2))
+print('saved to', DRIVE / 's2_num_envs.json')
 '''),
 
     md("## 4. Train\n\n"
@@ -557,10 +569,30 @@ if best:
        "expected failure mode for this project and it is worth catching in "
        "hour one rather than hour eleven."),
     code('''
+import json
+
 CKPT_LOCAL  = WORK / 'checkpoints'
 CKPT_DRIVE  = DRIVE / 's2_checkpoints'
 TOTAL_STEPS = 100_000_000
 MAX_HOURS   = 2.5
+
+# Section 3 measures the batch size and saves it to Drive. On a resume
+# session you skip section 3, so NUM_ENVS is not in this runtime: read it
+# back instead. Without this the documented resume path ('run sections 1 and
+# 4, skip 2 and 3') raises NameError on every session after the first, which
+# is every session that matters.
+_sizing = DRIVE / 's2_num_envs.json'
+if 'NUM_ENVS' not in dir():
+    if _sizing.exists():
+        NUM_ENVS = json.loads(_sizing.read_text())['num_envs']
+        print('NUM_ENVS = %d (measured in an earlier session)' % NUM_ENVS)
+    else:
+        raise SystemExit(
+            'No batch size available. Run section 3 once on this account. It '
+            'measures the knee and saves it to ' + str(_sizing) + ', after '
+            'which every later session reads it back and can skip section 3.')
+else:
+    print('NUM_ENVS = %d (measured in this session)' % NUM_ENVS)
 
 cmd = [sys.executable, '-u', '-m', 's2_inhand.train',
        '--total-steps', str(TOTAL_STEPS),
@@ -698,7 +730,16 @@ print('\\nbatching OK')
     code('''
 ARM         = 'dr'          # 'dr' or 'baseline' -- run both
 TOTAL_STEPS = 30_000_000
-NUM_ENVS    = 2048          # use the knee S2's section 3 measured
+import json
+
+# The knee S2's throughput sweep measured on the GPU this account was given,
+# not a number typed here. A hardcoded batch size is a guess about hardware
+# nobody had seen: too high wastes the lease on compiles and risks OOM, too
+# low leaves the card idle.
+_sizing = DRIVE / 's2_num_envs.json'
+NUM_ENVS = json.loads(_sizing.read_text())['num_envs'] if _sizing.exists() else 2048
+print('NUM_ENVS = %d (%s)' % (NUM_ENVS,
+      'measured' if _sizing.exists() else 'default; run S2 section 3 to measure it'))
 MAX_HOURS   = 2.5
 
 import os, subprocess, sys

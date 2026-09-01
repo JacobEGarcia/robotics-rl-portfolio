@@ -48,10 +48,28 @@ to ten minutes whatever the throughput turns out to be. Verified against a
 simulated 2,000 steps/s run: worst gap 10.1 minutes, and on a fast run the
 time trigger never fires and step spacing is unchanged.
 
-**Batch size should be the knee, not the ceiling.** S10's throughput sweep
-reports the smallest batch within 10% of the best. Past it, each extra
-environment buys under 10% while costing proportional memory and a longer
-compile, and on a preemptible lease a longer compile is a direct loss.
+**Batch size should be the knee, not the ceiling, and it should be measured
+once.** S10's throughput sweep reports the smallest batch within 10% of the
+best. Past it, each extra environment buys under 10% while costing
+proportional memory and a longer compile, and on a preemptible lease a longer
+compile is a direct loss. The measured value is written to
+`MyDrive/robotics-rl-portfolio/s2_num_envs.json`; the training cells and the
+autopilot read it back, so the sweep runs once rather than once per session,
+and a number nobody measured is never used silently.
+
+## A bug worth knowing about, since it is the shape of the others
+
+The S2 notebook used to end by printing "run sections 1 and 4, skip 2 and 3",
+and section 4 used a variable that only section 3 defined. Every session after
+the first, which is every session that matters, would have raised `NameError`
+after mounting Drive and cloning: a wasted lease for a one-line cause.
+
+Nothing catches that by reading the code, because each cell is individually
+correct. It is caught by asking a different question, "does the path the
+document tells you to take actually work", which is why `colab/` is now
+audited by walking each notebook's cells in order and checking that every name
+is bound before use, that every flag the autopilot passes exists in the target
+CLI, and that every model key it names is in S10's catalogue.
 
 ## What free Colab actually gives you
 

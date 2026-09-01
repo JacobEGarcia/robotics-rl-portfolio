@@ -93,8 +93,40 @@ def _s10_done(drive: Path) -> bool:
     return all((res / f).exists() for f in ("throughput.json", "solver.json"))
 
 
+def measured_num_envs(drive: Path, fallback: int) -> tuple[int, str]:
+    """
+    The batch size S2's throughput sweep actually measured, if it exists.
+
+    Prefer a measurement over a default. `--num-envs` defaults to 2048 because
+    something has to be written down, but 2048 is a guess about a GPU nobody
+    had seen; the sweep reports the knee on the hardware this account was
+    actually given, which on a smaller card can be several times lower and on
+    a larger one several times higher. Guessing high wastes the lease on
+    compiles and risks OOM; guessing low wastes it on idle SMs.
+    """
+    f = drive / "s2_num_envs.json"
+    if not f.exists():
+        return fallback, f"default (no measurement in Drive yet)"
+    try:
+        d = json.loads(f.read_text())
+        n = int(d["num_envs"])
+        sps = d.get("steps_per_s")
+        why = "measured knee"
+        if sps:
+            why += f", {sps:,.0f} steps/s"
+        if d.get("device_kind_reported"):
+            why += f" on {d['device_kind_reported']} as reported"
+        return n, why
+    except (OSError, ValueError, KeyError) as exc:
+        # A corrupt sizing file must not take the session down; the default is
+        # a perfectly serviceable batch size, it is just not the best one.
+        return fallback, f"default ({type(exc).__name__} reading {f.name})"
+
+
 def plan(drive: Path, max_hours: float, num_envs: int) -> list[Job]:
     jobs: list[Job] = []
+    num_envs, why = measured_num_envs(drive, num_envs)
+    print(f"batch size: {num_envs:,} ({why})")
 
     # Before anything is charged against the quota, prove the preemption story
     # works on this machine. `--smoke --resume` with a mirror runs four
