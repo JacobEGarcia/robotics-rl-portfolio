@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Closing the Reality Gap — Jacob E. Garcia</title>
-<meta name="description" content="Reinforcement learning written from scratch, tendon actuator modeling in MuJoCo, and a simulator fitted to a physical Franka Panda. Six projects, seven silent bugs.">
+<meta name="description" content="Reinforcement learning written from scratch, muscle and hydraulic actuator modeling in MuJoCo, and a simulator fitted to a physical Franka Panda. Sixteen projects, twenty-two silent bugs.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -81,6 +81,10 @@ h1 i{font-style:italic;color:var(--ink2)}
 
 /* ---------------- chapters ---------------- */
 article{padding:96px 0;border-bottom:1px solid var(--rule)}
+.correction{border-left:2px solid var(--amber);padding:14px 0 14px 18px;margin-top:26px;
+  font-size:15px;color:var(--faint)}
+.correction b{color:var(--amber);font-weight:600}
+.correction a{color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.18)}
 .chapno{font-family:var(--mono);font-size:11.5px;letter-spacing:.2em;color:var(--faint);
   margin:0 0 20px;text-transform:uppercase}
 h2{font-family:var(--serif);font-weight:300;font-size:clamp(32px,4.6vw,50px);line-height:1.08;
@@ -185,6 +189,9 @@ footer a:hover{color:var(--amber)}
     <a href="#tendon">Tendons</a>
     <a href="#algorithms">Algorithms</a>
     <a href="#speed">Speed</a>
+    <a href="#muscle">Muscle</a>
+    <a href="#hydraulic">Water</a>
+    <a href="#instruments">Instruments</a>
     <a href="#method">Method</a>
     <a href="kare.html">1-Bit Edition</a>
     <a href="https://github.com/JacobEGarcia/robotics-rl-portfolio">Source ↗</a>
@@ -195,8 +202,8 @@ footer a:hover{color:var(--amber)}
 <section class="titlepage"><div class="sheet">
   <p class="kicker">Robotics · Scaling Laws · Reinforcement Learning · Sim-to-Real</p>
   <h1>Closing the <i>reality gap</i></h1>
-  <p class="standfirst">Seven projects on what it takes to measure a robot-learning claim honestly —
-     from the scaling laws of imitation to the distance between a simulator and a physical arm.</p>
+  <p class="standfirst">Sixteen projects on what it takes to measure a robot-learning claim honestly,
+     from the scaling laws of imitation to the fluid budget of a body that runs on water.</p>
 
   <div class="colophon">
     <span>Author<b>Jacob E. Garcia</b></span>
@@ -214,7 +221,10 @@ footer a:hover{color:var(--amber)}
     <figure><span class="n">56.7%</span><span class="l">Reality gap closed<br>on held-out data</span></figure>
     <figure><span class="n sage">28.3×</span><span class="l">JAX throughput<br>same CPU</span></figure>
     <figure><span class="n">70</span><span class="l">Training runs<br>in the scaling grid</span></figure>
-    <figure><span class="n">13</span><span class="l">Silent bugs found<br>none raised an exception</span></figure>
+    <figure><span class="n">22</span><span class="l">Silent bugs found<br>none raised an exception</span></figure>
+    <figure><span class="n amber">17<span style="font-size:26px"> / 50</span></span><span class="l">Leg muscles no braid<br>can match, at any angle</span></figure>
+    <figure><span class="n sky">3.0×</span><span class="l">Won by choosing how<br>to ration a pump</span></figure>
+    <figure><span class="n sage">0.0<span style="font-size:26px"> N</span></span><span class="l">Force muscles exert<br>on their own base</span></figure>
   </div>
 </div></section>
 
@@ -603,6 +613,12 @@ footer a:hover{color:var(--amber)}
     <p>The distinction matters for control. Friction hysteresis can be reduced with better routing
        or compensated with a model. <strong>Bistability cannot.</strong> It is intrinsic to the
        kinematics, and a controller either plans around it or gets surprised by it.</p>
+
+    <p class="correction"><b>Corrected in Chapter Eight.</b> The widths quoted above are not
+       converged with respect to the settling cap this measurement used. Holding each level longer
+       shrinks the zero-friction width from 0.207 rad to 0.032 and it is still falling. The
+       monotone rise with friction survives; the specific figure of 0.207 rad, and its attribution
+       to bistability, do not. <a href="#instruments">See the convergence sweep &rarr;</a></p>
   </div>
 </div></article>
 
@@ -686,11 +702,273 @@ footer a:hover{color:var(--amber)}
   </div>
 </div></article>
 
+<!-- ============================================ VI — MUSCLE ============================================ -->
+<article id="muscle"><div class="sheet">
+  <div class="col">
+    <p class="chapno">Chapter Six</p>
+    <h2>Muscles are not <i>motors</i></h2>
+    <p class="deck">A whole-body musculoskeletal model with 700 Hill-type actuators over 85 degrees
+       of freedom, and six studies on what changes when the thing pulling the tendon has a state
+       of its own.</p>
+
+    <p>Every other humanoid in the standard model library is torque-actuated: one motor per joint,
+       force commanded directly, available torque independent of pose. A muscle is none of those
+       things. It pulls only, its force depends on its own length and shortening velocity, and
+       there are far more of them than there are joints to move.</p>
+
+    <p>MS-Human-700 is the closest public model with all three properties. It is not a model of any
+       particular robot, and nothing here claims otherwise. It is a testbed for the control problems
+       muscle-like actuation creates regardless of whether the contractile element is protein or a
+       pneumatic bladder.</p>
+  </div>
+
+  <figure class="plate bleed">
+    <img src="media/s9/muscle_characterisation.png" alt="Moment-arm rank, force-length decomposition, and activation step response">
+    <figcaption><b>Plate 21 · The plant</b>Left, the joint directions no activation pattern can
+      drive. Centre, the contractile and passive elements separated, because their sum hides the
+      Hill curve entirely. Right, activation chasing a step command at two integration steps.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p>The moment-arm matrix has rank <strong>65</strong> of 85, identically at every one of 24
+       sampled poses. Two numbers follow. The activation null space is <strong>635-dimensional</strong>,
+       so activation is not recoverable from joint torque: enormously many patterns produce the
+       same motion and differ only in stiffness. And 20 joint directions are unreachable, six of
+       them the floating base, which no internal force can move.</p>
+
+    <p>That last one is the check the rest of the chapter rests on. Across random activation
+       vectors, the generalised force on the three base translation degrees of freedom is
+       <strong>0.0 N, exactly</strong>. Newton's third law, not a fit. A non-zero answer would have
+       invalidated everything downstream.</p>
+  </div>
+
+  <figure class="plate">
+    <img src="media/s9/recruitment_knee.png" alt="Quadriceps group recruited at full activation, rest of the body idle">
+    <figcaption><b>Plate 22 · Recruitment</b>The five muscles that extend the right knee, driven to
+      full activation while the other 695 sit near zero. Selected by measuring the moment-arm
+      matrix, not by matching muscle names.</figcaption>
+  </figure>
+
+  <figure class="plate bleed">
+    <img src="media/s9/synergies.png" alt="Variance accounted for against synergy count, with a shuffled null control">
+    <figcaption><b>Plate 23 · Synergies</b>Five fixed patterns account for 90% of the activation
+      variance across 387 stance problems, which is where the human EMG literature lands. The
+      shuffled control, which preserves every marginal and destroys the structure, never gets
+      there.</figcaption>
+  </figure>
+
+  <div class="pull">Five patterns explain ninety per cent of the activation and deliver seventy per
+    cent of the force.
+    <cite>The gap between the two curves in Plate 23</cite></div>
+
+  <div class="col">
+    <p>Activation-space variance is the metric the synergy literature uses, and on this plant it
+       overstates functional adequacy badly. Muscle gains span 25 N to 6,200 N, so a small
+       activation error on a strong muscle is a large torque error. If you are compressing a
+       controller onto a synergy basis, score it on what it delivers, not on what it explains.</p>
+
+    <p>Two more results were not the hypothesis. Co-contraction is supposed to stiffen a joint, and
+       here its <strong>sign changes with joint angle at every joint measured</strong>, negative
+       over roughly 40% of each range. And a command derived from a torque model loses
+       <strong>10.6%</strong> of the required joint torque at walking cadence, recovered to 2.0% by
+       inverting the actuator dynamics in closed form.</p>
+  </div>
+
+  <figure class="plate">
+    <video src="media/s9/film_impedance.mp4" autoplay loop muted playsinline></video>
+    <figcaption><b>Plate 24 · Opposite outcomes</b>Two knees, identical full co-contraction,
+      released from a held equilibrium after the same nudge. At one angle the joint returns to
+      within 0.002 rad. At the other it runs away 0.557 rad.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p>The model's shipped integration step misintegrates the fastest state it has by 15% of full
+       scale: activation is advanced by explicit Euler at 2 ms against a 5 ms time constant. A
+       10-90% rise time is not merely inaccurate there, it is <em>unbracketed</em>, because the
+       first step jumps from zero to 0.4 and never lands between the thresholds.</p>
+
+    <p>One bug in this chapter is worth naming because it had already produced a published number.
+       The model encodes its knee and shoulder kinematics as 42 equality couplings, and a forward
+       pass computes constraint <em>forces</em> without projecting <em>positions</em>. Writing a
+       driver joint therefore leaves its dependents stale, and every moment arm is then evaluated
+       at a configuration the model does not admit. A torque swing first reported as 26.6× is
+       <strong>1.33×</strong> once the dependent joints are projected.</p>
+  </div>
+</div></article>
+
+<!-- ============================================ VII — WATER ============================================ -->
+<article id="hydraulic"><div class="sheet">
+  <div class="col">
+    <p class="chapno">Chapter Seven</p>
+    <h2>A machine that runs on <i>water</i></h2>
+    <p class="deck">Hill muscles are a good model of a muscle and the wrong model of a braided
+       hydraulic actuator. Building the right one, from published specifications, and asking what
+       it takes to fill a leg with them.</p>
+
+    <p>The previous chapter found two things a Hill muscle cannot represent for an android driven by
+       fluid: it carries no series elasticity, which is why its co-contraction stiffness changes
+       sign, and its activation lag is a fixed filter rather than a valve moving a volume. So this
+       chapter builds a McKibben-class actuator, a bladder inside an inextensible braided sleeve,
+       and sizes it from figures its manufacturer has published.</p>
+
+    <p>The sizing is an inference rather than a fit. A published figure of over 30% unloaded
+       contraction constrains the rest braid angle below 34.4 degrees, on its own, through the
+       closed form for maximum contraction. A published 3 gram fibre at a kilogram of force then
+       sets the radius. Every comparison afterwards is an inequality in the direction the
+       specification states.</p>
+  </div>
+
+  <figure class="plate bleed">
+    <img src="media/s11/myofiber.png" alt="Force against contraction, loaded step response, pump budget, and antagonist stiffness">
+    <figcaption><b>Plate 25 · The actuator</b>Force vanishing at the braid's blocking angle of
+      54.736 degrees, the classic result this implementation is checked against. Right, an
+      antagonist pair whose stiffness is positive everywhere, which the Hill model's was not.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p>Then the arithmetic turns unkind. A braided sleeve's maximum contraction rises as its braid
+       angle falls and has a ceiling, approached and never reached, of
+       <strong>1 − 1/√3 = 42.26%</strong>. That is a bound on the actuator class, not on a
+       particular design.</p>
+
+    <p>A human leg's muscles need a median excursion of 37.3% of their longest length, and
+       <strong>seventeen of fifty exceed the ceiling entirely.</strong> They are not a random
+       seventeen. They are the glutei, the adductors, sartorius, gracilis and psoas: the long-throw
+       hip muscles. Anatomy picked exactly the muscles a braid is worst at.</p>
+  </div>
+
+  <figure class="plate bleed">
+    <img src="media/s12/myofiber_leg.png" alt="Excursion ceiling, per-muscle requirement, transmission cost, and sizing comparison">
+    <figcaption><b>Plate 26 · What does not fit</b>Each bar one leg muscle. Red are the seventeen no
+      braid can match at any braid angle. The fix is a stroke-amplifying transmission, paid for
+      linearly in fluid volume.</figcaption>
+  </figure>
+
+  <div class="pull">A machine built to match a human's peak capability is 2.7× the machine needed to
+    do a human's actual work.
+    <cite>Peak isometric force against the force stance tasks use</cite></div>
+
+  <div class="col">
+    <p>Sizing target turns out to matter more than any of it. Summed peak isometric force for one
+       leg is 50,137 N; the force actually used across 277 stance problems is 18,684 N. That is
+       5.69 litres of working fluid against 2.19, and 5,111 published fibres against 1,905, for the
+       same limb doing the same job.</p>
+
+    <p>And the fluid itself is rationed, which is a constraint no torque-actuated humanoid has an
+       analogue of. A motor draws current from a bus that can usually supply it. Here, tracking a
+       stance cycle demands a mean 25.5 litres per minute against a peak of 60.0, so the published
+       40 litre pump is <strong>flow-limited 26.6% of every cycle</strong>.</p>
+  </div>
+
+  <figure class="plate bleed">
+    <img src="media/s13/flow_control.png" alt="Torque error against pump capacity for four allocation policies">
+    <figcaption><b>Plate 27 · Rationing</b>Four ways to divide a pump that cannot serve everyone.
+      Choosing well is worth 3.0× on identical hardware, and the policy that knows what the limb is
+      trying to do is not the one that wins.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p>Equal-share water-filling scores 0.139 relative torque error against uniform scaling's 0.417.
+       The torque-weighted policy, which prioritises by how much each actuator moves the joints being
+       tracked, comes second. At the worst instant equal-share fully satisfies 23 of 27 requests and
+       concentrates the entire shortfall on four, while uniform serves none of them fully and puts
+       everybody at 66.7%. Torque error is a norm, so many small correct contributions beat
+       everything being slightly wrong.</p>
+
+    <p>Serving actuators in proportion to what they asked for, meanwhile, produces allocations
+       <em>identical to uniform scaling</em> at every timestep. It sounds like a policy. It is
+       uniform scaling, restated.</p>
+  </div>
+</div></article>
+
+<!-- ============================================ VIII — INSTRUMENTS ============================================ -->
+<article id="instruments"><div class="sheet">
+  <div class="col">
+    <p class="chapno">Chapter Eight</p>
+    <h2>Sensing, switching, and a number that was <i>wrong</i></h2>
+    <p class="deck">Three studies that each set out to measure one thing and found a different one,
+       including one that corrects an earlier chapter of this document.</p>
+
+    <p>A musculoskeletal robot is hard to instrument. There is no clean place to put a joint encoder
+       on a tendon-routed skeleton. But close a valve and the fluid is trapped, so any change in
+       contraction has to be absorbed by pressure, and a closed actuator becomes its own encoder.
+       In principle.</p>
+  </div>
+
+  <figure class="plate bleed">
+    <img src="media/s14/proprioception.png" alt="Open and closed valve stiffness, sensing range, estimator error, and integration drift">
+    <figcaption><b>Plate 28 · A lock, not a sensor</b>Trapping near-incompressible fluid makes the
+      actuator up to 246× stiffer. The same stiffness that holds a joint at zero power saturates
+      the sensor within a fraction of a millimetre.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p>The full pressure scale covers between 0.215 and 2.44 mm of travel, under 8% of the stroke,
+       at sub-micron resolution. Superb force and contact sensing; useless for pose. The open-valve
+       alternative, integrating flow, drifts <strong>85% of the stroke in sixty seconds</strong> at
+       one per cent flow error, because integration has no restoring term.</p>
+
+    <p>Pose is nonetheless fully observable from the pressure vector, rank 5 of 5. The two modes fail
+       in complementary ways, which suggests treating valve closures as position fixes: a limb that
+       occasionally holds still is a limb that stays calibrated.</p>
+  </div>
+
+  <figure class="plate bleed">
+    <img src="media/s15/valve.png" alt="Ripple against carrier frequency, tracking error with minimum on-time, achievable duty levels">
+    <figcaption><b>Plate 29 · A cliff, not a rolloff</b>Pulse-width modulation only averages when
+      its period is short against the actuator's own time constant. Below three kilohertz the
+      pressure swings full scale every cycle.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p>The actuator fills with a time constant of 0.354 ms. A solenoid running at 100 Hz has a period
+       twenty-eight times that, so each cycle fully charges and fully discharges: the result is a
+       square wave between empty and supply, not a held mid-pressure. Ripple collapses by a factor
+       of <strong>2,565</strong> across the transition, which is a cliff rather than the textbook
+       inverse-frequency rolloff, and fitting a power law across it measures the wrong thing.</p>
+
+    <p>Getting above the cliff is the whole game, and a minimum on-time is what stops you: raising
+       the carrier to fix ripple directly worsens duty resolution. A tenth of a millisecond, fast
+       for a solenoid, costs 440×. The cheap fix is to add hydraulic compliance, which directly
+       undoes the lock in Plate 28. Two measurements taken independently, constraining each other.</p>
+  </div>
+
+  <div class="pull">The finger reproduced Chapter Three to three decimal places, and then broke it.
+    <cite>What happens when you vary a parameter nobody varied</cite></div>
+
+  <figure class="plate bleed">
+    <img src="media/s16/myofiber_finger.png" alt="Hysteresis against friction for ideal and braided actuators, loop shape, dead band">
+    <figcaption><b>Plate 30 · The correction</b>The same finger from Chapter Three with a real
+      actuator behind it. Driven by an ideal force source it reproduces the earlier result exactly,
+      which is the gate that makes the rest of it credible.</figcaption>
+  </figure>
+
+  <div class="col">
+    <p>Chapter Three reported 0.207 rad of hysteresis at <em>zero</em> friction, argued correctly
+       that friction cannot explain it, and attributed it to snap-through bistability. The first
+       half of that argument still stands. The trouble is the settling cap.</p>
+
+    <p>That measurement holds each command until the joint stops moving or a four-second cap
+       expires, and notes that some levels hit the cap. It never varied the cap. Varying it:
+       <strong>0.207 rad at four seconds, 0.117 at ten, 0.055 at thirty, 0.032 at eighty</strong>,
+       monotone and still falling. The published figures measure how long the sweep waited.</p>
+
+    <p>The qualitative claim survives at every cap tested: hysteresis rises monotonically with
+       tendon friction. That was the study's main result and it is robust. The absolute table, and
+       the attribution of 0.207 rad specifically to bistability, are not. The width trends toward
+       zero, which is what frictionless physics predicts and what incomplete settling looks like.</p>
+
+    <p>The braid, for its part, cuts hysteresis by 49 to 85% against an ideal force source, because
+       a compliant actuator cannot hold its command through a snap. Its own absolute numbers are
+       reported as upper bounds: that arm does not settle either, and saying so is the point.</p>
+  </div>
+</div></article>
+
 <!-- ============================================ V — METHOD ============================================ -->
 <article id="method"><div class="sheet">
   <div class="col">
-    <p class="chapno">Chapter Six</p>
-    <h2>Thirteen bugs, none of which raised an <i>exception</i></h2>
+    <p class="chapno">Chapter Nine</p>
+    <h2>Twenty-two bugs, none of which raised an <i>exception</i></h2>
     <p class="deck">Every result here was checked against something external. This is what that
        discipline caught.</p>
 
@@ -771,6 +1049,60 @@ footer a:hover{color:var(--amber)}
          fails every episode resamples to itself and reports certainty. Replaced with Wilson
          intervals, which have correct coverage at the extremes — where a reader most needs to
          see uncertainty.</p></div></div>
+    <div class="bug"><div>
+      <h5>A NaN that was telling the truth</h5>
+      <p>A rise time came back NaN. "Fixing" it to fall back on the first sample produced a
+         plausible 25.9 ms that sat neatly beside the converged 31.8 and was entirely an artifact
+         of the step size: at that step the first move clears the 10% threshold, so the window is
+         never bracketed. The NaN was correct output.</p></div></div>
+    <div class="bug"><div>
+      <h5>Actuator index is not tendon index</h5>
+      <p>Both arrays are length 700 in this model, so colouring tendons by activation index
+         compiles, runs, and renders the wrong muscles. The orderings are a non-trivial
+         permutation. Found because a render lit a strip of shin while the quadriceps it had
+         actually activated stayed blue.</p></div></div>
+    <div class="bug"><div>
+      <h5>Equality-coupled joints that do not follow their drivers</h5>
+      <p>Forty-two couplings encode the knee and shoulder kinematics, and a forward pass computes
+         constraint <em>forces</em> without projecting <em>positions</em>. Writing a driver joint
+         leaves its dependents stale by up to 0.60, and every moment arm is then evaluated at a
+         configuration the model does not admit. It had already produced a published number: a
+         torque swing of 26.6× that is 1.33× once projected.</p></div></div>
+    <div class="bug"><div>
+      <h5>A constraint that silently stopped existing</h5>
+      <p>The flow study tracked only the bladder's compliance volume and missed the braid's
+         geometric volume, four orders of magnitude larger. Mean demand read 0.003 L/min, nothing
+         was ever rationed, and all four allocation policies tied at exactly zero error. Every
+         check passed, because a constraint that never binds is trivially respected. Four
+         different algorithms agreeing exactly is the tell.</p></div></div>
+    <div class="bug"><div>
+      <h5>A bisection bracket that forbade extension</h5>
+      <p>A braid pulled past its rest length pulls <em>harder</em>, which is the state an
+         antagonist pair puts one of its members into. Capping the bracket at rest length pinned
+         the stretched actuator at the bound and gave a flat joint-stiffness curve at exactly
+         <code>k·r²</code>, which is the answer you get when the solver has stopped solving.</p></div></div>
+    <div class="bug"><div>
+      <h5>A pinned solve that returns a number, not an error</h5>
+      <p>One low-pressure point still landed on the bound with an −11 N residual against a nominal
+         1e−8, and set the reported maximum stiffness for its whole pressure level. The solver now
+         returns a convergence flag and the statistics exclude and count the failures.</p></div></div>
+    <div class="bug"><div>
+      <h5>A median where a minimum belonged</h5>
+      <p>The achievable-duty check compared the median gap in a discrete set against a closed form
+         and reported a 25% error. The closed form was right: a short grid's top end is irregular
+         and the median picks the leftover up. The resolution floor a controller feels is the
+         smallest gap, not the typical one.</p></div></div>
+    <div class="bug"><div>
+      <h5>An under-resolved run that looked like physics</h5>
+      <p>At a fixed integration step the fastest carrier got forty samples per period and reported
+         an error that <em>rose</em> with frequency, which reads as a real high-frequency penalty.
+         It was arithmetic. The step now adapts, and the rise disappears.</p></div></div>
+    <div class="bug"><div>
+      <h5>A different statistic, presented as a comparison</h5>
+      <p>One study measured the <em>maximum</em> separation between two branches while the study it
+         was being compared against measures the <em>mean</em> gap over a trimmed grid. It reported
+         0.863 rad against 0.207 for the identical case and looked like a finding. Both metrics are
+         defensible; using one of each and subtracting is not.</p></div></div>
   </div>
 
   <div class="col">
