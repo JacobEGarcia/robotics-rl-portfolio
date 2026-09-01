@@ -1,0 +1,1136 @@
+{
+  "leg_length_m": 0.9358,
+  "body_weight_N": 590.7,
+  "summary": {
+    "n_feasible": 9,
+    "n_infeasible": 2,
+    "feasible_range_m": [
+      0.3,
+      0.94
+    ],
+    "optimal_step_m": 0.46,
+    "optimal_cost_per_metre": 2.7225,
+    "minimum_is_interior": true,
+    "cost_at_half_optimal": 5.032,
+    "cost_at_double_optimal": 15.133200000000006,
+    "penalty_for_halving": 1.848,
+    "within_human_preferred": false,
+    "distance_from_human_band_m": 0.19,
+    "all_optimisations_improved": true,
+    "saturates_at_or_above_m": 0.78
+  },
+  "load_optima_m": {
+    "1.0": 0.46,
+    "1.25": 0.46,
+    "1.5": 0.46
+  },
+  "load_optimum_shift_m": 0.0,
+  "load_optimum_unchanged_at_grid": true,
+  "exponent_optima_m": {
+    "2.0": 0.54,
+    "3.0": 0.46,
+    "5.0": 0.38
+  },
+  "optimum_range_over_exponents_m": [
+    0.38,
+    0.54
+  ],
+  "optimum_robust_to_exponent": false,
+  "grid_spacing_m": 0.08,
+  "sweep": [
+    {
+      "length_m": 0.3,
+      "feasible": true,
+      "cost_per_step": 1.5096,
+      "cost_per_metre": 5.032,
+      "peak_activation": 0.5763,
+      "posture": [
+        0.0091,
+        0.0089,
+        0.2024
+      ],
+      "start_cost": 7.9968,
+      "improved_on_start": true
+    },
+    {
+      "length_m": 0.38,
+      "feasible": true,
+      "cost_per_step": 1.2468,
+      "cost_per_metre": 3.2811,
+      "peak_activation": 0.5647,
+      "posture": [
+        0.019,
+        -0.0094,
+        0.1859
+      ],
+      "start_cost": 7.6308,
+      "improved_on_start": true
+    },
+    {
+      "length_m": 0.46,
+      "feasible": true,
+      "cost_per_step": 1.2524,
+      "cost_per_metre": 2.7225,
+      "peak_activation": 0.5672,
+      "posture": [
+        0.0153,
+        0.0027,
+        0.1995
+      ],
+      "start_cost": 7.7506,
+      "improved_on_start": true
+    },
+    {
+      "length_m": 0.54,
+      "feasible": true,
+      "cost_per_step": 1.5535,
+      "cost_per_metre": 2.8769,
+      "peak_activation": 0.5693,
+      "posture": [
+        0.0183,
+        -0.0392,
+        0.2071
+      ],
+      "start_cost": 8.4173,
+      "improved_on_start": true
+    },
+    {
+      "length_m": 0.62,
+      "feasible": true,
+      "cost_per_step": 2.2587,
+      "cost_per_metre": 3.643,
+      "peak_activation": 0.6684,
+      "posture": [
+        0.0128,
+        -0.0184,
+        0.2029
+      ],
+      "start_cost": 9.7623,
+      "improved_on_start": true
+    },
+    {
+      "length_m": 0.7,
+      "feasible": true,
+      "cost_per_step": 3.5051,
+      "cost_per_metre": 5.0072,
+      "peak_activation": 0.8563,
+      "posture": [
+        -0.0878,
+        -0.9149,
+        0.3573
+      ],
+      "start_cost": 11.9738,
+      "improved_on_start": true
+    },
+    {
+      "length_m": 0.78,
+      "feasible": true,
+      "cost_per_step": 5.4502,
+      "cost_per_metre": 6.9874,
+      "peak_activation": 1.0,
+      "posture": [
+        -0.699,
+        -0.3891,
+        0.4499
+      ],
+      "start_cost": 15.7832,
+      "improved_on_start": true
+    },
+    {
+      "length_m": 0.86,
+      "feasible": true,
+      "cost_per_step": 8.9524,
+      "cost_per_metre": 10.4097,
+      "peak_activation": 1.0,
+      "posture": [
+        -0.538,
+        0.0911,
+        0.4496
+      ],
+      "start_cost": 23.8845,
+      "improved_on_start": true
+    },
+    {
+      "length_m": 0.94,
+      "feasible": true,
+      "cost_per_step": 15.7052,
+      "cost_per_metre": 16.7077,
+      "peak_activation": 1.0,
+      "posture": [
+        -0.8549,
+        0.8598,
+        0.4591
+      ],
+      "start_cost": null,
+      "improved_on_start": true
+    },
+    {
+      "length_m": 1.02,
+      "feasible": false,
+      "cost_per_step": null,
+      "cost_per_metre": null,
+      "peak_activation": null,
+      "posture": [
+        -0.835,
+        1.0617,
+        0.4767
+      ],
+      "start_cost": null,
+      "improved_on_start": false
+    },
+    {
+      "length_m": 1.1,
+      "feasible": false,
+      "cost_per_step": null,
+      "cost_per_metre": null,
+      "peak_activation": null,
+      "posture": [
+        -1.52,
+        0.84,
+        0.4867
+      ],
+      "start_cost": null,
+      "improved_on_start": false
+    }
+  ],
+  "load_sweeps": {
+    "1.0": [
+      {
+        "length_m": 0.3,
+        "feasible": true,
+        "cost_per_step": 1.5096,
+        "cost_per_metre": 5.032,
+        "peak_activation": 0.5763,
+        "posture": [
+          0.0091,
+          0.0089,
+          0.2024
+        ],
+        "start_cost": 7.9968,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.38,
+        "feasible": true,
+        "cost_per_step": 1.2468,
+        "cost_per_metre": 3.2811,
+        "peak_activation": 0.5647,
+        "posture": [
+          0.019,
+          -0.0094,
+          0.1859
+        ],
+        "start_cost": 7.6308,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.46,
+        "feasible": true,
+        "cost_per_step": 1.2524,
+        "cost_per_metre": 2.7225,
+        "peak_activation": 0.5672,
+        "posture": [
+          0.0153,
+          0.0027,
+          0.1995
+        ],
+        "start_cost": 7.7506,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.54,
+        "feasible": true,
+        "cost_per_step": 1.5535,
+        "cost_per_metre": 2.8769,
+        "peak_activation": 0.5693,
+        "posture": [
+          0.0183,
+          -0.0392,
+          0.2071
+        ],
+        "start_cost": 8.4173,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.62,
+        "feasible": true,
+        "cost_per_step": 2.2587,
+        "cost_per_metre": 3.643,
+        "peak_activation": 0.6684,
+        "posture": [
+          0.0128,
+          -0.0184,
+          0.2029
+        ],
+        "start_cost": 9.7623,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.7,
+        "feasible": true,
+        "cost_per_step": 3.5051,
+        "cost_per_metre": 5.0072,
+        "peak_activation": 0.8563,
+        "posture": [
+          -0.0878,
+          -0.9149,
+          0.3573
+        ],
+        "start_cost": 11.9738,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.78,
+        "feasible": true,
+        "cost_per_step": 5.4502,
+        "cost_per_metre": 6.9874,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.699,
+          -0.3891,
+          0.4499
+        ],
+        "start_cost": 15.7832,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.86,
+        "feasible": true,
+        "cost_per_step": 8.9524,
+        "cost_per_metre": 10.4097,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.538,
+          0.0911,
+          0.4496
+        ],
+        "start_cost": 23.8845,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.94,
+        "feasible": true,
+        "cost_per_step": 15.7052,
+        "cost_per_metre": 16.7077,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.8549,
+          0.8598,
+          0.4591
+        ],
+        "start_cost": null,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 1.02,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -0.835,
+          1.0617,
+          0.4767
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      },
+      {
+        "length_m": 1.1,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -1.52,
+          0.84,
+          0.4867
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      }
+    ],
+    "1.25": [
+      {
+        "length_m": 0.3,
+        "feasible": true,
+        "cost_per_step": 2.9021,
+        "cost_per_metre": 9.6735,
+        "peak_activation": 0.7194,
+        "posture": [
+          0.0091,
+          0.0089,
+          0.2024
+        ],
+        "start_cost": 17.0133,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.38,
+        "feasible": true,
+        "cost_per_step": 2.4399,
+        "cost_per_metre": 6.4207,
+        "peak_activation": 0.7144,
+        "posture": [
+          0.0175,
+          -0.0002,
+          0.2046
+        ],
+        "start_cost": 16.1919,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.46,
+        "feasible": true,
+        "cost_per_step": 2.4606,
+        "cost_per_metre": 5.3492,
+        "peak_activation": 0.7076,
+        "posture": [
+          0.013,
+          0.0003,
+          0.1989
+        ],
+        "start_cost": 16.502,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.54,
+        "feasible": true,
+        "cost_per_step": 3.1263,
+        "cost_per_metre": 5.7894,
+        "peak_activation": 0.7127,
+        "posture": [
+          0.0153,
+          -0.0602,
+          0.2109
+        ],
+        "start_cost": 18.1014,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.62,
+        "feasible": true,
+        "cost_per_step": 4.6206,
+        "cost_per_metre": 7.4526,
+        "peak_activation": 0.8686,
+        "posture": [
+          0.002,
+          0.0152,
+          0.1829
+        ],
+        "start_cost": 21.5015,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.7,
+        "feasible": true,
+        "cost_per_step": 7.2813,
+        "cost_per_metre": 10.4018,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.6061,
+          -0.3576,
+          0.421
+        ],
+        "start_cost": 29.8077,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.78,
+        "feasible": true,
+        "cost_per_step": 12.4112,
+        "cost_per_metre": 15.9117,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.7977,
+          0.7059,
+          0.4493
+        ],
+        "start_cost": null,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.86,
+        "feasible": true,
+        "cost_per_step": 23.6715,
+        "cost_per_metre": 27.525,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.7837,
+          0.7919,
+          0.494
+        ],
+        "start_cost": null,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.94,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -0.835,
+          1.0617,
+          0.4767
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      },
+      {
+        "length_m": 1.02,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -0.835,
+          1.0617,
+          0.4767
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      },
+      {
+        "length_m": 1.1,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -1.52,
+          0.84,
+          0.4867
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      }
+    ],
+    "1.5": [
+      {
+        "length_m": 0.3,
+        "feasible": true,
+        "cost_per_step": 4.5823,
+        "cost_per_metre": 15.2744,
+        "peak_activation": 0.7824,
+        "posture": [
+          -0.0528,
+          0.0876,
+          0.0589
+        ],
+        "start_cost": null,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.38,
+        "feasible": true,
+        "cost_per_step": 3.53,
+        "cost_per_metre": 9.2895,
+        "peak_activation": 0.6611,
+        "posture": [
+          0.0144,
+          -0.0986,
+          -0.1488
+        ],
+        "start_cost": null,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.46,
+        "feasible": true,
+        "cost_per_step": 3.9838,
+        "cost_per_metre": 8.6605,
+        "peak_activation": 0.7198,
+        "posture": [
+          -0.0518,
+          -0.0007,
+          -0.0164
+        ],
+        "start_cost": null,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.54,
+        "feasible": true,
+        "cost_per_step": 5.4415,
+        "cost_per_metre": 10.0768,
+        "peak_activation": 0.8018,
+        "posture": [
+          0.02,
+          -0.1002,
+          0.1303
+        ],
+        "start_cost": null,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.62,
+        "feasible": true,
+        "cost_per_step": 8.2726,
+        "cost_per_metre": 13.3429,
+        "peak_activation": 1.0,
+        "posture": [
+          0.0128,
+          -0.0184,
+          0.2029
+        ],
+        "start_cost": null,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.7,
+        "feasible": true,
+        "cost_per_step": 13.9305,
+        "cost_per_metre": 19.9007,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.7846,
+          0.6898,
+          0.45
+        ],
+        "start_cost": null,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.78,
+        "feasible": true,
+        "cost_per_step": 28.7945,
+        "cost_per_metre": 36.916,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.8618,
+          0.8685,
+          0.4749
+        ],
+        "start_cost": null,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.86,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -0.835,
+          1.0617,
+          0.4767
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      },
+      {
+        "length_m": 0.94,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -0.835,
+          1.0617,
+          0.4767
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      },
+      {
+        "length_m": 1.02,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -0.835,
+          1.0617,
+          0.4767
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      },
+      {
+        "length_m": 1.1,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -0.835,
+          1.0617,
+          0.4767
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      }
+    ]
+  },
+  "exponent_sweeps": {
+    "2.0": [
+      {
+        "length_m": 0.3,
+        "feasible": true,
+        "cost_per_step": 4.1446,
+        "cost_per_metre": 13.8153,
+        "peak_activation": 0.6454,
+        "posture": [
+          0.013,
+          0.0003,
+          0.1989
+        ],
+        "start_cost": 13.5974,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.38,
+        "feasible": true,
+        "cost_per_step": 3.749,
+        "cost_per_metre": 9.8658,
+        "peak_activation": 0.6436,
+        "posture": [
+          0.0183,
+          -0.0392,
+          0.2071
+        ],
+        "start_cost": 13.2996,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.46,
+        "feasible": true,
+        "cost_per_step": 3.8442,
+        "cost_per_metre": 8.3569,
+        "peak_activation": 0.642,
+        "posture": [
+          0.0194,
+          -0.0531,
+          0.2106
+        ],
+        "start_cost": 13.5285,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.54,
+        "feasible": true,
+        "cost_per_step": 4.4568,
+        "cost_per_metre": 8.2534,
+        "peak_activation": 0.637,
+        "posture": [
+          0.0128,
+          -0.0184,
+          0.2029
+        ],
+        "start_cost": 14.3507,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.62,
+        "feasible": true,
+        "cost_per_step": 5.6254,
+        "cost_per_metre": 9.0732,
+        "peak_activation": 0.8904,
+        "posture": [
+          0.0128,
+          -0.0184,
+          0.2029
+        ],
+        "start_cost": 15.8016,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.7,
+        "feasible": true,
+        "cost_per_step": 7.3644,
+        "cost_per_metre": 10.5206,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.1575,
+          -1.172,
+          0.4401
+        ],
+        "start_cost": 18.4179,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.78,
+        "feasible": true,
+        "cost_per_step": 10.1647,
+        "cost_per_metre": 13.0317,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.6766,
+          -0.4294,
+          0.4492
+        ],
+        "start_cost": 23.2116,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.86,
+        "feasible": true,
+        "cost_per_step": 14.8192,
+        "cost_per_metre": 17.2316,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.6737,
+          -0.4424,
+          0.4503
+        ],
+        "start_cost": 31.4619,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.94,
+        "feasible": true,
+        "cost_per_step": 22.0204,
+        "cost_per_metre": 23.426,
+        "peak_activation": 1.0,
+        "posture": [
+          -1.3339,
+          1.3381,
+          0.6749
+        ],
+        "start_cost": null,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 1.02,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -0.835,
+          1.0617,
+          0.4767
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      },
+      {
+        "length_m": 1.1,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -1.52,
+          0.84,
+          0.4867
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      }
+    ],
+    "3.0": [
+      {
+        "length_m": 0.3,
+        "feasible": true,
+        "cost_per_step": 1.5096,
+        "cost_per_metre": 5.032,
+        "peak_activation": 0.5763,
+        "posture": [
+          0.0091,
+          0.0089,
+          0.2024
+        ],
+        "start_cost": 7.9968,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.38,
+        "feasible": true,
+        "cost_per_step": 1.2468,
+        "cost_per_metre": 3.2811,
+        "peak_activation": 0.5647,
+        "posture": [
+          0.019,
+          -0.0094,
+          0.1859
+        ],
+        "start_cost": 7.6308,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.46,
+        "feasible": true,
+        "cost_per_step": 1.2524,
+        "cost_per_metre": 2.7225,
+        "peak_activation": 0.5672,
+        "posture": [
+          0.0153,
+          0.0027,
+          0.1995
+        ],
+        "start_cost": 7.7506,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.54,
+        "feasible": true,
+        "cost_per_step": 1.5535,
+        "cost_per_metre": 2.8769,
+        "peak_activation": 0.5693,
+        "posture": [
+          0.0183,
+          -0.0392,
+          0.2071
+        ],
+        "start_cost": 8.4173,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.62,
+        "feasible": true,
+        "cost_per_step": 2.2587,
+        "cost_per_metre": 3.643,
+        "peak_activation": 0.6684,
+        "posture": [
+          0.0128,
+          -0.0184,
+          0.2029
+        ],
+        "start_cost": 9.7623,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.7,
+        "feasible": true,
+        "cost_per_step": 3.5051,
+        "cost_per_metre": 5.0072,
+        "peak_activation": 0.8563,
+        "posture": [
+          -0.0878,
+          -0.9149,
+          0.3573
+        ],
+        "start_cost": 11.9738,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.78,
+        "feasible": true,
+        "cost_per_step": 5.4502,
+        "cost_per_metre": 6.9874,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.699,
+          -0.3891,
+          0.4499
+        ],
+        "start_cost": 15.7832,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.86,
+        "feasible": true,
+        "cost_per_step": 8.9524,
+        "cost_per_metre": 10.4097,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.538,
+          0.0911,
+          0.4496
+        ],
+        "start_cost": 23.8845,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.94,
+        "feasible": true,
+        "cost_per_step": 15.7052,
+        "cost_per_metre": 16.7077,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.8549,
+          0.8598,
+          0.4591
+        ],
+        "start_cost": null,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 1.02,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -0.835,
+          1.0617,
+          0.4767
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      },
+      {
+        "length_m": 1.1,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -1.52,
+          0.84,
+          0.4867
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      }
+    ],
+    "5.0": [
+      {
+        "length_m": 0.3,
+        "feasible": true,
+        "cost_per_step": 0.1946,
+        "cost_per_metre": 0.6487,
+        "peak_activation": 0.5033,
+        "posture": [
+          -0.2449,
+          0.2993,
+          0.119
+        ],
+        "start_cost": 2.7665,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.38,
+        "feasible": true,
+        "cost_per_step": 0.1008,
+        "cost_per_metre": 0.2653,
+        "peak_activation": 0.4143,
+        "posture": [
+          -0.5085,
+          -0.0252,
+          -0.3713
+        ],
+        "start_cost": 2.5221,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.46,
+        "feasible": true,
+        "cost_per_step": 0.1381,
+        "cost_per_metre": 0.3002,
+        "peak_activation": 0.4772,
+        "posture": [
+          -0.0602,
+          0.0381,
+          0.0752
+        ],
+        "start_cost": 2.5614,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.54,
+        "feasible": true,
+        "cost_per_step": 0.2049,
+        "cost_per_metre": 0.3794,
+        "peak_activation": 0.5197,
+        "posture": [
+          0.0062,
+          0.0079,
+          0.1916
+        ],
+        "start_cost": 2.9311,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.62,
+        "feasible": true,
+        "cost_per_step": 0.3639,
+        "cost_per_metre": 0.587,
+        "peak_activation": 0.5326,
+        "posture": [
+          0.0028,
+          0.0072,
+          0.1828
+        ],
+        "start_cost": 3.7907,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.7,
+        "feasible": true,
+        "cost_per_step": 0.8055,
+        "cost_per_metre": 1.1507,
+        "peak_activation": 0.6706,
+        "posture": [
+          -0.0533,
+          -0.8354,
+          0.3337
+        ],
+        "start_cost": 5.4612,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.78,
+        "feasible": true,
+        "cost_per_step": 1.782,
+        "cost_per_metre": 2.2846,
+        "peak_activation": 0.8249,
+        "posture": [
+          -0.6842,
+          -0.3992,
+          0.4497
+        ],
+        "start_cost": 8.5242,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.86,
+        "feasible": true,
+        "cost_per_step": 3.9159,
+        "cost_per_metre": 4.5534,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.7946,
+          0.7144,
+          0.4499
+        ],
+        "start_cost": 15.6157,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 0.94,
+        "feasible": true,
+        "cost_per_step": 9.2613,
+        "cost_per_metre": 9.8525,
+        "peak_activation": 1.0,
+        "posture": [
+          -0.803,
+          0.9196,
+          0.456
+        ],
+        "start_cost": null,
+        "improved_on_start": true
+      },
+      {
+        "length_m": 1.02,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -0.835,
+          1.0617,
+          0.4767
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      },
+      {
+        "length_m": 1.1,
+        "feasible": false,
+        "cost_per_step": null,
+        "cost_per_metre": null,
+        "peak_activation": null,
+        "posture": [
+          -1.52,
+          0.84,
+          0.4867
+        ],
+        "start_cost": null,
+        "improved_on_start": false
+      }
+    ]
+  }
+}

@@ -3,6 +3,8 @@
 | # | Project | Status | Evidence |
 |---|---|---|---|
 | **S10** | GPU simulation: fidelity, throughput, solver cost | **Built, CPU-validated; GPU numbers pending** | `s10_gpu_scaling/README.md`, `colab/S10_gpu_scaling.ipynb` |
+| **S18** | Identifiability of a torque-only calibration rig | **Done, validated** | `media/s18/`, `s18_identifiability/README.md` |
+| **S17** | Effort-optimal gait economy | **Done, validated** (partial negative: shape yes, location no) | `media/s17/`, `s17_gait/README.md` |
 | **S16** | S4's finger with a braid behind it | **Done**; S4 correction validated, Myofiber values are upper bounds | `media/s16/`, `s16_myofiber_finger/README.md` |
 | **S15** | Switching-valve cost against a continuous one | **Done, validated** | `media/s15/`, `s15_valve/README.md` |
 | **S14** | Pressure proprioception | **Done, validated** | `media/s14/`, `s14_proprioception/README.md` |
@@ -20,11 +22,54 @@
 | **S2** | In-hand reorientation | **Built, unit-validated, untrained**, GPU trainer ready (`colab/S2_inhand.ipynb`) | `s2_inhand/`, see README |
 | **S3** | Domain randomization | **Complete and unit-validated, untrained**, both arms + held-out eval (`colab/S3_domain_rand.ipynb`) | `s3_domain_rand/` |
 
-**Fourteen of seventeen complete and validated.** S2, S3 and S10 are written and unit-tested; each needs GPU time, and each ships a Colab notebook that checkpoints through a preempted session (see `colab/README.md`). Site published at `docs/` (GitHub Pages ready).
+**Sixteen of nineteen complete and validated.** S2, S3 and S10 are written and unit-tested; each needs GPU time, and each ships a Colab notebook that checkpoints through a preempted session (see `colab/README.md`). Site published at `docs/` (GitHub Pages ready).
 
 Every completed project was validated against something external: a published
 baseline, an independent implementation, a physical consistency check, or
 held-out data the optimiser never saw.
+
+---
+
+## S17 / S18: what the mechanics choose, and what a rig could measure (2026-09-01)
+
+**S17, gait economy.** Effort per metre against step length, with the knee and
+ankle profiles optimised at every length rather than assumed. The U-shape is
+real, with an interior minimum: halving the optimal step costs 1.85x, doubling
+it 5.6x, and past 0.94 m the leg cannot produce the torque at all.
+
+The hypothesis failed on the location. The optimum is **0.46 m against a human
+0.65-0.75 m**, roughly 30% short, and it moves two grid cells (0.38 to 0.54)
+with the effort exponent, so it is not a robust prediction either. The
+diagnosis is in the optimised postures: the cheapest quasi-static gait is
+stiff-legged, because a straight knee is cheap to hold and this model contains
+none of the costs (landing shock, swing clearance, elastic return) that make
+bending it worthwhile. Quasi-static mechanical effort explains the shape of the
+cost curve and not the location of its minimum.
+
+**S18, identifiability.** The real-data version of muscle-parameter sysID needs
+an EMG-plus-mocap dataset this repository does not have, so this asks the prior
+question, which needs no data: what could a torque-only rig recover? Because
+torque is affine in activation, scaling actuator i's peak force scales column i
+of the plant, so torque is **linear in the unknown scales** and identifiability
+is a rank question.
+
+Rank grows by exactly 5 per condition, the number of joints measured, and
+reaches full rank 50 at **16 poses**. Conditioning is at its *worst* (2,507)
+right where the system becomes solvable and keeps improving to 618 at 128
+poses, so rank and conditioning give different advice about when to stop
+collecting. At 0.1 N·m sensor noise **all fifty actuators are recovered to
+better than 3.2%**; at 1 N·m, 39 of 50, and the eleven that drop out are the
+psoas group and perbrev, which have almost no moment arm about the joints being
+measured. That is a specification for where to put sensors.
+
+Two silent bugs, continuing the count:
+
+17. **Infeasible samples averaged away.** Cost was the mean over solvable
+    samples, scaled up, so long steps came out cheaper than the optimum with
+    their impossible thirds silently dropped.
+18. **An objective returning infinity.** Nelder-Mead's convergence test then
+    computes inf - inf = NaN and the simplex wanders. A finite penalty fixed
+    it, and the optimiser immediately found postures 6x cheaper.
 
 ---
 

@@ -1,0 +1,16 @@
+{"type": "manifest", "run_id": "20260901-123210_s18_identifiability_seed0_ca7b6413", "project": "s18_identifiability", "seed": 0, "config": {"condition_counts": [2, 4, 8, 16, 32, 64, 128], "n_conditions": 128, "noise_levels_Nm": [0.0, 0.01, 0.1, 1.0], "joints": ["hip_flexion_r", "hip_adduction_r", "hip_rotation_r", "knee_angle_r", "ankle_angle_r"]}, "environment": {"python_version": "3.11.9", "platform": "Windows-10-10.0.26200-SP0", "numpy_version": "2.4.6", "torch_version": "2.13.0+cpu", "mujoco_version": "3.11.0", "torch_device": "cpu", "git_sha": "de78ed1456ca08613cc3488640262e71596b9478", "git_dirty": true}, "started_at": "2026-09-01T12:32:11", "model_hash": "677cd288e2abea83"}
+{"type": "warning", "t": 0.263, "message": "Working tree is dirty; git_sha does not fully describe this run."}
+{"type": "linearity", "t": 0.263, "max_abs_error_Nm": 2.842170943040401e-14, "regressor_matches_plant": true}
+{"type": "rank", "t": 0.263, "n_conditions": 2, "n_equations": 10, "n_unknowns": 50, "rank": 10, "full_rank": false, "rank_deficit": 40, "condition_number": 24.76, "smallest_singular_value": 8.934}
+{"type": "rank", "t": 0.263, "n_conditions": 4, "n_equations": 20, "n_unknowns": 50, "rank": 20, "full_rank": false, "rank_deficit": 30, "condition_number": 63.77, "smallest_singular_value": 5.866}
+{"type": "rank", "t": 0.263, "n_conditions": 8, "n_equations": 40, "n_unknowns": 50, "rank": 40, "full_rank": false, "rank_deficit": 10, "condition_number": 2507.0, "smallest_singular_value": 0.1967}
+{"type": "rank", "t": 0.263, "n_conditions": 16, "n_equations": 80, "n_unknowns": 50, "rank": 50, "full_rank": true, "rank_deficit": 0, "condition_number": 2378.0, "smallest_singular_value": 0.2969}
+{"type": "rank", "t": 0.263, "n_conditions": 32, "n_equations": 160, "n_unknowns": 50, "rank": 50, "full_rank": true, "rank_deficit": 0, "condition_number": 797.2, "smallest_singular_value": 1.062}
+{"type": "rank", "t": 0.263, "n_conditions": 64, "n_equations": 320, "n_unknowns": 50, "rank": 50, "full_rank": true, "rank_deficit": 0, "condition_number": 651.4, "smallest_singular_value": 1.988}
+{"type": "rank", "t": 0.264, "n_conditions": 128, "n_equations": 640, "n_unknowns": 50, "rank": 50, "full_rank": true, "rank_deficit": 0, "condition_number": 617.6, "smallest_singular_value": 2.949}
+{"type": "recovery", "t": 0.264, "noise_Nm": 0.0, "rms_scale_error": 1.051e-14, "worst_muscle_error": 5.063e-14, "median_muscle_error": 3.442e-15, "n_muscles_within_5pct": 50}
+{"type": "recovery", "t": 0.264, "noise_Nm": 0.01, "rms_scale_error": 0.0007244, "worst_muscle_error": 0.003191, "median_muscle_error": 9.557e-05, "n_muscles_within_5pct": 50}
+{"type": "recovery", "t": 0.264, "noise_Nm": 0.1, "rms_scale_error": 0.007244, "worst_muscle_error": 0.03191, "median_muscle_error": 0.0009557, "n_muscles_within_5pct": 50}
+{"type": "recovery", "t": 0.264, "noise_Nm": 1.0, "rms_scale_error": 0.07244, "worst_muscle_error": 0.3191, "median_muscle_error": 0.009557, "n_muscles_within_5pct": 39}
+{"type": "summary", "t": 0.264, "first_full_rank_at": 16}
+{"type": "run_end", "wall_seconds": 1.972, "failed": false, "error": null}

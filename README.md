@@ -38,7 +38,7 @@ an independent implementation, a physical consistency check, or held-out data
 the optimiser never saw. A learning curve that rises proves only that a number
 went up.
 
-That discipline found **twenty-two bugs, none of which raised an exception**:
+That discipline found **twenty-four bugs, none of which raised an exception**:
 
 1. **Missing reward scaling** (PyTorch PPO), value loss of ~10⁶ against a
    policy loss of ~10⁻² meant `clip_grad_norm_` sent nearly the entire gradient
@@ -120,6 +120,8 @@ python -m s13_flow_control.schedule             # ~40 s
 python -m s14_proprioception.pressure           # ~15 s
 python -m s15_valve.quantise                    # ~60 s
 python -m s16_myofiber_finger.hysteresis        # ~4 min
+python -m s17_gait.economy                      # ~15 min
+python -m s18_identifiability.identify          # ~25 s
 python -m s5_sysid.fit       --iterations 45
 python -m s6_brax_jax.train  --total-steps 8000000 --num-envs 512
 ```
@@ -163,6 +165,8 @@ s13_flow_control/ allocating a rationed pump across 50 actuators
 s14_proprioception/ what a pressure vector says about where the limb is
 s15_valve/       switching valves against the continuous one models assume
 s16_myofiber_finger/ S4's finger with a braid behind it
+s17_gait/        what step length minimises muscular effort, and why it is wrong
+s18_identifiability/ what a torque-only calibration rig could recover
 s5_sysid/        real-to-sim system identification against DROID
 s6_brax_jax/     PPO in JAX, MJX verified
 s2_inhand/       in-hand cube reorientation on the LEAP hand (MJX, needs GPU)
