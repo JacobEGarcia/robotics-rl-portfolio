@@ -123,7 +123,35 @@ def measured_num_envs(drive: Path, fallback: int) -> tuple[int, str]:
         return fallback, f"default ({type(exc).__name__} reading {f.name})"
 
 
-def plan(drive: Path, max_hours: float, num_envs: int) -> list[Job]:
+def select(jobs: list[Job], only: str | None) -> list[Job]:
+    """
+    Keep only the jobs whose name starts with one of the comma-separated
+    prefixes in `only`. Case-insensitive, so `--only s3` takes every S3 job.
+
+    **The smoke gate is never filtered out.** It is a gate, not a job: it costs
+    a couple of minutes and it is the only thing standing between a typo and a
+    day of sessions that silently restart from zero. An `--only S2` that
+    skipped it would be exactly the wrong saving.
+
+    This exists so several Google accounts can work on different parts at the
+    same time. Each account has its own Drive, so running the unfiltered plan
+    on two of them does not split the work, it duplicates it: the second
+    account would start its own smoke gate, its own S10, and its own S2 from
+    step zero, and you would end up with two half-finished copies of one thing.
+    """
+    if not only:
+        return jobs
+    wanted = tuple(p.strip().lower() for p in only.split(",") if p.strip())
+    kept = [j for j in jobs
+            if j.name == "smoke" or j.name.lower().startswith(wanted)]
+    dropped = [j.name for j in jobs if j not in kept]
+    if dropped:
+        print(f"--only {only}: skipping {', '.join(dropped)}")
+    return kept
+
+
+def plan(drive: Path, max_hours: float, num_envs: int,
+         only: str | None = None) -> list[Job]:
     jobs: list[Job] = []
     num_envs, why = measured_num_envs(drive, num_envs)
     print(f"batch size: {num_envs:,} ({why})")
@@ -185,7 +213,7 @@ def plan(drive: Path, max_hours: float, num_envs: int) -> list[Job]:
              "--baseline", str(drive / "s3_checkpoints" / "baseline"),
              "--episodes", "512", "--out", str(drive / "s3_eval.json")]))
 
-    return jobs
+    return select(jobs, only)
 
 
 def cache_env(drive: Path) -> dict:
@@ -238,15 +266,27 @@ def main() -> None:
     ap.add_argument("--session-hours", type=float, default=3.0,
                     help="budget for this whole session across jobs")
     ap.add_argument("--num-envs", type=int, default=2048)
+    ap.add_argument("--only", default=None,
+                    help="comma-separated job prefixes to run, e.g. 'S2' or "
+                         "'S3'. Case-insensitive; the smoke gate always runs. "
+                         "Use this to give different Google accounts different "
+                         "parts of the work. Without it every account runs the "
+                         "whole plan against its own Drive, which duplicates "
+                         "the work rather than dividing it.")
     ap.add_argument("--plan", action="store_true", help="show the plan, run nothing")
     args = ap.parse_args()
 
     drive = Path(args.drive)
-    jobs = plan(drive, args.max_hours, args.num_envs)
+    jobs = plan(drive, args.max_hours, args.num_envs, args.only)
 
     if not jobs:
-        print("Nothing left to run. Every budget is met and the evaluation "
-              "exists. Pull the results out of Drive and write them up.")
+        if args.only:
+            print(f"Nothing left to run under --only {args.only}. That part is "
+                  f"finished on this account; other parts may still be "
+                  f"outstanding elsewhere.")
+        else:
+            print("Nothing left to run. Every budget is met and the evaluation "
+                  "exists. Pull the results out of Drive and write them up.")
         return
 
     cache = cache_env(drive)

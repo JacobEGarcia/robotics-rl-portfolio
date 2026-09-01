@@ -859,14 +859,31 @@ Interrupting this cell is safe. The newest checkpoint is already in Drive.
     code('''
 SESSION_HOURS = 3.0
 MAX_HOURS     = 2.5
-NUM_ENVS      = 2048     # use S10's measured knee
+NUM_ENVS      = 2048     # ignored once S10 has measured the knee into Drive
+
+# ONLY splits the work across Google accounts. Each account has its own
+# Drive, so running the unfiltered plan on two of them duplicates the work
+# instead of dividing it: the second would start its own S10 and its own S2
+# from step zero. Set this per account:
+#
+#     account A   ONLY = 'S2'     the flagship, 1e8 steps, the long one
+#     account B   ONLY = 'S3'     both arms, deliberately together
+#     account C   ONLY = 'S10'    fidelity, throughput, solver cost
+#
+# Both S3 arms stay on ONE account on purpose. They are a control and a
+# treatment, and splitting them across machines would put a hardware
+# difference inside the comparison the experiment exists to make.
+#
+# None runs everything, which is right when you have a single account.
+ONLY = None
 
 p = subprocess.Popen(
     [sys.executable, '-u', 'colab/autopilot.py',
      '--drive', str(DRIVE),
      '--session-hours', str(SESSION_HOURS),
      '--max-hours', str(MAX_HOURS),
-     '--num-envs', str(NUM_ENVS)],
+     '--num-envs', str(NUM_ENVS)]
+    + (['--only', ONLY] if ONLY else []),
     cwd=str(SRC), env=dict(os.environ, PYTHONPATH=str(SRC)),
     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1)
 try:

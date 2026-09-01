@@ -26,6 +26,39 @@ discovering afterwards that the batch size was wrong is the expensive ordering.
 the budget runs out after one, an orphaned baseline is at least a usable no-DR
 number for S2's task, whereas an orphaned DR arm answers no question at all.
 
+## Running several Google accounts at once
+
+Each account is a separate quota, and each has its own Drive. That second fact
+is the trap: **running the unfiltered plan on two accounts duplicates the work
+rather than dividing it.** The plan is computed from Drive, so a second account
+starts its own smoke gate, its own S10, and its own S2 from step zero, and you
+finish with two half-done copies of one thing instead of one finished set.
+
+`ONLY` in the Autopilot notebook (or `--only` on `autopilot.py`) fixes that.
+Set it per account:
+
+| account | `ONLY` | what it does | rough cost |
+|---|---|---|---|
+| A | `'S2'` | the flagship, 10^8 steps | days |
+| B | `'S3'` | both arms, 2 x 3x10^7 steps | days |
+| C | `'S10'` | fidelity, throughput, solver cost | one session |
+
+`--only` takes comma-separated prefixes and is case-insensitive, so `S3` picks
+up `S3:baseline`, `S3:dr` and `S3:eval`. `None` runs everything, which is right
+when you have one account.
+
+**The smoke gate always runs, whatever `ONLY` says.** It is a gate, not a job:
+two minutes against a day of sessions that silently restart from zero.
+
+**Both S3 arms stay on one account on purpose.** They are a control and a
+treatment. Splitting them across machines would put a hardware difference
+inside the comparison the experiment exists to make, and the whole point of S3
+is that the two arms differ in the randomization and in nothing else.
+
+One thing this does not solve: the S3 evaluation needs both arms in one place,
+so whichever account trains them also runs `S3:eval`. If you ever do split
+them, copy both checkpoint directories into one Drive first.
+
 ## Getting the most out of a lease
 
 The free tier charges wall-clock GPU time, not useful work, so three things
